@@ -1,0 +1,208 @@
+<%- include('../partials/header', { pageTitle: listing.title, user }) %>
+
+<section class="py-3">
+  <div class="container">
+    <a href="/listings" class="text-sm text-light" style="display: inline-block; margin-bottom: 1rem;">&larr; Back to listings</a>
+
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+    <% if (success) { %><div class="alert alert-success"><%= success %></div><% } %>
+
+    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem;">
+      <!-- Left: Images -->
+      <div>
+        <% if (images.length > 0) { %>
+          <div class="card mb-2">
+            <img src="/uploads/<%= images[0].file_path %>" alt="<%= listing.title %>"
+                 style="width: 100%; max-height: 500px; object-fit: contain; background: #f1f5f9;" id="mainImage">
+          </div>
+          <% if (images.length > 1) { %>
+            <div class="flex gap-1" style="flex-wrap: wrap;">
+              <% images.forEach((img, i) => { %>
+                <img src="/uploads/<%= img.file_path %>" alt="Image <%= i + 1 %>"
+                     style="width: 80px; height: 60px; object-fit: cover; border-radius: var(--radius); cursor: pointer; border: 2px solid <%= i === 0 ? 'var(--primary)' : 'var(--border)' %>;"
+                     onclick="document.getElementById('mainImage').src=this.src; document.querySelectorAll('[data-thumb]').forEach(t=>t.style.borderColor='var(--border)'); this.style.borderColor='var(--primary)';"
+                     data-thumb>
+              <% }) %>
+            </div>
+          <% } %>
+        <% } else { %>
+          <div class="card">
+            <div class="listing-img-placeholder" style="aspect-ratio: 4/3; font-size: 4rem;">
+              <% const catIcons = { 'Trading Cards': '&#127183;', 'Electronics': '&#128187;', 'Cars & Vehicles': '&#128663;', 'Apartments & Housing': '&#127968;', 'Fashion': '&#128085;', 'Furniture': '&#128715;', 'Sports': '&#127942;', 'Collectibles': '&#128142;' }; %>
+              <%- catIcons[listing.category_name] || '&#128230;' %>
+            </div>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Right: Details -->
+      <div>
+        <div class="card mb-2">
+          <div class="card-body" style="padding: 1.5rem;">
+            <div class="flex gap-1 mb-1">
+              <span class="badge badge-primary"><%= listing.category_name %></span>
+              <span class="badge badge-gray"><%= listing.condition.replace('_', ' ') %></span>
+              <% if (listing.type === 'swap') { %>
+                <span class="badge badge-amber">Swap Only</span>
+              <% } else if (listing.type === 'both') { %>
+                <span class="badge badge-amber">Sell / Swap</span>
+              <% } %>
+              <% if (listing.status !== 'active') { %>
+                <span class="badge badge-danger"><%= listing.status %></span>
+              <% } %>
+            </div>
+
+            <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem;"><%= listing.title %></h1>
+
+            <% if (listing.price) { %>
+              <div style="font-size: 1.75rem; font-weight: 800; color: var(--primary); margin-bottom: 1rem;">
+                CHF <%= parseFloat(listing.price).toLocaleString('de-CH', { minimumFractionDigits: 2 }) %>
+              </div>
+            <% } %>
+
+            <% if (listing.location) { %>
+              <p class="text-light text-sm mb-1">Location: <strong><%= listing.location %></strong></p>
+            <% } %>
+
+            <p class="text-sm text-light mb-2">
+              Listed <%= new Date(listing.created_at).toLocaleDateString('en-CH', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+            </p>
+
+            <% if (listing.description) { %>
+              <div style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem;">
+                <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem;">Description</h3>
+                <p style="white-space: pre-line; color: var(--text);"><%= listing.description %></p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Seller info -->
+        <div class="card mb-2">
+          <div class="card-body">
+            <h3 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-light);">Seller</h3>
+            <div class="flex-center gap-1">
+              <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary-dark);">
+                <%= listing.seller_name.charAt(0).toUpperCase() %>
+              </div>
+              <div>
+                <a href="/profile/<%= listing.seller_user_id %>" style="font-weight: 600;"><%= listing.seller_name %></a>
+                <div class="text-sm text-light">
+                  Rep: <%= listing.reputation_score %>
+                  <% if (listing.seller_location) { %> &middot; <%= listing.seller_location %><% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Make an Offer -->
+        <% if (user && user.id !== listing.seller_user_id && listing.status === 'active') { %>
+          <div class="card">
+            <div class="card-body" style="padding: 1.5rem;">
+              <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Make an Offer</h3>
+              <form action="/listings/<%= listing.id %>/offer" method="POST">
+                <div class="form-group">
+                  <label for="offer_type">Offer Type</label>
+                  <select id="offer_type" name="offer_type" class="form-control" onchange="toggleOfferFields()">
+                    <% if (listing.type !== 'swap') { %>
+                      <option value="cash">Cash Offer</option>
+                    <% } %>
+                    <% if (listing.type !== 'sell') { %>
+                      <option value="swap">Swap</option>
+                    <% } %>
+                    <option value="swap_cash">Swap + Cash</option>
+                  </select>
+                </div>
+
+                <div class="form-group" id="cashField">
+                  <label for="cash_amount">Cash Amount (CHF)</label>
+                  <input type="number" id="cash_amount" name="cash_amount" class="form-control"
+                         step="0.01" min="0" placeholder="0.00"
+                         value="<%= listing.price || '' %>">
+                </div>
+
+                <div class="form-group" id="swapField" style="display: none;">
+                  <label for="swap_listing_id">Your Item to Swap</label>
+                  <select id="swap_listing_id" name="swap_listing_id" class="form-control">
+                    <option value="">Select one of your listings...</option>
+                    <% userListings.forEach(ul => { %>
+                      <option value="<%= ul.id %>"><%= ul.title %></option>
+                    <% }) %>
+                  </select>
+                  <% if (userListings.length === 0) { %>
+                    <p class="text-sm text-light mt-1">You have no active listings to swap. <a href="/listings/new">Create one first</a>.</p>
+                  <% } %>
+                </div>
+
+                <div class="form-group">
+                  <label for="message">Message (optional)</label>
+                  <textarea id="message" name="message" class="form-control" rows="3" placeholder="Add a message to the seller..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Send Offer</button>
+              </form>
+            </div>
+          </div>
+
+          <script>
+            function toggleOfferFields() {
+              const type = document.getElementById('offer_type').value;
+              document.getElementById('cashField').style.display = (type === 'swap') ? 'none' : 'block';
+              document.getElementById('swapField').style.display = (type === 'cash') ? 'none' : 'block';
+            }
+            toggleOfferFields();
+          </script>
+        <% } else if (!user) { %>
+          <div class="card">
+            <div class="card-body text-center" style="padding: 1.5rem;">
+              <p class="mb-1">Interested in this item?</p>
+              <a href="/auth/login" class="btn btn-primary">Login to Make an Offer</a>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Similar Listings -->
+    <% if (similar.length > 0) { %>
+      <div class="mt-3">
+        <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Similar Listings</h2>
+        <div class="grid grid-4">
+          <% similar.forEach(s => { %>
+            <a href="/listings/<%= s.id %>" class="card" style="text-decoration: none;">
+              <% if (s.image) { %>
+                <img src="/uploads/<%= s.image %>" alt="<%= s.title %>" class="listing-img" loading="lazy">
+              <% } else { %>
+                <div class="listing-img-placeholder">&#128230;</div>
+              <% } %>
+              <div class="card-body">
+                <h3 style="font-size: 0.9rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  <%= s.title %>
+                </h3>
+                <div class="flex-between mt-1">
+                  <% if (s.price) { %>
+                    <span style="font-weight: 700; color: var(--primary); font-size: 0.9rem;">
+                      CHF <%= parseFloat(s.price).toLocaleString('de-CH') %>
+                    </span>
+                  <% } else { %>
+                    <span class="badge badge-amber">Swap</span>
+                  <% } %>
+                  <span class="text-sm text-light"><%= s.seller_name %></span>
+                </div>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<style>
+  @media (max-width: 768px) {
+    section .container > div:first-of-type { grid-template-columns: 1fr !important; }
+  }
+</style>
+
+<%- include('../partials/footer') %>

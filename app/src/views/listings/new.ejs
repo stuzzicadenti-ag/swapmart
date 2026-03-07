@@ -1,0 +1,100 @@
+<%- include('../partials/header', { pageTitle: 'Create Listing', user }) %>
+
+<section class="py-3">
+  <div class="container" style="max-width: 700px;">
+    <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">Create a Listing</h1>
+    <p class="text-light mb-2">List your item for sale, swap, or both.</p>
+
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+
+    <div class="card">
+      <div class="card-body" style="padding: 1.5rem;">
+        <form action="/listings/new" method="POST" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="title">Title *</label>
+            <input type="text" id="title" name="title" class="form-control" required
+                   placeholder="e.g. iPhone 15 Pro Max 256GB" maxlength="255">
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" class="form-control" rows="5"
+                      placeholder="Describe your item in detail: condition, features, reason for selling..."></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label for="category_id">Category *</label>
+              <select id="category_id" name="category_id" class="form-control" required>
+                <option value="">Select a category</option>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="condition">Condition *</label>
+              <select id="condition" name="condition" class="form-control" required>
+                <option value="">Select condition</option>
+                <option value="new">New</option>
+                <option value="like_new">Like New</option>
+                <option value="good">Good</option>
+                <option value="fair">Fair</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label for="type">Listing Type *</label>
+              <select id="type" name="type" class="form-control" required onchange="togglePrice()">
+                <option value="sell">For Sale</option>
+                <option value="swap">For Swap</option>
+                <option value="both">Sell or Swap</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="priceGroup">
+              <label for="price">Price (CHF)</label>
+              <input type="number" id="price" name="price" class="form-control"
+                     step="0.01" min="0" placeholder="0.00">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="location">Location</label>
+            <input type="text" id="location" name="location" class="form-control"
+                   placeholder="e.g. Zurich, CH">
+          </div>
+
+          <div class="form-group">
+            <label for="images">Images (up to 5, max 10MB each)</label>
+            <input type="file" id="images" name="images" class="form-control" accept="image/*" multiple
+                   style="padding: 0.4rem;">
+            <p class="text-sm text-light mt-1">Accepted formats: JPG, PNG, WebP. First image will be the cover.</p>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; font-size: 1rem; margin-top: 0.5rem;">
+            Create Listing
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function togglePrice() {
+    const type = document.getElementById('type').value;
+    const priceGroup = document.getElementById('priceGroup');
+    if (type === 'swap') {
+      priceGroup.style.opacity = '0.5';
+      document.getElementById('price').value = '';
+    } else {
+      priceGroup.style.opacity = '1';
+    }
+  }
+</script>
+
+<%- include('../partials/footer') %>

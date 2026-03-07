@@ -1,0 +1,87 @@
+<%- include('../partials/header', { pageTitle: 'Messages', user }) %>
+
+<section class="py-3">
+  <div class="container" style="max-width: 700px;">
+    <a href="/offers" class="text-sm text-light" style="display: inline-block; margin-bottom: 1rem;">&larr; Back to offers</a>
+
+    <!-- Offer context -->
+    <div class="card mb-2">
+      <div class="card-body">
+        <div class="flex-between" style="flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <div class="text-sm text-light">Conversation about</div>
+            <div style="font-weight: 600;"><%= offer.listing_title %></div>
+          </div>
+          <div class="text-sm">
+            <span class="text-light">Between</span>
+            <strong><%= offer.buyer_name %></strong>
+            <span class="text-light">and</span>
+            <strong><%= offer.seller_name %></strong>
+            &middot;
+            <% if (offer.status === 'pending') { %>
+              <span class="badge badge-gray">Pending</span>
+            <% } else if (offer.status === 'accepted') { %>
+              <span class="badge badge-success">Accepted</span>
+            <% } else if (offer.status === 'rejected') { %>
+              <span class="badge badge-danger">Rejected</span>
+            <% } else { %>
+              <span class="badge badge-success">Completed</span>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="card" style="min-height: 400px; display: flex; flex-direction: column;">
+      <div style="flex: 1; padding: 1rem; overflow-y: auto; max-height: 500px;" id="messagesContainer">
+        <% if (messages.length === 0) { %>
+          <div class="text-center py-4">
+            <p class="text-light">No messages yet. Start the conversation!</p>
+          </div>
+        <% } else { %>
+          <% messages.forEach(msg => { %>
+            <div style="margin-bottom: 1rem; display: flex; flex-direction: column; align-items: <%= msg.sender_id === user.id ? 'flex-end' : 'flex-start' %>;">
+              <div style="
+                max-width: 75%;
+                padding: 0.75rem 1rem;
+                border-radius: 12px;
+                background: <%= msg.sender_id === user.id ? 'var(--primary)' : 'var(--bg)' %>;
+                color: <%= msg.sender_id === user.id ? '#fff' : 'var(--text)' %>;
+                border: <%= msg.sender_id === user.id ? 'none' : '1px solid var(--border)' %>;
+              ">
+                <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.25rem; opacity: 0.8;">
+                  <%= msg.sender_name %>
+                </div>
+                <div style="white-space: pre-line; font-size: 0.9rem;"><%= msg.content %></div>
+              </div>
+              <div class="text-sm text-light" style="margin-top: 0.2rem; font-size: 0.75rem;">
+                <%= new Date(msg.created_at).toLocaleString('en-CH', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+                <% if (msg.read_at && msg.sender_id === user.id) { %>
+                  &middot; Read
+                <% } %>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+
+      <!-- Send message form -->
+      <div style="border-top: 1px solid var(--border); padding: 1rem;">
+        <form action="/messages/<%= offer.id %>" method="POST" style="display: flex; gap: 0.5rem;">
+          <input type="text" name="content" class="form-control" placeholder="Type a message..."
+                 required autocomplete="off" style="flex: 1;">
+          <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Scroll to bottom of messages
+  const container = document.getElementById('messagesContainer');
+  if (container) container.scrollTop = container.scrollHeight;
+</script>
+
+<%- include('../partials/footer') %>

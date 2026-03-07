@@ -1,0 +1,165 @@
+<%- include('../partials/header', { pageTitle: 'My Offers', user }) %>
+
+<section class="py-3">
+  <div class="container">
+    <h1 style="font-size: 1.75rem; margin-bottom: 1.5rem;">My Offers</h1>
+
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('received')" id="tab-received">Received (<%= received.length %>)</div>
+      <div class="tab" onclick="showTab('sent')" id="tab-sent">Sent (<%= sent.length %>)</div>
+    </div>
+
+    <!-- Received Offers -->
+    <div id="panel-received">
+      <% if (received.length === 0) { %>
+        <div class="card">
+          <div class="card-body text-center py-4">
+            <p class="text-light">No offers received yet. Share your listings to get offers!</p>
+          </div>
+        </div>
+      <% } else { %>
+        <% received.forEach(offer => { %>
+          <div class="card mb-2">
+            <div class="card-body">
+              <div class="flex-between" style="flex-wrap: wrap; gap: 1rem;">
+                <div class="flex-center gap-2">
+                  <% if (offer.listing_image) { %>
+                    <img src="/uploads/<%= offer.listing_image %>" alt=""
+                         style="width: 60px; height: 45px; object-fit: cover; border-radius: var(--radius);">
+                  <% } else { %>
+                    <div style="width: 60px; height: 45px; background: var(--border); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: var(--text-light);">&#128230;</div>
+                  <% } %>
+                  <div>
+                    <div style="font-weight: 600;"><%= offer.listing_title %></div>
+                    <div class="text-sm text-light">
+                      From <strong><%= offer.buyer_name %></strong> &middot;
+                      <%= new Date(offer.created_at).toLocaleDateString('en-CH') %>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex-center gap-1">
+                  <% if (offer.type === 'cash') { %>
+                    <span class="badge badge-primary">Cash: CHF <%= parseFloat(offer.cash_amount || 0).toFixed(2) %></span>
+                  <% } else if (offer.type === 'swap') { %>
+                    <span class="badge badge-amber">Swap</span>
+                  <% } else { %>
+                    <span class="badge badge-amber">Swap + CHF <%= parseFloat(offer.cash_amount || 0).toFixed(2) %></span>
+                  <% } %>
+
+                  <% if (offer.status === 'pending') { %>
+                    <span class="badge badge-gray">Pending</span>
+                  <% } else if (offer.status === 'accepted') { %>
+                    <span class="badge badge-success">Accepted</span>
+                  <% } else if (offer.status === 'rejected') { %>
+                    <span class="badge badge-danger">Rejected</span>
+                  <% } else if (offer.status === 'completed') { %>
+                    <span class="badge badge-success">Completed</span>
+                  <% } %>
+                </div>
+              </div>
+
+              <% if (offer.message) { %>
+                <div style="margin-top: 0.75rem; padding: 0.75rem; background: var(--bg); border-radius: var(--radius); font-size: 0.9rem;">
+                  "<%= offer.message %>"
+                </div>
+              <% } %>
+
+              <div class="flex gap-1 mt-2">
+                <a href="/messages/<%= offer.id %>" class="btn btn-outline btn-sm">Messages</a>
+                <% if (offer.status === 'pending') { %>
+                  <form action="/offers/<%= offer.id %>/accept" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-primary btn-sm">Accept</button>
+                  </form>
+                  <form action="/offers/<%= offer.id %>/reject" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                  </form>
+                <% } else if (offer.status === 'accepted') { %>
+                  <form action="/offers/<%= offer.id %>/complete" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-primary btn-sm">Mark Completed</button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+
+    <!-- Sent Offers -->
+    <div id="panel-sent" style="display: none;">
+      <% if (sent.length === 0) { %>
+        <div class="card">
+          <div class="card-body text-center py-4">
+            <p class="text-light">You haven't sent any offers yet. <a href="/listings">Browse listings</a> to get started.</p>
+          </div>
+        </div>
+      <% } else { %>
+        <% sent.forEach(offer => { %>
+          <div class="card mb-2">
+            <div class="card-body">
+              <div class="flex-between" style="flex-wrap: wrap; gap: 1rem;">
+                <div class="flex-center gap-2">
+                  <% if (offer.listing_image) { %>
+                    <img src="/uploads/<%= offer.listing_image %>" alt=""
+                         style="width: 60px; height: 45px; object-fit: cover; border-radius: var(--radius);">
+                  <% } else { %>
+                    <div style="width: 60px; height: 45px; background: var(--border); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: var(--text-light);">&#128230;</div>
+                  <% } %>
+                  <div>
+                    <a href="/listings/<%= offer.listing_id %>" style="font-weight: 600;"><%= offer.listing_title %></a>
+                    <div class="text-sm text-light">
+                      To <strong><%= offer.seller_name %></strong> &middot;
+                      <%= new Date(offer.created_at).toLocaleDateString('en-CH') %>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex-center gap-1">
+                  <% if (offer.type === 'cash') { %>
+                    <span class="badge badge-primary">Cash: CHF <%= parseFloat(offer.cash_amount || 0).toFixed(2) %></span>
+                  <% } else if (offer.type === 'swap') { %>
+                    <span class="badge badge-amber">Swap</span>
+                  <% } else { %>
+                    <span class="badge badge-amber">Swap + CHF <%= parseFloat(offer.cash_amount || 0).toFixed(2) %></span>
+                  <% } %>
+
+                  <% if (offer.status === 'pending') { %>
+                    <span class="badge badge-gray">Pending</span>
+                  <% } else if (offer.status === 'accepted') { %>
+                    <span class="badge badge-success">Accepted</span>
+                  <% } else if (offer.status === 'rejected') { %>
+                    <span class="badge badge-danger">Rejected</span>
+                  <% } else if (offer.status === 'completed') { %>
+                    <span class="badge badge-success">Completed</span>
+                  <% } %>
+                </div>
+              </div>
+
+              <% if (offer.message) { %>
+                <div style="margin-top: 0.75rem; padding: 0.75rem; background: var(--bg); border-radius: var(--radius); font-size: 0.9rem;">
+                  "<%= offer.message %>"
+                </div>
+              <% } %>
+
+              <div class="flex gap-1 mt-2">
+                <a href="/messages/<%= offer.id %>" class="btn btn-outline btn-sm">Messages</a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<script>
+  function showTab(tab) {
+    document.getElementById('panel-received').style.display = tab === 'received' ? 'block' : 'none';
+    document.getElementById('panel-sent').style.display = tab === 'sent' ? 'block' : 'none';
+    document.getElementById('tab-received').classList.toggle('active', tab === 'received');
+    document.getElementById('tab-sent').classList.toggle('active', tab === 'sent');
+  }
+</script>
+
+<%- include('../partials/footer') %>
