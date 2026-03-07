@@ -1,0 +1,475 @@
+openapi: 3.0.3
+info:
+  title: SwapMart API
+  description: Swiss marketplace for trades, swaps, and deals.
+  version: 1.0.0
+  contact:
+    name: Stuzzicadenti AG
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Auth
+  - name: Users
+  - name: Listings
+  - name: Swaps
+  - name: Messages
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, displayName]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                displayName: { type: string }
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken: { type: string }
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /users/me:
+    get:
+      tags: [Users]
+      summary: Get current user profile
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    patch:
+      tags: [Users]
+      summary: Update current user profile
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                displayName: { type: string }
+                bio: { type: string }
+                location: { type: string }
+                avatarUrl: { type: string }
+      responses:
+        '200':
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Get user by ID (public profile)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Public user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /listings:
+    get:
+      tags: [Listings]
+      summary: Search and filter listings
+      parameters:
+        - name: q
+          in: query
+          schema: { type: string }
+          description: Search query
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [cards, electronics, cars, apartments, fashion, furniture, sports, collectibles]
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [sell, swap, both]
+        - name: minPrice
+          in: query
+          schema: { type: number }
+        - name: maxPrice
+          in: query
+          schema: { type: number }
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [newest, price_asc, price_desc]
+            default: newest
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20, maximum: 100 }
+      responses:
+        '200':
+          description: Paginated listings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Listing'
+                  total: { type: integer }
+                  page: { type: integer }
+                  limit: { type: integer }
+    post:
+      tags: [Listings]
+      summary: Create a new listing
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListingCreate'
+      responses:
+        '201':
+          description: Listing created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Listing'
+
+  /listings/{id}:
+    get:
+      tags: [Listings]
+      summary: Get listing by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Listing details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Listing'
+    patch:
+      tags: [Listings]
+      summary: Update listing (owner only)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListingCreate'
+      responses:
+        '200':
+          description: Updated listing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Listing'
+    delete:
+      tags: [Listings]
+      summary: Delete listing (owner only)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204':
+          description: Deleted
+
+  /swaps:
+    post:
+      tags: [Swaps]
+      summary: Propose a swap
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwapCreate'
+      responses:
+        '201':
+          description: Swap proposal created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Swap'
+    get:
+      tags: [Swaps]
+      summary: List my swaps (sent and received)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, accepted, rejected, completed, cancelled]
+      responses:
+        '200':
+          description: List of swaps
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Swap'
+
+  /swaps/{id}/accept:
+    post:
+      tags: [Swaps]
+      summary: Accept swap proposal
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Swap accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Swap'
+
+  /swaps/{id}/reject:
+    post:
+      tags: [Swaps]
+      summary: Reject swap proposal
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Swap rejected
+
+  /messages/{swapId}:
+    get:
+      tags: [Messages]
+      summary: Get messages for a swap
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: swapId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Chat messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+    post:
+      tags: [Messages]
+      summary: Send a message in a swap thread
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: swapId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body: { type: string, maxLength: 2000 }
+      responses:
+        '201':
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    AuthResponse:
+      type: object
+      properties:
+        accessToken: { type: string }
+        refreshToken: { type: string }
+        expiresIn: { type: integer }
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        displayName: { type: string }
+        bio: { type: string }
+        location: { type: string }
+        avatarUrl: { type: string }
+        rating: { type: number }
+        tradeCount: { type: integer }
+        verified: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    ListingCreate:
+      type: object
+      required: [title, category, type]
+      properties:
+        title: { type: string, maxLength: 120 }
+        description: { type: string, maxLength: 4000 }
+        category:
+          type: string
+          enum: [cards, electronics, cars, apartments, fashion, furniture, sports, collectibles]
+        type:
+          type: string
+          enum: [sell, swap, both]
+        priceCHF: { type: number, minimum: 0 }
+        swapFor: { type: string, description: "What the seller wants in exchange" }
+        condition:
+          type: string
+          enum: [new, like_new, good, fair, parts]
+        images:
+          type: array
+          items: { type: string }
+          maxItems: 10
+        location: { type: string }
+
+    Listing:
+      allOf:
+        - $ref: '#/components/schemas/ListingCreate'
+        - type: object
+          properties:
+            id: { type: string, format: uuid }
+            seller:
+              $ref: '#/components/schemas/User'
+            status:
+              type: string
+              enum: [active, sold, swapped, expired, removed]
+            viewCount: { type: integer }
+            createdAt: { type: string, format: date-time }
+            updatedAt: { type: string, format: date-time }
+
+    SwapCreate:
+      type: object
+      required: [listingId]
+      properties:
+        listingId: { type: string, format: uuid }
+        offeredListingId: { type: string, format: uuid, description: "Listing offered in exchange" }
+        cashOfferCHF: { type: number, minimum: 0 }
+        message: { type: string }
+
+    Swap:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        listing:
+          $ref: '#/components/schemas/Listing'
+        offeredListing:
+          $ref: '#/components/schemas/Listing'
+        proposer:
+          $ref: '#/components/schemas/User'
+        receiver:
+          $ref: '#/components/schemas/User'
+        cashOfferCHF: { type: number }
+        status:
+          type: string
+          enum: [pending, accepted, rejected, completed, cancelled]
+        createdAt: { type: string, format: date-time }
+
+    Message:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        swapId: { type: string, format: uuid }
+        senderId: { type: string, format: uuid }
+        body: { type: string }
+        createdAt: { type: string, format: date-time }

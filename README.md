@@ -18,24 +18,28 @@ SwapMart is a Swiss-focused marketplace that disrupts the traditional buy/sell m
 
 ## Tech Stack
 
-- HTML5 + CSS3 (vanilla, no frameworks)
-- BEM methodology for CSS architecture
-- GitHub Pages (static hosting)
-- GitHub Actions CI/CD
+**Frontend:** HTML5 + CSS3 (vanilla, BEM) — GitHub Pages
+**Backend:** Node.js + Express + SQLite (better-sqlite3) — JWT auth
 
 ## Architecture
 
 ```
 swapmart/
-├── src/
-│   ├── index.html          # Landing page
-│   ├── css/
-│   │   └── style.css       # Styles (BEM)
-│   └── robots.txt          # Search engine directives
-├── .github/
-│   └── workflows/
-│       ├── deploy.yml       # GitHub Pages deployment
-│       └── lint.yml         # HTML validation + secret detection
+├── src/                     # Frontend (landing page)
+│   ├── index.html
+│   ├── css/style.css
+│   └── robots.txt
+├── api/                     # Backend REST API
+│   ├── server.js            # Express API (auth, listings, swaps, messages)
+│   ├── migrate.js           # Database migration runner
+│   ├── package.json         # Dependencies
+│   ├── openapi.yaml         # OpenAPI 3.0 spec
+│   ├── .env.example         # Environment template
+│   └── migrations/
+│       └── 001_initial.sql  # PostgreSQL/SQLite schema
+├── .github/workflows/
+│   ├── deploy.yml
+│   └── lint.yml
 ├── .gitignore
 └── README.md
 ```
@@ -81,12 +85,44 @@ open src/index.html
 | Money Guard | Free | Paid |
 | Free Listings | 5/month | Varies |
 
+## API Quick Start
+
+```bash
+cd api
+cp .env.example .env
+npm install
+npm run migrate
+npm run dev
+# API running on http://localhost:3000
+```
+
+## API Endpoints
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | /auth/register | - | Register user |
+| POST | /auth/login | - | Login (JWT) |
+| POST | /auth/refresh | - | Refresh token |
+| GET | /users/me | Yes | My profile |
+| PATCH | /users/me | Yes | Update profile |
+| GET | /listings | - | Search listings |
+| POST | /listings | Yes | Create listing |
+| GET | /listings/:id | - | Get listing |
+| PATCH | /listings/:id | Yes | Update listing |
+| DELETE | /listings/:id | Yes | Remove listing |
+| POST | /swaps | Yes | Propose swap |
+| GET | /swaps | Yes | My swaps |
+| POST | /swaps/:id/accept | Yes | Accept swap |
+| POST | /swaps/:id/reject | Yes | Reject swap |
+| GET | /messages/:swapId | Yes | Get messages |
+| POST | /messages/:swapId | Yes | Send message |
+
 ## Roadmap
 
-- [ ] i18n support (DE, FR, IT, EN)
-- [ ] Backend API and database
-- [ ] User authentication and profiles
-- [ ] Real-time messaging
+- [x] i18n support (DE, FR, IT, EN)
+- [x] Backend API and database
+- [x] User authentication (JWT)
+- [ ] Real-time messaging (WebSocket)
 - [ ] Swiss Post API integration
 - [ ] Payment processing (Stripe/TWINT)
 - [ ] Mobile app
