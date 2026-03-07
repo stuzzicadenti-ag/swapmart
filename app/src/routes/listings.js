@@ -161,11 +161,18 @@ export default async function listingsRoutes(fastify) {
 
       const listingId = result.rows[0].id;
 
-      // Save images
-      for (let i = 0; i < files.length; i++) {
+      // Save images (batch insert)
+      if (files.length > 0) {
+        const values = [];
+        const params = [];
+        for (let i = 0; i < files.length; i++) {
+          const offset = i * 3;
+          values.push(`($${offset + 1}, $${offset + 2}, $${offset + 3})`);
+          params.push(listingId, files[i], i);
+        }
         await db.query(
-          'INSERT INTO listing_images (listing_id, file_path, position) VALUES ($1, $2, $3)',
-          [listingId, files[i], i]
+          `INSERT INTO listing_images (listing_id, file_path, position) VALUES ${values.join(', ')}`,
+          params
         );
       }
 
@@ -202,31 +209,36 @@ export default async function listingsRoutes(fastify) {
 
       const listing = listingResult.rows[0];
 
-      const imagesResult = await db.query(
-        'SELECT * FROM listing_images WHERE listing_id = $1 ORDER BY position',
-        [listing.id]
-      );
+      // Parallel queries for images, similar listings, and user listings
+      const parallelQueries = [
+        db.query(
+          'SELECT * FROM listing_images WHERE listing_id = $1 ORDER BY position',
+          [listing.id]
+        ),
+        db.query(
+          `SELECT l.*, u.username as seller_name,
+           (SELECT file_path FROM listing_images WHERE listing_id = l.id ORDER BY position LIMIT 1) as image
+           FROM listings l
+           JOIN users u ON l.seller_id = u.id
+           WHERE l.category_id = $1 AND l.id != $2 AND l.status = 'active'
+           ORDER BY l.created_at DESC LIMIT 4`,
+          [listing.category_id, listing.id]
+        ),
+      ];
 
-      // Similar listings
-      const similarResult = await db.query(
-        `SELECT l.*, u.username as seller_name,
-         (SELECT file_path FROM listing_images WHERE listing_id = l.id ORDER BY position LIMIT 1) as image
-         FROM listings l
-         JOIN users u ON l.seller_id = u.id
-         WHERE l.category_id = $1 AND l.id != $2 AND l.status = 'active'
-         ORDER BY l.created_at DESC LIMIT 4`,
-        [listing.category_id, listing.id]
-      );
-
-      // User's listings for swap offers
-      let userListings = [];
       if (request.user) {
-        const userListingsResult = await db.query(
-          "SELECT id, title FROM listings WHERE seller_id = $1 AND status = 'active' AND id != $2",
-          [request.user.id, listing.id]
+        parallelQueries.push(
+          db.query(
+            "SELECT id, title FROM listings WHERE seller_id = $1 AND status = 'active' AND id != $2 LIMIT 50",
+            [request.user.id, listing.id]
+          )
         );
-        userListings = userListingsResult.rows;
       }
+
+      const results = await Promise.all(parallelQueries);
+      const imagesResult = results[0];
+      const similarResult = results[1];
+      const userListings = results[2] ? results[2].rows : [];
 
       return reply.view('listings/detail.ejs', {
         user: request.user,

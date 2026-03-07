@@ -20,7 +20,8 @@ export default async function offersRoutes(fastify) {
          JOIN listings l ON o.listing_id = l.id
          JOIN users u ON o.buyer_id = u.id
          WHERE l.seller_id = $1
-         ORDER BY o.created_at DESC`,
+         ORDER BY o.created_at DESC
+         LIMIT 100`,
         [request.user.id]
       );
 
@@ -32,7 +33,8 @@ export default async function offersRoutes(fastify) {
          JOIN listings l ON o.listing_id = l.id
          JOIN users u ON l.seller_id = u.id
          WHERE o.buyer_id = $1
-         ORDER BY o.created_at DESC`,
+         ORDER BY o.created_at DESC
+         LIMIT 100`,
         [request.user.id]
       );
 

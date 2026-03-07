@@ -28,14 +28,14 @@ const JWT_SECRET = process.env.JWT_SECRET || 'change-me';
 const COOKIE_SECRET = process.env.COOKIE_SECRET || 'change-me';
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'data', 'uploads');
 
-const pool = new pg.Pool({ connectionString: DATABASE_URL });
+const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 10, idleTimeoutMillis: 30000 });
 const redis = new Redis(REDIS_URL, { lazyConnect: true, maxRetriesPerRequest: 3 });
 
 redis.on('error', (err) => {
   console.error('Redis connection error:', err.message);
 });
 
-const app = Fastify({ logger: true });
+const app = Fastify({ logger: true, trustProxy: true });
 
 // Decorators
 app.decorate('db', pool);
@@ -67,26 +67,26 @@ await app.register(fastifyView, {
   engine: { ejs },
   root: path.join(__dirname, 'views'),
   defaultContext: { user: null },
+  production: process.env.NODE_ENV === 'production',
 });
 
 await app.register(fastifyStatic, {
   root: path.join(__dirname, 'public'),
   prefix: '/public/',
+  maxAge: process.env.NODE_ENV === 'production' ? 86400000 : 0,
 });
 
 await app.register(fastifyStatic, {
   root: UPLOAD_DIR,
   prefix: '/uploads/',
   decorateReply: false,
+  maxAge: process.env.NODE_ENV === 'production' ? 604800000 : 0,
 });
 
 // Inject user into all view contexts
 app.addHook('preHandler', async (request, reply) => {
   reply.locals = { user: request.user };
 });
-
-// Override view to always include user
-const originalView = app.view;
 
 // Health check
 app.get('/health', async () => {
@@ -115,17 +115,19 @@ app.get('/', async (request, reply) => {
   let categories = [];
   let featured = [];
   try {
-    const catResult = await pool.query('SELECT * FROM categories WHERE parent_id IS NULL ORDER BY name');
+    const [catResult, featResult] = await Promise.all([
+      pool.query('SELECT * FROM categories WHERE parent_id IS NULL ORDER BY name'),
+      pool.query(
+        `SELECT l.*, u.username as seller_name, c.name as category_name,
+         (SELECT file_path FROM listing_images WHERE listing_id = l.id ORDER BY position LIMIT 1) as image
+         FROM listings l
+         JOIN users u ON l.seller_id = u.id
+         JOIN categories c ON l.category_id = c.id
+         WHERE l.status = 'active'
+         ORDER BY l.created_at DESC LIMIT 8`
+      ),
+    ]);
     categories = catResult.rows;
-    const featResult = await pool.query(
-      `SELECT l.*, u.username as seller_name, c.name as category_name,
-       (SELECT file_path FROM listing_images WHERE listing_id = l.id ORDER BY position LIMIT 1) as image
-       FROM listings l
-       JOIN users u ON l.seller_id = u.id
-       JOIN categories c ON l.category_id = c.id
-       WHERE l.status = 'active'
-       ORDER BY l.created_at DESC LIMIT 8`
-    );
     featured = featResult.rows;
   } catch (err) {
     app.log.error(err);

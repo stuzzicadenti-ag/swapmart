@@ -83,25 +83,26 @@ export default async function profileRoutes(fastify) {
 
       const profile = userResult.rows[0];
 
-      // User's active listings
-      const listingsResult = await db.query(
-        `SELECT l.*,
-         (SELECT file_path FROM listing_images WHERE listing_id = l.id ORDER BY position LIMIT 1) as image
-         FROM listings l
-         WHERE l.seller_id = $1 AND l.status = 'active'
-         ORDER BY l.created_at DESC`,
-        [parseInt(id)]
-      );
-
-      // Reviews received
-      const reviewsResult = await db.query(
-        `SELECT r.*, u.username as reviewer_name
-         FROM reviews r
-         JOIN users u ON r.reviewer_id = u.id
-         WHERE r.reviewee_id = $1
-         ORDER BY r.created_at DESC LIMIT 10`,
-        [parseInt(id)]
-      );
+      // Parallel queries for listings and reviews
+      const [listingsResult, reviewsResult] = await Promise.all([
+        db.query(
+          `SELECT l.*,
+           (SELECT file_path FROM listing_images WHERE listing_id = l.id ORDER BY position LIMIT 1) as image
+           FROM listings l
+           WHERE l.seller_id = $1 AND l.status = 'active'
+           ORDER BY l.created_at DESC
+           LIMIT 50`,
+          [parseInt(id)]
+        ),
+        db.query(
+          `SELECT r.*, u.username as reviewer_name
+           FROM reviews r
+           JOIN users u ON r.reviewer_id = u.id
+           WHERE r.reviewee_id = $1
+           ORDER BY r.created_at DESC LIMIT 10`,
+          [parseInt(id)]
+        ),
+      ]);
 
       return reply.view('profile/view.ejs', {
         user: request.user,
