@@ -70,6 +70,11 @@
       </div>
     <% } %>
 
+    <!-- KYC Warning for messaging -->
+    <% if (typeof kycRequired !== 'undefined' || (typeof URLSearchParams !== 'undefined')) { %>
+      <% var params = new URLSearchParams(typeof __query !== 'undefined' ? __query : ''); %>
+    <% } %>
+
     <!-- Messages -->
     <div class="card" style="min-height: 400px; display: flex; flex-direction: column;">
       <div style="flex: 1; padding: 1rem; overflow-y: auto; max-height: 500px;" id="messagesContainer">
@@ -118,6 +123,17 @@
                    required autocomplete="off" style="flex: 1;">
             <button type="submit" class="btn btn-primary">Send</button>
           </form>
+          <script>
+            // Show KYC warning if redirected with kyc=required
+            if (window.location.search.indexOf('kyc=required') !== -1) {
+              var warn = document.createElement('div');
+              warn.className = 'alert alert-warning';
+              warn.style.marginTop = '8px';
+              warn.style.marginBottom = '0';
+              warn.innerHTML = '<a href="/profile/verify" style="font-weight:600;color:var(--amber-700)">Complete identity verification</a> to send messages.';
+              document.querySelector('[style*="border-top: 1px solid var(--border)"]').appendChild(warn);
+            }
+          </script>
         <% } else { %>
           <div style="display: flex; gap: 0.5rem; opacity: 0.5;">
             <input type="text" class="form-control" placeholder="Chat unlocks when the offer is accepted"

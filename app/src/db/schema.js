@@ -1,10 +1,11 @@
-import { pgTable, serial, text, varchar, integer, decimal, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, varchar, integer, decimal, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core';
 
 // Enums
 export const kycStatusEnum = pgEnum('kyc_status', ['none', 'pending', 'verified']);
 export const planEnum = pgEnum('plan', ['free', 'seller_pro', 'business']);
 export const conditionEnum = pgEnum('condition', ['new', 'like_new', 'good', 'fair']);
 export const listingTypeEnum = pgEnum('listing_type', ['sell', 'swap', 'both']);
+export const listingModeEnum = pgEnum('listing_mode', ['fixed', 'auction']);
 export const listingStatusEnum = pgEnum('listing_status', ['active', 'sold', 'swapped', 'expired']);
 export const offerTypeEnum = pgEnum('offer_type', ['cash', 'swap', 'swap_cash']);
 export const offerStatusEnum = pgEnum('offer_status', ['pending', 'accepted', 'rejected', 'completed']);
@@ -20,6 +21,12 @@ export const users = pgTable('users', {
   bio: text('bio'),
   location: varchar('location', { length: 255 }),
   kyc_status: text('kyc_status').default('none').notNull(),
+  kyc_document_type: varchar('kyc_document_type', { length: 50 }),
+  kyc_document_path: text('kyc_document_path'),
+  kyc_verified: boolean('kyc_verified').default(false),
+  kyc_submitted_at: timestamp('kyc_submitted_at'),
+  kyc_verified_at: timestamp('kyc_verified_at'),
+  kyc_rejected_reason: text('kyc_rejected_reason'),
   reputation_score: integer('reputation_score').default(0).notNull(),
   plan: text('plan').default('free').notNull(),
   avatar_path: text('avatar_path'),
@@ -45,6 +52,11 @@ export const listings = pgTable('listings', {
   condition: text('condition').notNull(),
   location: varchar('location', { length: 255 }),
   type: text('type').notNull(),
+  listing_mode: text('listing_mode').default('fixed').notNull(),
+  starting_price: decimal('starting_price', { precision: 12, scale: 2 }),
+  buy_now_price: decimal('buy_now_price', { precision: 12, scale: 2 }),
+  auction_end: timestamp('auction_end'),
+  min_bid_increment: decimal('min_bid_increment', { precision: 12, scale: 2 }).default('1.00'),
   status: text('status').default('active').notNull(),
   created_at: timestamp('created_at').defaultNow().notNull(),
   updated_at: timestamp('updated_at').defaultNow().notNull(),
@@ -55,6 +67,14 @@ export const listingImages = pgTable('listing_images', {
   listing_id: integer('listing_id').notNull(),
   file_path: text('file_path').notNull(),
   position: integer('position').default(0).notNull(),
+});
+
+export const bids = pgTable('bids', {
+  id: serial('id').primaryKey(),
+  listing_id: integer('listing_id').notNull(),
+  bidder_id: integer('bidder_id').notNull(),
+  amount: decimal('amount', { precision: 12, scale: 2 }).notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const offers = pgTable('offers', {

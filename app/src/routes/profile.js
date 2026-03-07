@@ -1,5 +1,9 @@
+import path from 'path';
+import { randomUUID } from 'crypto';
+import fs from 'fs/promises';
+
 export default async function profileRoutes(fastify) {
-  const { db } = fastify;
+  const { db, config } = fastify;
 
   const requireAuth = async (request, reply) => {
     if (!request.user) {
@@ -83,6 +87,114 @@ export default async function profileRoutes(fastify) {
         user: request.user,
         profile: result.rows[0],
         error: 'Failed to update profile.',
+        success: null,
+      });
+    }
+  });
+
+  // GET /profile/verify - KYC upload form
+  fastify.get('/verify', { preHandler: requireAuth }, async (request, reply) => {
+    try {
+      const result = await db.query(
+        'SELECT id, kyc_status, kyc_document_type, kyc_verified, kyc_submitted_at, kyc_verified_at, kyc_rejected_reason FROM users WHERE id = $1',
+        [request.user.id]
+      );
+      return reply.view('profile/verify.ejs', {
+        user: request.user,
+        profile: result.rows[0],
+        error: null,
+        success: null,
+      });
+    } catch (err) {
+      fastify.log.error(err);
+      return reply.redirect('/profile/settings');
+    }
+  });
+
+  // POST /profile/verify - Handle KYC document upload
+  fastify.post('/verify', { preHandler: requireAuth }, async (request, reply) => {
+    try {
+      const parts = request.parts();
+      const fields = {};
+      let documentFile = null;
+
+      for await (const part of parts) {
+        if (part.type === 'file' && part.filename) {
+          const ext = path.extname(part.filename).toLowerCase();
+          const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+          if (!['.jpg', '.jpeg', '.png', '.webp', '.pdf'].includes(ext)) continue;
+          if (!ALLOWED_MIMES.includes(part.mimetype)) continue;
+
+          const filename = `kyc_${request.user.id}_${randomUUID()}${ext}`;
+          const uploadDir = path.join(config.UPLOAD_DIR, 'kyc');
+          await fs.mkdir(uploadDir, { recursive: true });
+          const filepath = path.join(uploadDir, filename);
+
+          const buffer = await part.toBuffer();
+          await fs.writeFile(filepath, buffer);
+          documentFile = `kyc/${filename}`;
+        } else {
+          fields[part.fieldname] = part.value;
+        }
+      }
+
+      const { document_type } = fields;
+      const validTypes = ['passport', 'id_card', 'drivers_license', 'cie'];
+
+      if (!document_type || !validTypes.includes(document_type)) {
+        const result = await db.query(
+          'SELECT id, kyc_status, kyc_document_type, kyc_verified, kyc_submitted_at, kyc_verified_at, kyc_rejected_reason FROM users WHERE id = $1',
+          [request.user.id]
+        );
+        return reply.view('profile/verify.ejs', {
+          user: request.user,
+          profile: result.rows[0],
+          error: 'Please select a valid document type.',
+          success: null,
+        });
+      }
+
+      if (!documentFile) {
+        const result = await db.query(
+          'SELECT id, kyc_status, kyc_document_type, kyc_verified, kyc_submitted_at, kyc_verified_at, kyc_rejected_reason FROM users WHERE id = $1',
+          [request.user.id]
+        );
+        return reply.view('profile/verify.ejs', {
+          user: request.user,
+          profile: result.rows[0],
+          error: 'Please upload a document image or PDF.',
+          success: null,
+        });
+      }
+
+      await db.query(
+        `UPDATE users SET kyc_document_type = $1, kyc_document_path = $2, kyc_submitted_at = NOW(),
+         kyc_status = 'pending', kyc_verified = false, kyc_rejected_reason = NULL
+         WHERE id = $3`,
+        [document_type, documentFile, request.user.id]
+      );
+
+      const result = await db.query(
+        'SELECT id, kyc_status, kyc_document_type, kyc_verified, kyc_submitted_at, kyc_verified_at, kyc_rejected_reason FROM users WHERE id = $1',
+        [request.user.id]
+      );
+
+      return reply.view('profile/verify.ejs', {
+        user: request.user,
+        profile: result.rows[0],
+        error: null,
+        success: 'Document submitted for verification. We will review it shortly.',
+      });
+    } catch (err) {
+      fastify.log.error(err);
+      const result = await db.query(
+        'SELECT id, kyc_status, kyc_document_type, kyc_verified, kyc_submitted_at, kyc_verified_at, kyc_rejected_reason FROM users WHERE id = $1',
+        [request.user.id]
+      );
+      return reply.view('profile/verify.ejs', {
+        user: request.user,
+        profile: result.rows[0],
+        error: 'Failed to upload document. Please try again.',
         success: null,
       });
     }

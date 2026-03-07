@@ -185,6 +185,39 @@ const migrate = async () => {
     await client.query('CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)');
     await client.query('CREATE INDEX IF NOT EXISTS idx_users_banned ON users(banned)');
 
+    // --- KYC Document Verification columns ---
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_document_type VARCHAR(50)`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_document_path TEXT`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_verified BOOLEAN DEFAULT false`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_submitted_at TIMESTAMP`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_verified_at TIMESTAMP`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_rejected_reason TEXT`);
+
+    // --- Auction/Bidding system columns ---
+    await client.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS listing_mode VARCHAR(20) DEFAULT 'fixed'`);
+    await client.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS starting_price NUMERIC(12,2)`);
+    await client.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS buy_now_price NUMERIC(12,2)`);
+    await client.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS auction_end TIMESTAMP`);
+    await client.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS min_bid_increment NUMERIC(12,2) DEFAULT 1.00`);
+
+    // Bids table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS bids (
+        id SERIAL PRIMARY KEY,
+        listing_id INTEGER NOT NULL REFERENCES listings(id),
+        bidder_id INTEGER NOT NULL REFERENCES users(id),
+        amount NUMERIC(12,2) NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    // Bids indices
+    await client.query('CREATE INDEX IF NOT EXISTS idx_bids_listing ON bids(listing_id)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_bids_bidder ON bids(bidder_id)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_bids_amount ON bids(listing_id, amount DESC)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_listings_mode ON listings(listing_mode)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_listings_auction_end ON listings(auction_end)');
+
     await client.query('COMMIT');
     console.log('Migration completed successfully.');
   } catch (err) {

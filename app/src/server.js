@@ -184,17 +184,40 @@ app.get('/faq', async (request, reply) => {
 app.get('/', async (request, reply) => {
   let categories = [];
   let featured = [];
+  const { mode, type: filterType } = request.query;
+
   try {
+    let where = ["l.status = 'active'"];
+    let params = [];
+    let idx = 1;
+
+    if (mode === 'auction') {
+      where.push(`l.listing_mode = 'auction'`);
+    } else if (mode === 'fixed') {
+      where.push(`l.listing_mode = 'fixed'`);
+    }
+
+    if (filterType && ['sell', 'swap', 'both'].includes(filterType)) {
+      where.push(`l.type = $${idx}`);
+      params.push(filterType);
+      idx++;
+    }
+
+    const whereClause = where.join(' AND ');
+
     const [catResult, featResult] = await Promise.all([
       pool.query('SELECT * FROM categories WHERE parent_id IS NULL ORDER BY name'),
       pool.query(
         `SELECT l.*, u.username as seller_name, c.name as category_name,
-         (SELECT file_path FROM listing_images WHERE listing_id = l.id ORDER BY position LIMIT 1) as image
+         (SELECT file_path FROM listing_images WHERE listing_id = l.id ORDER BY position LIMIT 1) as image,
+         (SELECT COUNT(*) FROM bids WHERE listing_id = l.id) as bid_count,
+         (SELECT MAX(amount) FROM bids WHERE listing_id = l.id) as current_bid
          FROM listings l
          JOIN users u ON l.seller_id = u.id
          JOIN categories c ON l.category_id = c.id
-         WHERE l.status = 'active'
-         ORDER BY l.created_at DESC LIMIT 8`
+         WHERE ${whereClause}
+         ORDER BY l.created_at DESC LIMIT 8`,
+        params
       ),
     ]);
     categories = catResult.rows;
@@ -202,7 +225,10 @@ app.get('/', async (request, reply) => {
   } catch (err) {
     app.log.error(err);
   }
-  return reply.view('index.ejs', { user: request.user, categories, featured });
+  return reply.view('index.ejs', {
+    user: request.user, categories, featured,
+    activeFilter: mode || '', activeType: filterType || '',
+  });
 });
 
 // Graceful shutdown

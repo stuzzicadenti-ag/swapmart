@@ -2,6 +2,7 @@ import path from 'path';
 import { randomUUID } from 'crypto';
 import fs from 'fs/promises';
 import { scanContent } from '../utils/moderation.js';
+import { calculateCommission } from '../utils/commission.js';
 
 export default async function listingsRoutes(fastify) {
   const { db, config } = fastify;
@@ -13,9 +14,51 @@ export default async function listingsRoutes(fastify) {
     }
   };
 
+  // Helper: check if user is KYC verified
+  const isKycVerified = async (userId) => {
+    const result = await db.query('SELECT kyc_verified FROM users WHERE id = $1', [userId]);
+    return result.rows.length > 0 && result.rows[0].kyc_verified === true;
+  };
+
+  // Helper: finalize ended auctions lazily
+  const finalizeAuction = async (listing) => {
+    if (listing.listing_mode !== 'auction') return listing;
+    if (!listing.auction_end) return listing;
+    if (new Date(listing.auction_end) > new Date()) return listing;
+    if (listing.status !== 'active') return listing;
+
+    // Auction has ended - check for bids
+    const topBid = await db.query(
+      'SELECT b.*, u.username as bidder_name FROM bids b JOIN users u ON b.bidder_id = u.id WHERE b.listing_id = $1 ORDER BY b.amount DESC LIMIT 1',
+      [listing.id]
+    );
+
+    if (topBid.rows.length > 0) {
+      const bid = topBid.rows[0];
+      // Create an accepted offer for the winner
+      const offerResult = await db.query(
+        `INSERT INTO offers (listing_id, buyer_id, type, cash_amount, message, status)
+         VALUES ($1, $2, 'cash', $3, $4, 'accepted') RETURNING id`,
+        [listing.id, bid.bidder_id, bid.amount, `Auction won with bid of CHF ${parseFloat(bid.amount).toFixed(2)}`]
+      );
+
+      // Mark listing as sold
+      await db.query("UPDATE listings SET status = 'sold', updated_at = NOW() WHERE id = $1", [listing.id]);
+      listing.status = 'sold';
+      listing._auction_winner = bid;
+      listing._auction_offer_id = offerResult.rows[0].id;
+    } else {
+      // No bids - mark as expired
+      await db.query("UPDATE listings SET status = 'expired', updated_at = NOW() WHERE id = $1", [listing.id]);
+      listing.status = 'expired';
+    }
+
+    return listing;
+  };
+
   // GET /listings - Browse with filters
   fastify.get('/', async (request, reply) => {
-    const { category, min_price, max_price, type, q, search, sort, page = 1 } = request.query;
+    const { category, min_price, max_price, type, mode, q, search, sort, page = 1 } = request.query;
     // Support both ?q= and ?search= for text search
     const searchTerm = q || search || '';
     const limit = 12;
@@ -31,18 +74,23 @@ export default async function listingsRoutes(fastify) {
       idx++;
     }
     if (min_price) {
-      where.push(`l.price >= $${idx}`);
+      where.push(`COALESCE(l.price, l.starting_price, 0) >= $${idx}`);
       params.push(parseFloat(min_price));
       idx++;
     }
     if (max_price) {
-      where.push(`l.price <= $${idx}`);
+      where.push(`COALESCE(l.price, l.starting_price, 0) <= $${idx}`);
       params.push(parseFloat(max_price));
       idx++;
     }
     if (type && ['sell', 'swap', 'both'].includes(type)) {
       where.push(`l.type = $${idx}`);
       params.push(type);
+      idx++;
+    }
+    if (mode && ['fixed', 'auction'].includes(mode)) {
+      where.push(`l.listing_mode = $${idx}`);
+      params.push(mode);
       idx++;
     }
     if (searchTerm) {
@@ -56,11 +104,13 @@ export default async function listingsRoutes(fastify) {
     // Determine sort order
     let orderClause = 'l.created_at DESC'; // default: newest
     if (sort === 'price_asc') {
-      orderClause = 'l.price ASC NULLS LAST';
+      orderClause = 'COALESCE(l.price, l.starting_price) ASC NULLS LAST';
     } else if (sort === 'price_desc') {
-      orderClause = 'l.price DESC NULLS LAST';
+      orderClause = 'COALESCE(l.price, l.starting_price) DESC NULLS LAST';
     } else if (sort === 'oldest') {
       orderClause = 'l.created_at ASC';
+    } else if (sort === 'ending_soon') {
+      orderClause = 'l.auction_end ASC NULLS LAST';
     }
 
     try {
@@ -73,7 +123,9 @@ export default async function listingsRoutes(fastify) {
 
       const listingsResult = await db.query(
         `SELECT l.*, u.username as seller_name, c.name as category_name, c.slug as category_slug,
-         (SELECT file_path FROM listing_images WHERE listing_id = l.id ORDER BY position LIMIT 1) as image
+         (SELECT file_path FROM listing_images WHERE listing_id = l.id ORDER BY position LIMIT 1) as image,
+         (SELECT COUNT(*) FROM bids WHERE listing_id = l.id) as bid_count,
+         (SELECT MAX(amount) FROM bids WHERE listing_id = l.id) as current_bid
          FROM listings l
          JOIN users u ON l.seller_id = u.id
          JOIN categories c ON l.category_id = c.id
@@ -89,7 +141,7 @@ export default async function listingsRoutes(fastify) {
         user: request.user,
         listings: listingsResult.rows,
         categories: catResult.rows,
-        filters: { category, min_price, max_price, type, q: searchTerm, sort },
+        filters: { category, min_price, max_price, type, mode, q: searchTerm, sort },
         pagination: { page: parseInt(page), totalPages, total },
       });
     } catch (err) {
@@ -107,9 +159,11 @@ export default async function listingsRoutes(fastify) {
   // GET /listings/new - Create form
   fastify.get('/new', { preHandler: requireAuth }, async (request, reply) => {
     const catResult = await db.query('SELECT * FROM categories ORDER BY name');
+    const kycVerified = await isKycVerified(request.user.id);
     return reply.view('listings/new.ejs', {
       user: request.user,
       categories: catResult.rows,
+      kycVerified,
       error: null,
     });
   });
@@ -153,50 +207,79 @@ export default async function listingsRoutes(fastify) {
         }
       }
 
-      const { title, description, price, category_id, condition, location, type } = fields;
+      const { title, description, price, category_id, condition, location, type,
+              listing_mode, starting_price, buy_now_price, auction_duration, min_bid_increment } = fields;
+
+      const kycVerified = await isKycVerified(request.user.id);
+      const catResult = await db.query('SELECT * FROM categories ORDER BY name');
 
       // Input length limits
       if (title && title.length > 255) {
-        const catResult = await db.query('SELECT * FROM categories ORDER BY name');
         return reply.view('listings/new.ejs', {
-          user: request.user,
-          categories: catResult.rows,
+          user: request.user, categories: catResult.rows, kycVerified,
           error: 'Title is too long (max 255 characters).',
         });
       }
       if (description && description.length > 10000) {
-        const catResult = await db.query('SELECT * FROM categories ORDER BY name');
         return reply.view('listings/new.ejs', {
-          user: request.user,
-          categories: catResult.rows,
+          user: request.user, categories: catResult.rows, kycVerified,
           error: 'Description is too long (max 10,000 characters).',
         });
       }
 
       if (files.length === 0) {
-        const catResult = await db.query('SELECT * FROM categories ORDER BY name');
         return reply.view('listings/new.ejs', {
-          user: request.user,
-          categories: catResult.rows,
+          user: request.user, categories: catResult.rows, kycVerified,
           error: 'At least 1 photo is required.',
         });
       }
       if (files.length > 5) {
-        const catResult = await db.query('SELECT * FROM categories ORDER BY name');
         return reply.view('listings/new.ejs', {
-          user: request.user,
-          categories: catResult.rows,
+          user: request.user, categories: catResult.rows, kycVerified,
           error: 'Maximum 5 photos allowed.',
         });
       }
 
       if (!title || !category_id || !condition || !type) {
-        const catResult = await db.query('SELECT * FROM categories ORDER BY name');
         return reply.view('listings/new.ejs', {
-          user: request.user,
-          categories: catResult.rows,
+          user: request.user, categories: catResult.rows, kycVerified,
           error: 'Title, category, condition, and listing type are required.',
         });
+      }
+
+      const isAuction = listing_mode === 'auction';
+
+      // KYC restriction: listings above CHF 500 require KYC
+      const listingPrice = isAuction ? parseFloat(starting_price || 0) : parseFloat(price || 0);
+      if (listingPrice > 500 && !kycVerified) {
+        return reply.view('listings/new.ejs', {
+          user: request.user, categories: catResult.rows, kycVerified,
+          error: 'Identity verification (KYC) is required to create listings above CHF 500. Please verify your identity first.',
+        });
+      }
+
+      // KYC restriction: auctions require KYC
+      if (isAuction && !kycVerified) {
+        return reply.view('listings/new.ejs', {
+          user: request.user, categories: catResult.rows, kycVerified,
+          error: 'Identity verification (KYC) is required to create auction listings. Please verify your identity first.',
+        });
+      }
+
+      // Auction validation
+      if (isAuction) {
+        if (!starting_price || parseFloat(starting_price) < 0) {
+          return reply.view('listings/new.ejs', {
+            user: request.user, categories: catResult.rows, kycVerified,
+            error: 'Starting price is required for auctions.',
+          });
+        }
+        if (!auction_duration || !['3', '5', '7', '10'].includes(auction_duration)) {
+          return reply.view('listings/new.ejs', {
+            user: request.user, categories: catResult.rows, kycVerified,
+            error: 'Please select a valid auction duration.',
+          });
+        }
       }
 
       // Content moderation
@@ -204,13 +287,26 @@ export default async function listingsRoutes(fastify) {
       const hasPhone = moderationResult.flags.some(f => f.type === 'auto_phone');
       const listingStatus = hasPhone ? 'blocked' : 'active';
 
+      // Calculate auction end time
+      let auctionEnd = null;
+      if (isAuction && auction_duration) {
+        auctionEnd = new Date();
+        auctionEnd.setDate(auctionEnd.getDate() + parseInt(auction_duration));
+      }
+
       const result = await db.query(
-        `INSERT INTO listings (seller_id, title, description, price, category_id, condition, location, type, status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+        `INSERT INTO listings (seller_id, title, description, price, category_id, condition, location, type, status,
+         listing_mode, starting_price, buy_now_price, auction_end, min_bid_increment)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id`,
         [
           request.user.id, title, description || null,
-          price ? parseFloat(price) : null, parseInt(category_id),
-          condition, location || null, type, listingStatus,
+          isAuction ? null : (price ? parseFloat(price) : null),
+          parseInt(category_id), condition, location || null, type, listingStatus,
+          isAuction ? 'auction' : 'fixed',
+          isAuction ? parseFloat(starting_price) : null,
+          (isAuction && buy_now_price) ? parseFloat(buy_now_price) : null,
+          auctionEnd,
+          (isAuction && min_bid_increment) ? parseFloat(min_bid_increment) : 1.00,
         ]
       );
 
@@ -243,10 +339,8 @@ export default async function listingsRoutes(fastify) {
 
       // If phone detected, block and show error
       if (hasPhone) {
-        const catResult = await db.query('SELECT * FROM categories ORDER BY name');
         return reply.view('listings/new.ejs', {
-          user: request.user,
-          categories: catResult.rows,
+          user: request.user, categories: catResult.rows, kycVerified,
           error: 'Listing blocked: phone numbers are not allowed in listings. Contact info is exchanged after a completed transaction.',
         });
       }
@@ -255,9 +349,9 @@ export default async function listingsRoutes(fastify) {
     } catch (err) {
       fastify.log.error(err);
       const catResult = await db.query('SELECT * FROM categories ORDER BY name');
+      const kycVerified = await isKycVerified(request.user.id);
       return reply.view('listings/new.ejs', {
-        user: request.user,
-        categories: catResult.rows,
+        user: request.user, categories: catResult.rows, kycVerified,
         error: 'Failed to create listing. Please try again.',
       });
     }
@@ -282,9 +376,12 @@ export default async function listingsRoutes(fastify) {
         return reply.code(404).view('index.ejs', { user: request.user, categories: [], featured: [] });
       }
 
-      const listing = listingResult.rows[0];
+      let listing = listingResult.rows[0];
 
-      // Parallel queries for images, similar listings, and user listings
+      // Lazy-finalize ended auctions
+      listing = await finalizeAuction(listing);
+
+      // Parallel queries for images, similar listings, bids, and user listings
       const parallelQueries = [
         db.query(
           'SELECT * FROM listing_images WHERE listing_id = $1 ORDER BY position',
@@ -298,6 +395,14 @@ export default async function listingsRoutes(fastify) {
            WHERE l.category_id = $1 AND l.id != $2 AND l.status = 'active'
            ORDER BY l.created_at DESC LIMIT 4`,
           [listing.category_id, listing.id]
+        ),
+        // Get bids for auction listings
+        db.query(
+          `SELECT b.*, u.username as bidder_name FROM bids b
+           JOIN users u ON b.bidder_id = u.id
+           WHERE b.listing_id = $1
+           ORDER BY b.amount DESC`,
+          [listing.id]
         ),
       ];
 
@@ -313,7 +418,14 @@ export default async function listingsRoutes(fastify) {
       const results = await Promise.all(parallelQueries);
       const imagesResult = results[0];
       const similarResult = results[1];
-      const userListings = results[2] ? results[2].rows : [];
+      const bidsResult = results[2];
+      const userListings = results[3] ? results[3].rows : [];
+
+      // Check KYC status for current user
+      let kycVerified = false;
+      if (request.user) {
+        kycVerified = await isKycVerified(request.user.id);
+      }
 
       // Check for offer feedback from query params
       const offerStatus = request.query.offer;
@@ -321,20 +433,138 @@ export default async function listingsRoutes(fastify) {
       if (offerStatus === 'sent') success = 'Your offer has been sent to the seller!';
       if (offerStatus === 'reported') success = 'Listing has been reported. Thank you for helping keep SwapMart safe.';
       if (offerStatus === 'already_reported') success = 'You have already reported this listing.';
-      const error = offerStatus === 'error' ? 'Failed to send offer. Please try again.' : null;
+      if (offerStatus === 'bid_placed') success = 'Your bid has been placed successfully!';
+      if (offerStatus === 'buy_now') success = 'Buy Now offer sent to the seller!';
+      const error = offerStatus === 'error' ? 'Failed to send offer. Please try again.'
+        : offerStatus === 'kyc_required' ? 'Identity verification (KYC) is required for this action. Please verify your identity first.'
+        : offerStatus === 'bid_too_low' ? 'Your bid must be higher than the current bid plus the minimum increment.'
+        : offerStatus === 'auction_ended' ? 'This auction has ended.'
+        : null;
 
       return reply.view('listings/detail.ejs', {
         user: request.user,
         listing,
         images: imagesResult.rows,
         similar: similarResult.rows,
+        bids: bidsResult.rows,
         userListings,
+        kycVerified,
         error,
         success,
       });
     } catch (err) {
       fastify.log.error(err);
       return reply.redirect('/listings');
+    }
+  });
+
+  // POST /listings/:id/bid - Place a bid
+  fastify.post('/:id/bid', { preHandler: requireAuth }, async (request, reply) => {
+    const { id } = request.params;
+    const { bid_amount } = request.body;
+
+    try {
+      // Check KYC
+      const kycOk = await isKycVerified(request.user.id);
+      if (!kycOk) {
+        return reply.redirect(`/listings/${id}?offer=kyc_required`);
+      }
+
+      // Get listing
+      const listingResult = await db.query(
+        "SELECT * FROM listings WHERE id = $1 AND listing_mode = 'auction' AND status = 'active'",
+        [parseInt(id)]
+      );
+      if (listingResult.rows.length === 0) {
+        return reply.redirect(`/listings/${id}?offer=auction_ended`);
+      }
+
+      const listing = listingResult.rows[0];
+
+      // Check auction hasn't ended
+      if (new Date(listing.auction_end) <= new Date()) {
+        return reply.redirect(`/listings/${id}?offer=auction_ended`);
+      }
+
+      // Can't bid on own listing
+      if (listing.seller_id === request.user.id) {
+        return reply.redirect(`/listings/${id}`);
+      }
+
+      const amount = parseFloat(bid_amount);
+
+      // Get current highest bid
+      const topBid = await db.query(
+        'SELECT MAX(amount) as max_bid FROM bids WHERE listing_id = $1',
+        [parseInt(id)]
+      );
+      const currentMax = topBid.rows[0].max_bid ? parseFloat(topBid.rows[0].max_bid) : parseFloat(listing.starting_price);
+      const minRequired = topBid.rows[0].max_bid
+        ? currentMax + parseFloat(listing.min_bid_increment)
+        : parseFloat(listing.starting_price);
+
+      if (amount < minRequired) {
+        return reply.redirect(`/listings/${id}?offer=bid_too_low`);
+      }
+
+      await db.query(
+        'INSERT INTO bids (listing_id, bidder_id, amount) VALUES ($1, $2, $3)',
+        [parseInt(id), request.user.id, amount]
+      );
+
+      return reply.redirect(`/listings/${id}?offer=bid_placed`);
+    } catch (err) {
+      fastify.log.error(err);
+      return reply.redirect(`/listings/${id}?offer=error`);
+    }
+  });
+
+  // POST /listings/:id/buy-now - Buy now at auction price
+  fastify.post('/:id/buy-now', { preHandler: requireAuth }, async (request, reply) => {
+    const { id } = request.params;
+
+    try {
+      // Check KYC
+      const kycOk = await isKycVerified(request.user.id);
+      if (!kycOk) {
+        return reply.redirect(`/listings/${id}?offer=kyc_required`);
+      }
+
+      // Get listing
+      const listingResult = await db.query(
+        "SELECT * FROM listings WHERE id = $1 AND listing_mode = 'auction' AND status = 'active' AND buy_now_price IS NOT NULL",
+        [parseInt(id)]
+      );
+      if (listingResult.rows.length === 0) {
+        return reply.redirect(`/listings/${id}?offer=error`);
+      }
+
+      const listing = listingResult.rows[0];
+
+      // Check auction hasn't ended
+      if (new Date(listing.auction_end) <= new Date()) {
+        return reply.redirect(`/listings/${id}?offer=auction_ended`);
+      }
+
+      // Can't buy own listing
+      if (listing.seller_id === request.user.id) {
+        return reply.redirect(`/listings/${id}`);
+      }
+
+      // Create offer at buy_now_price and mark as accepted
+      await db.query(
+        `INSERT INTO offers (listing_id, buyer_id, type, cash_amount, message, status)
+         VALUES ($1, $2, 'cash', $3, 'Buy Now purchase', 'accepted')`,
+        [parseInt(id), request.user.id, listing.buy_now_price]
+      );
+
+      // Mark listing as sold and end auction
+      await db.query("UPDATE listings SET status = 'sold', updated_at = NOW() WHERE id = $1", [parseInt(id)]);
+
+      return reply.redirect(`/listings/${id}?offer=buy_now`);
+    } catch (err) {
+      fastify.log.error(err);
+      return reply.redirect(`/listings/${id}?offer=error`);
     }
   });
 
@@ -392,6 +622,15 @@ export default async function listingsRoutes(fastify) {
       const listing = listingResult.rows[0];
       if (listing.seller_id === request.user.id) {
         return reply.redirect(`/listings/${id}`);
+      }
+
+      // KYC restriction: offers above CHF 50 require KYC
+      const offerAmount = cash_amount ? parseFloat(cash_amount) : 0;
+      if (offerAmount > 50) {
+        const kycOk = await isKycVerified(request.user.id);
+        if (!kycOk) {
+          return reply.redirect(`/listings/${id}?offer=kyc_required`);
+        }
       }
 
       await db.query(

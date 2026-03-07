@@ -1,0 +1,97 @@
+<%- include('../partials/header', { pageTitle: 'Admin - KYC Reviews', user }) %>
+
+<style>
+  .admin-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - var(--nav-h)); }
+  .admin-sidebar { background: var(--gray-900); padding: 1.5rem 0; position: sticky; top: var(--nav-h); height: calc(100vh - var(--nav-h)); overflow-y: auto; }
+  .admin-sidebar__logo { padding: 0 1.25rem 1.25rem; border-bottom: 1px solid var(--gray-700); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--white); font-weight: 700; font-size: 1.1rem; }
+  .admin-sidebar__logo span { color: var(--amber-400); }
+  .admin-nav { list-style: none; padding: 0; }
+  .admin-nav a { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1.25rem; color: var(--gray-400); font-size: 0.9rem; font-weight: 500; transition: all 0.15s; text-decoration: none; border-left: 3px solid transparent; }
+  .admin-nav a:hover, .admin-nav a.active { background: rgba(255,255,255,0.05); color: var(--white); border-left-color: var(--primary); }
+  .admin-nav a.active { color: var(--teal-300); }
+  .admin-nav__icon { font-size: 1.1rem; width: 1.5rem; text-align: center; }
+  .admin-content { padding: 1.5rem 2rem; background: var(--bg-alt); min-width: 0; }
+  .admin-content h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+  .admin-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  .admin-table th { text-align: left; padding: 0.6rem 0.75rem; background: var(--gray-50); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-light); border-bottom: 2px solid var(--border); }
+  .admin-table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .admin-table tr:hover { background: var(--gray-50); }
+  @media (max-width: 768px) {
+    .admin-layout { grid-template-columns: 1fr; }
+    .admin-sidebar { position: relative; top: 0; height: auto; display: flex; overflow-x: auto; padding: 0.75rem 0; }
+    .admin-sidebar__logo { display: none; }
+    .admin-nav { display: flex; gap: 0; white-space: nowrap; }
+    .admin-nav a { padding: 0.5rem 1rem; border-left: none; border-bottom: 3px solid transparent; font-size: 0.8rem; }
+    .admin-content { padding: 1rem; }
+  }
+</style>
+
+<div class="admin-layout">
+  <%- include('_sidebar', { activePage: 'kyc' }) %>
+
+  <div class="admin-content">
+    <h1>KYC Verification Reviews (<%= submissions.length %>)</h1>
+
+    <% if (submissions.length === 0) { %>
+      <div class="card">
+        <div class="empty-state">
+          <div class="empty-state__icon">&#128196;</div>
+          <div class="empty-state__title">No pending submissions</div>
+          <div class="empty-state__text">All KYC submissions have been reviewed.</div>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="card" style="overflow: visible;">
+        <div style="overflow-x: auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Document Type</th>
+                <th>Submitted</th>
+                <th>Document</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% submissions.forEach(s => { %>
+                <tr>
+                  <td><a href="/profile/<%= s.id %>"><strong><%= s.username %></strong></a></td>
+                  <td class="text-sm"><%= s.email %></td>
+                  <td>
+                    <span class="badge badge-blue"><%= (s.kyc_document_type || '').replace('_', ' ') %></span>
+                  </td>
+                  <td class="text-sm text-light">
+                    <% if (s.kyc_submitted_at) { %>
+                      <%= new Date(s.kyc_submitted_at).toLocaleDateString('en-CH') %>
+                    <% } else { %>-<% } %>
+                  </td>
+                  <td>
+                    <% if (s.kyc_document_path) { %>
+                      <a href="/uploads/<%= s.kyc_document_path %>" target="_blank" class="btn btn--outline btn--xs">View</a>
+                    <% } %>
+                  </td>
+                  <td>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                      <form action="/admin/kyc/<%= s.id %>/approve" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-primary btn--xs">Approve</button>
+                      </form>
+                      <form action="/admin/kyc/<%= s.id %>/reject" method="POST" style="display: inline-flex; gap: 0.25rem; align-items: center;"
+                            onsubmit="var r = prompt('Rejection reason:'); if (!r) return false; this.querySelector('[name=reason]').value = r;">
+                        <input type="hidden" name="reason" value="">
+                        <button type="submit" class="btn btn-danger btn--xs">Reject</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -20,12 +20,21 @@
           <input type="text" class="form-control" value="<%= profile.username %>" disabled
                  style="background: var(--bg); color: var(--text-light);">
         </div>
-        <div class="flex gap-1" style="flex-wrap: wrap;">
+        <div class="flex gap-1" style="flex-wrap: wrap; align-items: center;">
           <span class="badge badge-primary">Plan: <%= profile.plan %></span>
-          <span class="badge badge-gray">KYC: <%= profile.kyc_status %></span>
+          <% if (profile.kyc_status === 'verified') { %>
+            <span class="badge badge-success">KYC: Verified</span>
+          <% } else if (profile.kyc_status === 'pending') { %>
+            <span class="badge badge-amber">KYC: Pending</span>
+          <% } else { %>
+            <span class="badge badge-gray">KYC: Not Verified</span>
+          <% } %>
           <span class="badge badge-gray">
             Joined: <%= new Date(profile.created_at).toLocaleDateString('en-CH') %>
           </span>
+          <a href="/profile/verify" class="btn btn--outline btn--xs" style="margin-left: 4px;">
+            <%= profile.kyc_status === 'verified' ? 'View KYC' : 'Verify Identity' %>
+          </a>
         </div>
       </div>
     </div>

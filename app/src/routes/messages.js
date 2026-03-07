@@ -138,6 +138,12 @@ export default async function messagesRoutes(fastify) {
     }
 
     try {
+      // KYC check for messaging
+      const kycResult = await db.query('SELECT kyc_verified FROM users WHERE id = $1', [request.user.id]);
+      if (!kycResult.rows[0]?.kyc_verified) {
+        return reply.redirect(`/messages/${offerId}?kyc=required`);
+      }
+
       // Verify user is buyer or seller AND offer is accepted/completed
       const offerResult = await db.query(
         `SELECT o.*, l.seller_id

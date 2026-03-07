@@ -119,6 +119,13 @@
       </div>
     </div>
 
+    <% if (stats.pendingKyc > 0) { %>
+      <div class="alert alert-warning mb-2" style="display: flex; align-items: center; justify-content: space-between;">
+        <span><strong><%= stats.pendingKyc %></strong> KYC submission<%= stats.pendingKyc !== 1 ? 's' : '' %> pending review</span>
+        <a href="/admin/kyc" class="btn btn--accent btn--sm">Review</a>
+      </div>
+    <% } %>
+
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
       <!-- Recent Flags -->
       <div class="card" style="overflow: visible;">

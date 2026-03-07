@@ -1,0 +1,114 @@
+<%- include('../partials/header', { pageTitle: 'Identity Verification', user }) %>
+
+<section class="py-3">
+  <div class="container" style="max-width: 600px;">
+    <h1 class="section-heading mb-1">Identity Verification</h1>
+    <p class="section-subheading mb-3">Verify your identity to unlock all SwapMart features.</p>
+
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+    <% if (success) { %><div class="alert alert-success"><%= success %></div><% } %>
+
+    <!-- Current Status -->
+    <div class="card mb-2">
+      <div class="card-body" style="padding: 1.5rem;">
+        <h2 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Verification Status</h2>
+        <div class="flex-center gap-2" style="flex-wrap: wrap;">
+          <% if (profile.kyc_verified) { %>
+            <span class="badge badge-success" style="font-size: 0.875rem; padding: 0.4rem 1rem;">Verified</span>
+            <span class="text-sm text-light">
+              Verified on <%= new Date(profile.kyc_verified_at).toLocaleDateString('en-CH', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+            </span>
+          <% } else if (profile.kyc_status === 'pending') { %>
+            <span class="badge badge-amber" style="font-size: 0.875rem; padding: 0.4rem 1rem;">Pending Review</span>
+            <span class="text-sm text-light">
+              Submitted on <%= new Date(profile.kyc_submitted_at).toLocaleDateString('en-CH', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+            </span>
+          <% } else { %>
+            <span class="badge badge-gray" style="font-size: 0.875rem; padding: 0.4rem 1rem;">Not Verified</span>
+          <% } %>
+        </div>
+
+        <% if (profile.kyc_rejected_reason) { %>
+          <div class="alert alert-danger mt-2" style="margin-bottom: 0;">
+            <strong>Rejected:</strong> <%= profile.kyc_rejected_reason %>. Please submit a new document.
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Benefits -->
+    <div class="card mb-2">
+      <div class="card-body" style="padding: 1.5rem;">
+        <h2 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem;">What you unlock with KYC</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+          <div class="text-sm" style="display: flex; align-items: center; gap: 6px;">
+            <span style="color: var(--success);">&#10003;</span> Send & receive messages
+          </div>
+          <div class="text-sm" style="display: flex; align-items: center; gap: 6px;">
+            <span style="color: var(--success);">&#10003;</span> Make offers above CHF 50
+          </div>
+          <div class="text-sm" style="display: flex; align-items: center; gap: 6px;">
+            <span style="color: var(--success);">&#10003;</span> Create listings above CHF 500
+          </div>
+          <div class="text-sm" style="display: flex; align-items: center; gap: 6px;">
+            <span style="color: var(--success);">&#10003;</span> Participate in auctions
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Form -->
+    <% if (!profile.kyc_verified && profile.kyc_status !== 'pending') { %>
+      <div class="card">
+        <div class="card-body" style="padding: 1.5rem;">
+          <h2 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Submit Document</h2>
+          <form action="/profile/verify" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="document_type">Document Type</label>
+              <select id="document_type" name="document_type" class="form-control" required>
+                <option value="">Select document type...</option>
+                <option value="passport">Passport</option>
+                <option value="id_card">National ID Card</option>
+                <option value="drivers_license">Driver's License</option>
+                <option value="cie">CIE (Carta d'Identita Elettronica)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Document Photo or Scan</label>
+              <label class="file-upload">
+                <input type="file" name="document" accept="image/jpeg,image/png,image/webp,application/pdf" required>
+                <span class="file-upload__icon">&#128196;</span>
+                <span class="file-upload__text">
+                  <strong>Click to upload</strong> or drag and drop<br>
+                  JPG, PNG, WebP, or PDF (max 10MB)
+                </span>
+              </label>
+              <p class="text-sm text-light mt-1">Please upload a clear photo of your document. All 4 corners must be visible.</p>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Submit for Verification</button>
+          </form>
+        </div>
+      </div>
+    <% } else if (profile.kyc_status === 'pending') { %>
+      <div class="card">
+        <div class="card-body text-center" style="padding: 2rem;">
+          <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">&#9203;</div>
+          <p style="font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem;">Your document is being reviewed</p>
+          <p class="text-light text-sm">This typically takes 1-2 business days. You will see the result on this page.</p>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="card">
+        <div class="card-body text-center" style="padding: 2rem;">
+          <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">&#9989;</div>
+          <p style="font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem;">Your identity is verified!</p>
+          <p class="text-light text-sm">You have full access to all SwapMart features.</p>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

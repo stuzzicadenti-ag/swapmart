@@ -2,14 +2,24 @@
 
 <section class="py-3">
   <div class="container" style="max-width: 700px;">
-    <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">Create a Listing</h1>
-    <p class="text-light mb-2">List your item for sale, swap, or both.</p>
+    <h1 class="section-heading mb-1">Create a Listing</h1>
+    <p class="section-subheading mb-2">List your item for sale, swap, auction, or all of the above.</p>
+
+    <% if (typeof kycVerified !== 'undefined' && !kycVerified) { %>
+      <div class="kyc-banner">
+        <span class="kyc-banner__icon">&#9888;</span>
+        <div>
+          <strong>Identity not verified.</strong> Listings above CHF 500 and auctions require KYC verification.
+          <a href="/profile/verify">Verify now</a>
+        </div>
+      </div>
+    <% } %>
 
     <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
 
     <div class="card">
       <div class="card-body" style="padding: 1.5rem;">
-        <form action="/listings/new" method="POST" enctype="multipart/form-data">
+        <form action="/listings/new" method="POST" enctype="multipart/form-data" id="listingForm">
           <div class="form-group">
             <label for="title">Title *</label>
             <input type="text" id="title" name="title" class="form-control" required
@@ -55,10 +65,62 @@
               </select>
             </div>
 
+            <div class="form-group">
+              <label for="listing_mode">Listing Mode *</label>
+              <select id="listing_mode" name="listing_mode" class="form-control" required onchange="toggleMode()">
+                <option value="fixed">Fixed Price</option>
+                <option value="auction" <%= (typeof kycVerified !== 'undefined' && !kycVerified) ? 'disabled' : '' %>>
+                  Auction <%= (typeof kycVerified !== 'undefined' && !kycVerified) ? '(KYC required)' : '' %>
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Fixed Price fields -->
+          <div id="fixedPriceFields">
             <div class="form-group" id="priceGroup">
               <label for="price">Price (CHF)</label>
               <input type="number" id="price" name="price" class="form-control"
                      step="0.01" min="0" placeholder="0.00">
+            </div>
+          </div>
+
+          <!-- Auction fields (hidden by default) -->
+          <div id="auctionFields" style="display: none;">
+            <div style="background: var(--amber-50); border: 1px solid var(--amber-200); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem;">
+              <h3 style="font-size: 0.9rem; font-weight: 600; color: var(--amber-700); margin-bottom: 0.75rem;">Auction Settings</h3>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group" style="margin-bottom: 0.5rem;">
+                  <label for="starting_price">Starting Price (CHF) *</label>
+                  <input type="number" id="starting_price" name="starting_price" class="form-control"
+                         step="0.01" min="0" placeholder="1.00">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0.5rem;">
+                  <label for="buy_now_price">Buy Now Price (CHF)</label>
+                  <input type="number" id="buy_now_price" name="buy_now_price" class="form-control"
+                         step="0.01" min="0" placeholder="Optional">
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="auction_duration">Duration</label>
+                  <select id="auction_duration" name="auction_duration" class="form-control">
+                    <option value="3">3 days</option>
+                    <option value="5">5 days</option>
+                    <option value="7" selected>7 days</option>
+                    <option value="10">10 days</option>
+                  </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="min_bid_increment">Min Bid Increment (CHF)</label>
+                  <input type="number" id="min_bid_increment" name="min_bid_increment" class="form-control"
+                         step="0.01" min="0.01" value="1.00" placeholder="1.00">
+                </div>
+              </div>
             </div>
           </div>
 
@@ -69,14 +131,20 @@
           </div>
 
           <div class="form-group">
-            <label for="images">Images * (1-5 photos, max 10MB each)</label>
-            <input type="file" id="images" name="images" class="form-control" accept="image/jpeg,image/png,image/webp" multiple
-                   required style="padding: 0.4rem;">
-            <p class="text-sm text-light mt-1">Accepted formats: JPG, PNG, WebP. First image will be the cover.</p>
+            <label>Images * (1-5 photos, max 10MB each)</label>
+            <label class="file-upload" id="imageUploadLabel">
+              <input type="file" id="images" name="images" accept="image/jpeg,image/png,image/webp" multiple required>
+              <span class="file-upload__icon">&#128247;</span>
+              <span class="file-upload__text">
+                <strong>Click to upload photos</strong><br>
+                JPG, PNG, or WebP. First image will be the cover.
+              </span>
+            </label>
             <p class="text-sm" style="color: var(--danger); display: none;" id="imageError"></p>
+            <div id="imagePreview" style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;"></div>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; font-size: 1rem; margin-top: 0.5rem;">
+          <button type="submit" class="btn btn-primary btn-block" style="padding: 0.875rem; font-size: 1rem; margin-top: 0.5rem;">
             Create Listing
           </button>
         </form>
@@ -87,8 +155,8 @@
 
 <script>
   function togglePrice() {
-    const type = document.getElementById('type').value;
-    const priceGroup = document.getElementById('priceGroup');
+    var type = document.getElementById('type').value;
+    var priceGroup = document.getElementById('priceGroup');
     if (type === 'swap') {
       priceGroup.style.opacity = '0.5';
       document.getElementById('price').value = '';
@@ -97,13 +165,22 @@
     }
   }
 
-  // Client-side image validation
+  function toggleMode() {
+    var mode = document.getElementById('listing_mode').value;
+    document.getElementById('fixedPriceFields').style.display = mode === 'fixed' ? 'block' : 'none';
+    document.getElementById('auctionFields').style.display = mode === 'auction' ? 'block' : 'none';
+  }
+
+  // Client-side image validation + preview
   var imageInput = document.getElementById('images');
   var imageError = document.getElementById('imageError');
+  var imagePreview = document.getElementById('imagePreview');
 
   imageInput.addEventListener('change', function() {
     var files = this.files;
     imageError.style.display = 'none';
+    imagePreview.innerHTML = '';
+
     if (files.length === 0) {
       imageError.textContent = 'At least 1 photo is required.';
       imageError.style.display = 'block';
@@ -127,10 +204,21 @@
           return;
         }
       }
+      // Show preview thumbnails
+      for (var j = 0; j < files.length; j++) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var img = document.createElement('img');
+          img.src = e.target.result;
+          img.style.cssText = 'width:64px;height:48px;object-fit:cover;border-radius:6px;border:2px solid var(--border);';
+          imagePreview.appendChild(img);
+        };
+        reader.readAsDataURL(files[j]);
+      }
     }
   });
 
-  document.querySelector('form').addEventListener('submit', function(e) {
+  document.getElementById('listingForm').addEventListener('submit', function(e) {
     if (imageInput.files.length === 0) {
       e.preventDefault();
       imageError.textContent = 'At least 1 photo is required.';

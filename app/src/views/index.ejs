@@ -316,14 +316,26 @@
       <h2 class="section__title">Latest Listings</h2>
       <p class="section__subtitle">Fresh picks from our community. See something you like? Make an offer.</p>
 
+      <!-- Filter Tabs -->
+      <div style="display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; justify-content: center;">
+        <a href="/?#listings" class="btn <%= (typeof activeFilter === 'undefined' || !activeFilter) && (typeof activeType === 'undefined' || !activeType) ? 'btn--primary' : 'btn--outline' %> btn--sm" style="border-radius: 999px;">All</a>
+        <a href="/?type=sell#listings" class="btn <%= (typeof activeType !== 'undefined' && activeType === 'sell') ? 'btn--primary' : 'btn--outline' %> btn--sm" style="border-radius: 999px;">For Sale</a>
+        <a href="/?type=swap#listings" class="btn <%= (typeof activeType !== 'undefined' && activeType === 'swap') ? 'btn--primary' : 'btn--outline' %> btn--sm" style="border-radius: 999px;">For Swap</a>
+        <a href="/?type=both#listings" class="btn <%= (typeof activeType !== 'undefined' && activeType === 'both') ? 'btn--primary' : 'btn--outline' %> btn--sm" style="border-radius: 999px;">Swap + Cash</a>
+        <a href="/?mode=auction#listings" class="btn <%= (typeof activeFilter !== 'undefined' && activeFilter === 'auction') ? 'btn--accent' : 'btn--outline' %> btn--sm" style="border-radius: 999px;">&#128276; Auctions</a>
+      </div>
+
       <% if (featured.length > 0) { %>
         <div class="listings__grid">
           <% featured.forEach(function(listing) { %>
             <a href="/listings/<%= listing.id %>" style="text-decoration:none; color:inherit;">
               <article class="listing-card">
                 <% if (listing.image) { %>
-                  <div class="listing-card__img">
+                  <div class="listing-card__img" style="position: relative;">
                     <img src="/uploads/<%= listing.image %>" alt="<%= listing.title %>" style="width:100%; height:100%; object-fit:cover;">
+                    <% if (listing.listing_mode === 'auction') { %>
+                      <span class="listing-card__badge" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #111; font-weight: 700; top: 8px; left: 8px; right: auto;">Auction</span>
+                    <% } %>
                     <% if (listing.type === 'swap') { %>
                       <span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span>
                     <% } else if (listing.type === 'both') { %>
@@ -331,9 +343,12 @@
                     <% } %>
                   </div>
                 <% } else { %>
-                  <div class="listing-card__img" aria-label="<%= listing.title %>">
+                  <div class="listing-card__img" aria-label="<%= listing.title %>" style="position: relative;">
                     <% const catIcons = { 'Trading Cards': '&#127183;', 'Electronics': '&#128187;', 'Cars & Vehicles': '&#128663;', 'Apartments & Housing': '&#127968;', 'Fashion': '&#128085;', 'Furniture': '&#128715;', 'Sports': '&#127942;', 'Collectibles': '&#128142;' }; %>
                     <%- catIcons[listing.category_name] || '&#128230;' %>
+                    <% if (listing.listing_mode === 'auction') { %>
+                      <span class="listing-card__badge" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #111; font-weight: 700; top: 8px; left: 8px; right: auto;">Auction</span>
+                    <% } %>
                     <% if (listing.type === 'swap') { %>
                       <span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span>
                     <% } else if (listing.type === 'both') { %>
@@ -344,7 +359,22 @@
                 <div class="listing-card__body">
                   <h3 class="listing-card__title"><%= listing.title %></h3>
                   <p class="listing-card__meta"><%= listing.category_name %> &middot; <%= listing.seller_name %></p>
-                  <% if (listing.price) { %>
+                  <% if (listing.listing_mode === 'auction') { %>
+                    <div class="listing-card__price" style="display: flex; justify-content: space-between; align-items: center;">
+                      <span>
+                        <% if (listing.current_bid) { %>
+                          CHF <%= parseFloat(listing.current_bid).toLocaleString('de-CH', { minimumFractionDigits: 0 }) %>
+                        <% } else { %>
+                          From CHF <%= parseFloat(listing.starting_price).toLocaleString('de-CH', { minimumFractionDigits: 0 }) %>
+                        <% } %>
+                      </span>
+                      <span style="font-size: 0.75rem; font-weight: 500; opacity: 0.7;"><%= listing.bid_count || 0 %> bid<%= listing.bid_count != 1 ? 's' : '' %></span>
+                    </div>
+                    <% if (listing.auction_end) { %>
+                      <div class="listing-card__countdown" data-end="<%= new Date(listing.auction_end).toISOString() %>"
+                           style="font-size: 0.75rem; color: var(--amber-600); font-weight: 600; margin-top: 4px;">...</div>
+                    <% } %>
+                  <% } else if (listing.price) { %>
                     <div class="listing-card__price">CHF <%= parseFloat(listing.price).toLocaleString('de-CH', { minimumFractionDigits: 0 }) %></div>
                   <% } else { %>
                     <div class="listing-card__swap-label">&#x1F501; Open to Swaps</div>
@@ -915,6 +945,29 @@
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') { menu.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
       });
+    })();
+
+    // Auction countdowns on homepage cards
+    (function() {
+      var els = document.querySelectorAll('.listing-card__countdown[data-end]');
+      if (!els.length) return;
+      function tick() {
+        els.forEach(function(el) {
+          var end = new Date(el.getAttribute('data-end')).getTime();
+          var diff = end - Date.now();
+          if (diff <= 0) { el.textContent = 'Ended'; el.style.color = '#ef4444'; return; }
+          var d = Math.floor(diff / 86400000);
+          var h = Math.floor((diff % 86400000) / 3600000);
+          var m = Math.floor((diff % 3600000) / 60000);
+          var txt = '';
+          if (d > 0) txt += d + 'd ';
+          txt += h + 'h ' + m + 'm left';
+          el.textContent = txt;
+          if (diff < 3600000) el.style.color = '#ef4444';
+        });
+      }
+      tick();
+      setInterval(tick, 30000);
     })();
   </script>
 

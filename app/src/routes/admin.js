@@ -47,6 +47,37 @@ export default async function adminRoutes(fastify) {
   await db.query('CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)');
   await db.query('CREATE INDEX IF NOT EXISTS idx_users_banned ON users(banned)');
 
+  // --- KYC Document Verification columns ---
+  await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_document_type VARCHAR(50)`);
+  await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_document_path TEXT`);
+  await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_verified BOOLEAN DEFAULT false`);
+  await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_submitted_at TIMESTAMP`);
+  await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_verified_at TIMESTAMP`);
+  await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_rejected_reason TEXT`);
+
+  // --- Auction/Bidding system ---
+  await db.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS listing_mode VARCHAR(20) DEFAULT 'fixed'`);
+  await db.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS starting_price NUMERIC(12,2)`);
+  await db.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS buy_now_price NUMERIC(12,2)`);
+  await db.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS auction_end TIMESTAMP`);
+  await db.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS min_bid_increment NUMERIC(12,2) DEFAULT 1.00`);
+
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS bids (
+      id SERIAL PRIMARY KEY,
+      listing_id INTEGER NOT NULL REFERENCES listings(id),
+      bidder_id INTEGER NOT NULL REFERENCES users(id),
+      amount NUMERIC(12,2) NOT NULL,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  await db.query('CREATE INDEX IF NOT EXISTS idx_bids_listing ON bids(listing_id)');
+  await db.query('CREATE INDEX IF NOT EXISTS idx_bids_bidder ON bids(bidder_id)');
+  await db.query('CREATE INDEX IF NOT EXISTS idx_bids_amount ON bids(listing_id, amount DESC)');
+  await db.query('CREATE INDEX IF NOT EXISTS idx_listings_mode ON listings(listing_mode)');
+  await db.query('CREATE INDEX IF NOT EXISTS idx_listings_auction_end ON listings(auction_end)');
+
   // Ensure at least one owner exists; if not, promote the first registered user
   const ownerCheck = await db.query("SELECT id FROM users WHERE role = 'owner' LIMIT 1");
   if (ownerCheck.rows.length === 0) {
@@ -86,11 +117,12 @@ export default async function adminRoutes(fastify) {
   // --- GET /admin - Dashboard ---
   fastify.get('/', { preHandler: requireAdmin }, async (request, reply) => {
     try {
-      const [usersCount, listingsCount, revenueResult, flagsCount, recentFlags, recentTx] = await Promise.all([
+      const [usersCount, listingsCount, revenueResult, flagsCount, kycPendingCount, recentFlags, recentTx] = await Promise.all([
         db.query('SELECT COUNT(*) FROM users'),
         db.query("SELECT COUNT(*) FROM listings WHERE status = 'active'"),
         db.query("SELECT COALESCE(SUM(commission), 0) as total FROM transactions WHERE status = 'completed'"),
         db.query("SELECT COUNT(*) FROM flags WHERE status = 'pending'"),
+        db.query("SELECT COUNT(*) FROM users WHERE kyc_document_path IS NOT NULL AND kyc_verified = false"),
         db.query(`
           SELECT f.*, l.title as listing_title, u.username as reporter_name
           FROM flags f
@@ -117,6 +149,7 @@ export default async function adminRoutes(fastify) {
           listings: parseInt(listingsCount.rows[0].count),
           revenue: parseFloat(revenueResult.rows[0].total),
           pendingFlags: parseInt(flagsCount.rows[0].count),
+          pendingKyc: parseInt(kycPendingCount.rows[0].count),
         },
         recentFlags: recentFlags.rows,
         recentTransactions: recentTx.rows,
@@ -125,7 +158,7 @@ export default async function adminRoutes(fastify) {
       fastify.log.error(err);
       return reply.view('admin/dashboard.ejs', {
         user: request.user,
-        stats: { users: 0, listings: 0, revenue: 0, pendingFlags: 0 },
+        stats: { users: 0, listings: 0, revenue: 0, pendingFlags: 0, pendingKyc: 0 },
         recentFlags: [],
         recentTransactions: [],
       });
@@ -497,6 +530,62 @@ export default async function adminRoutes(fastify) {
     } catch (err) {
       fastify.log.error(err);
       return reply.redirect('/admin/flags');
+    }
+  });
+
+  // --- GET /admin/kyc - Pending KYC submissions ---
+  fastify.get('/kyc', { preHandler: requireAdmin }, async (request, reply) => {
+    try {
+      const pendingResult = await db.query(
+        `SELECT id, username, email, kyc_document_type, kyc_document_path, kyc_submitted_at, kyc_rejected_reason
+         FROM users
+         WHERE kyc_document_path IS NOT NULL AND kyc_verified = false
+         ORDER BY kyc_submitted_at ASC`
+      );
+
+      return reply.view('admin/kyc.ejs', {
+        user: request.user,
+        submissions: pendingResult.rows,
+      });
+    } catch (err) {
+      fastify.log.error(err);
+      return reply.view('admin/kyc.ejs', {
+        user: request.user,
+        submissions: [],
+      });
+    }
+  });
+
+  // --- POST /admin/kyc/:userId/approve ---
+  fastify.post('/kyc/:userId/approve', { preHandler: requireAdmin }, async (request, reply) => {
+    const { userId } = request.params;
+    try {
+      await db.query(
+        `UPDATE users SET kyc_verified = true, kyc_verified_at = NOW(), kyc_status = 'verified', kyc_rejected_reason = NULL WHERE id = $1`,
+        [parseInt(userId)]
+      );
+      await logAction(request.user.id, 'approve_kyc', 'user', parseInt(userId), null);
+      return reply.redirect('/admin/kyc');
+    } catch (err) {
+      fastify.log.error(err);
+      return reply.redirect('/admin/kyc');
+    }
+  });
+
+  // --- POST /admin/kyc/:userId/reject ---
+  fastify.post('/kyc/:userId/reject', { preHandler: requireAdmin }, async (request, reply) => {
+    const { userId } = request.params;
+    const { reason } = request.body;
+    try {
+      await db.query(
+        `UPDATE users SET kyc_verified = false, kyc_rejected_reason = $1, kyc_status = 'none', kyc_document_path = NULL, kyc_document_type = NULL, kyc_submitted_at = NULL WHERE id = $2`,
+        [reason || 'Document rejected', parseInt(userId)]
+      );
+      await logAction(request.user.id, 'reject_kyc', 'user', parseInt(userId), `Reason: ${reason || 'No reason'}`);
+      return reply.redirect('/admin/kyc');
+    } catch (err) {
+      fastify.log.error(err);
+      return reply.redirect('/admin/kyc');
     }
   });
 
