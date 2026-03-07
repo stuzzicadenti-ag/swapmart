@@ -43,7 +43,7 @@ app.decorate('redis', redis);
 app.decorate('jwt', { secret: JWT_SECRET });
 app.decorate('config', { UPLOAD_DIR, JWT_SECRET, COOKIE_SECRET });
 
-// Auth decorator — attaches user to request if valid JWT cookie
+// Auth decorator - attaches user to request if valid JWT cookie
 app.decorateRequest('user', null);
 app.addHook('onRequest', async (request) => {
   const token = request.cookies?.token;

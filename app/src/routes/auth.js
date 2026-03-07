@@ -1,6 +1,9 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+const IS_PROD = process.env.NODE_ENV === 'production';
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default async function authRoutes(fastify) {
   const { db, config } = fastify;
 
@@ -17,8 +20,20 @@ export default async function authRoutes(fastify) {
       return reply.view('auth/register.ejs', { user: request.user, error: 'Email, username, and password are required.' });
     }
 
-    if (password.length < 6) {
-      return reply.view('auth/register.ejs', { user: request.user, error: 'Password must be at least 6 characters.' });
+    if (!EMAIL_RE.test(email)) {
+      return reply.view('auth/register.ejs', { user: request.user, error: 'Invalid email format.' });
+    }
+
+    if (username.length < 3 || username.length > 50) {
+      return reply.view('auth/register.ejs', { user: request.user, error: 'Username must be 3-50 characters.' });
+    }
+
+    if (password.length < 8) {
+      return reply.view('auth/register.ejs', { user: request.user, error: 'Password must be at least 8 characters.' });
+    }
+
+    if (email.length > 255) {
+      return reply.view('auth/register.ejs', { user: request.user, error: 'Input too long.' });
     }
 
     try {
@@ -48,6 +63,7 @@ export default async function authRoutes(fastify) {
       reply.setCookie('token', token, {
         path: '/',
         httpOnly: true,
+        secure: IS_PROD,
         sameSite: 'lax',
         maxAge: 7 * 24 * 60 * 60,
       });
@@ -98,6 +114,7 @@ export default async function authRoutes(fastify) {
       reply.setCookie('token', token, {
         path: '/',
         httpOnly: true,
+        secure: IS_PROD,
         sameSite: 'lax',
         maxAge: 7 * 24 * 60 * 60,
       });
