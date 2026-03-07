@@ -345,10 +345,12 @@
       </a>
       <div class="nav__links">
         <a href="/listings">Browse</a>
+        <a href="/fees" class="hide-mobile">Fees & Protection</a>
         <% if (user) { %>
           <a href="/listings/new">Sell / Swap</a>
           <a href="/offers">Offers</a>
           <a href="/messages">Messages</a>
+          <a href="/invoices" class="hide-mobile">Invoices</a>
           <a class="hide-mobile" href="/profile/<%= user.id %>"><%= user.username %></a>
           <a href="/profile/settings">Settings</a>
           <a href="/auth/logout" class="btn btn--outline btn--sm">Logout</a>

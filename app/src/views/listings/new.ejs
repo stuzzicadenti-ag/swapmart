@@ -69,10 +69,11 @@
           </div>
 
           <div class="form-group">
-            <label for="images">Images (up to 5, max 10MB each)</label>
-            <input type="file" id="images" name="images" class="form-control" accept="image/*" multiple
-                   style="padding: 0.4rem;">
+            <label for="images">Images * (1-5 photos, max 10MB each)</label>
+            <input type="file" id="images" name="images" class="form-control" accept="image/jpeg,image/png,image/webp" multiple
+                   required style="padding: 0.4rem;">
             <p class="text-sm text-light mt-1">Accepted formats: JPG, PNG, WebP. First image will be the cover.</p>
+            <p class="text-sm" style="color: var(--danger); display: none;" id="imageError"></p>
           </div>
 
           <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; font-size: 1rem; margin-top: 0.5rem;">
@@ -95,6 +96,52 @@
       priceGroup.style.opacity = '1';
     }
   }
+
+  // Client-side image validation
+  var imageInput = document.getElementById('images');
+  var imageError = document.getElementById('imageError');
+
+  imageInput.addEventListener('change', function() {
+    var files = this.files;
+    imageError.style.display = 'none';
+    if (files.length === 0) {
+      imageError.textContent = 'At least 1 photo is required.';
+      imageError.style.display = 'block';
+    } else if (files.length > 5) {
+      imageError.textContent = 'Maximum 5 photos allowed. You selected ' + files.length + '.';
+      imageError.style.display = 'block';
+      this.value = '';
+    } else {
+      var allowed = ['image/jpeg', 'image/png', 'image/webp'];
+      for (var i = 0; i < files.length; i++) {
+        if (allowed.indexOf(files[i].type) === -1) {
+          imageError.textContent = 'Invalid file type: ' + files[i].name + '. Only JPG, PNG, WebP allowed.';
+          imageError.style.display = 'block';
+          this.value = '';
+          return;
+        }
+        if (files[i].size > 10 * 1024 * 1024) {
+          imageError.textContent = files[i].name + ' exceeds 10MB limit.';
+          imageError.style.display = 'block';
+          this.value = '';
+          return;
+        }
+      }
+    }
+  });
+
+  document.querySelector('form').addEventListener('submit', function(e) {
+    if (imageInput.files.length === 0) {
+      e.preventDefault();
+      imageError.textContent = 'At least 1 photo is required.';
+      imageError.style.display = 'block';
+      imageInput.focus();
+    } else if (imageInput.files.length > 5) {
+      e.preventDefault();
+      imageError.textContent = 'Maximum 5 photos allowed.';
+      imageError.style.display = 'block';
+    }
+  });
 </script>
 
 <%- include('../partials/footer') %>

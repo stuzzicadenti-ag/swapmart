@@ -1,0 +1,97 @@
+<%- include('../partials/header', { pageTitle: 'My Invoices', user }) %>
+
+<section class="py-3">
+  <div class="container" style="max-width: 800px;">
+    <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">My Invoices</h1>
+    <p class="text-light mb-2">Commission invoices for completed sales.</p>
+
+    <% if (invoices.length === 0) { %>
+      <div class="card">
+        <div class="card-body text-center py-4">
+          <p class="text-light">No invoices yet. Invoices are generated when you complete a sale with a cash component.</p>
+          <a href="/offers" class="btn btn-outline btn--sm mt-2">View Offers</a>
+        </div>
+      </div>
+    <% } else { %>
+      <!-- Summary -->
+      <div class="grid grid-3 mb-3" style="gap: 1rem;">
+        <div class="card">
+          <div class="card-body text-center">
+            <div class="text-sm text-light mb-1">Total Invoices</div>
+            <div style="font-size: 1.5rem; font-weight: 700;"><%= invoices.length %></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body text-center">
+            <div class="text-sm text-light mb-1">Pending</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--amber-600);">
+              CHF <%= invoices.filter(i => i.status === 'pending').reduce((s, i) => s + parseFloat(i.amount), 0).toFixed(2) %>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body text-center">
+            <div class="text-sm text-light mb-1">Paid</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">
+              CHF <%= invoices.filter(i => i.status === 'paid').reduce((s, i) => s + parseFloat(i.amount), 0).toFixed(2) %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Invoices List -->
+      <div class="card" style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.9375rem;">
+          <thead>
+            <tr style="background: var(--gray-50); border-bottom: 2px solid var(--border);">
+              <th style="padding: 0.875rem 1rem; text-align: left; font-weight: 600;">Invoice #</th>
+              <th style="padding: 0.875rem 1rem; text-align: left; font-weight: 600;">Listing</th>
+              <th style="padding: 0.875rem 1rem; text-align: right; font-weight: 600;">Sale Amount</th>
+              <th style="padding: 0.875rem 1rem; text-align: right; font-weight: 600;">Commission</th>
+              <th style="padding: 0.875rem 1rem; text-align: center; font-weight: 600;">Status</th>
+              <th style="padding: 0.875rem 1rem; text-align: left; font-weight: 600;">Due Date</th>
+              <th style="padding: 0.875rem 1rem; text-align: left; font-weight: 600;">Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% invoices.forEach(inv => { %>
+              <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 0.875rem 1rem; font-weight: 600; font-family: monospace;">
+                  INV-<%= String(inv.id).padStart(5, '0') %>
+                </td>
+                <td style="padding: 0.875rem 1rem;">
+                  <% if (inv.listing_title) { %>
+                    <a href="/listings/<%= inv.listing_id %>"><%= inv.listing_title %></a>
+                  <% } else { %>
+                    <span class="text-light">-</span>
+                  <% } %>
+                </td>
+                <td style="padding: 0.875rem 1rem; text-align: right;">
+                  CHF <%= parseFloat(inv.transaction_amount).toFixed(2) %>
+                </td>
+                <td style="padding: 0.875rem 1rem; text-align: right; font-weight: 600; color: var(--primary);">
+                  CHF <%= parseFloat(inv.amount).toFixed(2) %>
+                </td>
+                <td style="padding: 0.875rem 1rem; text-align: center;">
+                  <% if (inv.status === 'pending') { %>
+                    <span class="badge badge-amber">Pending</span>
+                  <% } else { %>
+                    <span class="badge badge-success">Paid</span>
+                  <% } %>
+                </td>
+                <td style="padding: 0.875rem 1rem;">
+                  <%= new Date(inv.due_date).toLocaleDateString('en-CH', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                </td>
+                <td style="padding: 0.875rem 1rem;">
+                  <%= new Date(inv.created_at).toLocaleDateString('en-CH', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

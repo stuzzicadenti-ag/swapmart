@@ -172,6 +172,23 @@ export default async function listingsRoutes(fastify) {
         });
       }
 
+      if (files.length === 0) {
+        const catResult = await db.query('SELECT * FROM categories ORDER BY name');
+        return reply.view('listings/new.ejs', {
+          user: request.user,
+          categories: catResult.rows,
+          error: 'At least 1 photo is required.',
+        });
+      }
+      if (files.length > 5) {
+        const catResult = await db.query('SELECT * FROM categories ORDER BY name');
+        return reply.view('listings/new.ejs', {
+          user: request.user,
+          categories: catResult.rows,
+          error: 'Maximum 5 photos allowed.',
+        });
+      }
+
       if (!title || !category_id || !condition || !type) {
         const catResult = await db.query('SELECT * FROM categories ORDER BY name');
         return reply.view('listings/new.ejs', {

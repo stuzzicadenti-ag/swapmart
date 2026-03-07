@@ -66,7 +66,9 @@
               <% } %>
 
               <div class="flex gap-1 mt-2">
-                <a href="/messages/<%= offer.id %>" class="btn btn-outline btn-sm">Messages</a>
+                <% if (offer.status === 'accepted' || offer.status === 'completed') { %>
+                  <a href="/messages/<%= offer.id %>" class="btn btn-outline btn-sm">Messages</a>
+                <% } %>
                 <% if (offer.status === 'pending') { %>
                   <form action="/offers/<%= offer.id %>/accept" method="POST" style="display: inline;">
                     <button type="submit" class="btn btn-primary btn-sm">Accept</button>
@@ -143,7 +145,9 @@
               <% } %>
 
               <div class="flex gap-1 mt-2">
-                <a href="/messages/<%= offer.id %>" class="btn btn-outline btn-sm">Messages</a>
+                <% if (offer.status === 'accepted' || offer.status === 'completed') { %>
+                  <a href="/messages/<%= offer.id %>" class="btn btn-outline btn-sm">Messages</a>
+                <% } %>
               </div>
             </div>
           </div>

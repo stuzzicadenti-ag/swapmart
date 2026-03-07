@@ -17,6 +17,7 @@ import listingsRoutes from './routes/listings.js';
 import offersRoutes from './routes/offers.js';
 import messagesRoutes from './routes/messages.js';
 import profileRoutes from './routes/profile.js';
+import invoicesRoutes from './routes/invoices.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -156,6 +157,12 @@ await app.register(listingsRoutes, { prefix: '/listings' });
 await app.register(offersRoutes, { prefix: '/offers' });
 await app.register(messagesRoutes, { prefix: '/messages' });
 await app.register(profileRoutes, { prefix: '/profile' });
+await app.register(invoicesRoutes, { prefix: '/invoices' });
+
+// Fees page
+app.get('/fees', async (request, reply) => {
+  return reply.view('fees.ejs', { user: request.user });
+});
 
 // Homepage
 app.get('/', async (request, reply) => {

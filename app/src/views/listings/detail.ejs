@@ -11,17 +11,17 @@
       <!-- Left: Images -->
       <div>
         <% if (images.length > 0) { %>
-          <div class="card mb-2">
+          <div class="card mb-2" style="cursor: zoom-in;" id="mainImageWrap" onclick="openGallery(currentImageIndex)">
             <img src="/uploads/<%= images[0].file_path %>" alt="<%= listing.title %>"
                  style="width: 100%; max-height: 500px; object-fit: contain; background: #f1f5f9;" id="mainImage">
           </div>
           <% if (images.length > 1) { %>
-            <div class="flex gap-1" style="flex-wrap: wrap;">
+            <div style="overflow-x: auto; white-space: nowrap; padding-bottom: 4px;" id="thumbStrip">
               <% images.forEach((img, i) => { %>
                 <img src="/uploads/<%= img.file_path %>" alt="Image <%= i + 1 %>"
-                     style="width: 80px; height: 60px; object-fit: cover; border-radius: var(--radius); cursor: pointer; border: 2px solid <%= i === 0 ? 'var(--primary)' : 'var(--border)' %>;"
-                     onclick="document.getElementById('mainImage').src=this.src; document.querySelectorAll('[data-thumb]').forEach(t=>t.style.borderColor='var(--border)'); this.style.borderColor='var(--primary)';"
-                     data-thumb>
+                     style="width: 80px; height: 60px; object-fit: cover; border-radius: var(--radius); cursor: pointer; border: 2px solid <%= i === 0 ? 'var(--primary)' : 'var(--border)' %>; display: inline-block; margin-right: 6px; vertical-align: top;"
+                     onclick="selectThumb(<%= i %>)"
+                     data-thumb="<%= i %>">
               <% }) %>
             </div>
           <% } %>
@@ -147,7 +147,7 @@
 
           <script>
             function toggleOfferFields() {
-              const type = document.getElementById('offer_type').value;
+              var type = document.getElementById('offer_type').value;
               document.getElementById('cashField').style.display = (type === 'swap') ? 'none' : 'block';
               document.getElementById('swapField').style.display = (type === 'cash') ? 'none' : 'block';
             }
@@ -199,10 +199,116 @@
   </div>
 </section>
 
+<!-- Fullscreen Gallery Overlay -->
+<% if (images.length > 0) { %>
+<div id="galleryOverlay" style="
+  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.92); z-index: 9999; align-items: center; justify-content: center;
+  flex-direction: column;
+">
+  <button onclick="closeGallery()" style="
+    position: absolute; top: 16px; right: 20px; background: none; border: none;
+    color: #fff; font-size: 2rem; cursor: pointer; z-index: 10001; padding: 8px;
+    line-height: 1;
+  " aria-label="Close gallery">&times;</button>
+
+  <% if (images.length > 1) { %>
+    <button onclick="galleryNav(-1)" id="galleryPrev" style="
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 2rem;
+      width: 48px; height: 48px; border-radius: 50%; cursor: pointer; z-index: 10001;
+      display: flex; align-items: center; justify-content: center;
+    " aria-label="Previous image">&#10094;</button>
+
+    <button onclick="galleryNav(1)" id="galleryNext" style="
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 2rem;
+      width: 48px; height: 48px; border-radius: 50%; cursor: pointer; z-index: 10001;
+      display: flex; align-items: center; justify-content: center;
+    " aria-label="Next image">&#10095;</button>
+  <% } %>
+
+  <img id="galleryImage" src="" alt="" style="
+    max-width: 90vw; max-height: 80vh; object-fit: contain; border-radius: 4px;
+  ">
+
+  <div id="galleryCounter" style="
+    color: rgba(255,255,255,0.7); margin-top: 12px; font-size: 0.875rem;
+  "></div>
+</div>
+<% } %>
+
 <style>
   @media (max-width: 768px) {
     section .container > div:first-of-type { grid-template-columns: 1fr !important; }
   }
+  #galleryOverlay button:hover {
+    background: rgba(255,255,255,0.25) !important;
+  }
 </style>
+
+<script>
+(function() {
+  var galleryImages = [<% images.forEach((img, i) => { %>'<%= img.file_path %>'<% if (i < images.length - 1) { %>,<% } %><% }) %>];
+  var currentIndex = 0;
+
+  // Track current image index for main view
+  window.currentImageIndex = 0;
+
+  window.selectThumb = function(idx) {
+    currentIndex = idx;
+    window.currentImageIndex = idx;
+    var mainImg = document.getElementById('mainImage');
+    mainImg.src = '/uploads/' + galleryImages[idx];
+    var thumbs = document.querySelectorAll('[data-thumb]');
+    thumbs.forEach(function(t) {
+      t.style.borderColor = 'var(--border)';
+    });
+    if (thumbs[idx]) thumbs[idx].style.borderColor = 'var(--primary)';
+  };
+
+  window.openGallery = function(startIdx) {
+    if (galleryImages.length === 0) return;
+    currentIndex = startIdx || 0;
+    var overlay = document.getElementById('galleryOverlay');
+    overlay.style.display = 'flex';
+    updateGalleryImage();
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeGallery = function() {
+    document.getElementById('galleryOverlay').style.display = 'none';
+    document.body.style.overflow = '';
+  };
+
+  window.galleryNav = function(dir) {
+    currentIndex = (currentIndex + dir + galleryImages.length) % galleryImages.length;
+    updateGalleryImage();
+  };
+
+  function updateGalleryImage() {
+    document.getElementById('galleryImage').src = '/uploads/' + galleryImages[currentIndex];
+    var counter = document.getElementById('galleryCounter');
+    if (counter) counter.textContent = (currentIndex + 1) + ' / ' + galleryImages.length;
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    var overlay = document.getElementById('galleryOverlay');
+    if (!overlay || overlay.style.display === 'none') return;
+    if (e.key === 'Escape') closeGallery();
+    if (e.key === 'ArrowLeft') galleryNav(-1);
+    if (e.key === 'ArrowRight') galleryNav(1);
+  });
+
+  // Close on background click
+  var overlay = document.getElementById('galleryOverlay');
+  if (overlay) {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeGallery();
+    });
+  }
+})();
+</script>
 
 <%- include('../partials/footer') %>

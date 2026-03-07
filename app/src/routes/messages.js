@@ -7,6 +7,49 @@ export default async function messagesRoutes(fastify) {
     }
   };
 
+  // GET /messages - Conversations inbox
+  fastify.get('/', { preHandler: requireAuth }, async (request, reply) => {
+    try {
+      const result = await db.query(
+        `SELECT
+           o.id as offer_id,
+           o.status as offer_status,
+           l.title as listing_title,
+           l.seller_id,
+           o.buyer_id,
+           CASE
+             WHEN l.seller_id = $1 THEN bu.username
+             ELSE su.username
+           END as other_username,
+           (SELECT content FROM messages WHERE offer_id = o.id ORDER BY created_at DESC LIMIT 1) as last_message,
+           (SELECT sender_id FROM messages WHERE offer_id = o.id ORDER BY created_at DESC LIMIT 1) as last_sender_id,
+           (SELECT created_at FROM messages WHERE offer_id = o.id ORDER BY created_at DESC LIMIT 1) as last_message_at,
+           (SELECT COUNT(*) FROM messages WHERE offer_id = o.id AND sender_id != $1 AND read_at IS NULL) as unread_count
+         FROM offers o
+         JOIN listings l ON o.listing_id = l.id
+         JOIN users bu ON o.buyer_id = bu.id
+         JOIN users su ON l.seller_id = su.id
+         WHERE (l.seller_id = $1 OR o.buyer_id = $1)
+         ORDER BY
+           (SELECT created_at FROM messages WHERE offer_id = o.id ORDER BY created_at DESC LIMIT 1) DESC NULLS LAST,
+           o.created_at DESC
+         LIMIT 100`,
+        [request.user.id]
+      );
+
+      return reply.view('messages/inbox.ejs', {
+        user: request.user,
+        conversations: result.rows,
+      });
+    } catch (err) {
+      fastify.log.error(err);
+      return reply.view('messages/inbox.ejs', {
+        user: request.user,
+        conversations: [],
+      });
+    }
+  });
+
   // GET /messages/:offerId - Chat for an offer
   fastify.get('/:offerId', { preHandler: requireAuth }, async (request, reply) => {
     const { offerId } = request.params;
@@ -34,6 +77,9 @@ export default async function messagesRoutes(fastify) {
         return reply.redirect('/offers');
       }
 
+      // Check if chat is unlocked (offer must be accepted or completed)
+      const chatUnlocked = offer.status === 'accepted' || offer.status === 'completed';
+
       // Get messages
       const messagesResult = await db.query(
         `SELECT m.*, u.username as sender_name
@@ -45,15 +91,18 @@ export default async function messagesRoutes(fastify) {
       );
 
       // Mark unread messages as read
-      await db.query(
-        'UPDATE messages SET read_at = NOW() WHERE offer_id = $1 AND sender_id != $2 AND read_at IS NULL',
-        [parseInt(offerId), request.user.id]
-      );
+      if (chatUnlocked) {
+        await db.query(
+          'UPDATE messages SET read_at = NOW() WHERE offer_id = $1 AND sender_id != $2 AND read_at IS NULL',
+          [parseInt(offerId), request.user.id]
+        );
+      }
 
       return reply.view('messages/chat.ejs', {
         user: request.user,
         offer,
         messages: messagesResult.rows,
+        chatUnlocked,
       });
     } catch (err) {
       fastify.log.error(err);
@@ -75,7 +124,7 @@ export default async function messagesRoutes(fastify) {
     }
 
     try {
-      // Verify user is buyer or seller
+      // Verify user is buyer or seller AND offer is accepted/completed
       const offerResult = await db.query(
         `SELECT o.*, l.seller_id
          FROM offers o
@@ -91,6 +140,11 @@ export default async function messagesRoutes(fastify) {
       const offer = offerResult.rows[0];
       if (request.user.id !== offer.buyer_id && request.user.id !== offer.seller_id) {
         return reply.redirect('/offers');
+      }
+
+      // Block messages if offer is not accepted or completed
+      if (offer.status !== 'accepted' && offer.status !== 'completed') {
+        return reply.redirect(`/messages/${offerId}`);
       }
 
       await db.query(

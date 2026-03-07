@@ -1,0 +1,68 @@
+<%- include('../partials/header', { pageTitle: 'Messages', user }) %>
+
+<section class="py-3">
+  <div class="container" style="max-width: 700px;">
+    <h1 style="font-size: 1.75rem; margin-bottom: 1.5rem;">Messages</h1>
+
+    <% if (conversations.length === 0) { %>
+      <div class="card">
+        <div class="card-body text-center py-4">
+          <p class="text-light">No conversations yet. Messages will appear here when you have accepted offers.</p>
+          <a href="/listings" class="btn btn-primary btn--sm mt-2">Browse Listings</a>
+        </div>
+      </div>
+    <% } else { %>
+      <% conversations.forEach(conv => { %>
+        <a href="/messages/<%= conv.offer_id %>" class="card mb-2" style="text-decoration: none; display: block;">
+          <div class="card-body">
+            <div class="flex-between" style="flex-wrap: wrap; gap: 0.5rem;">
+              <div class="flex-center gap-2">
+                <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary-dark); flex-shrink: 0;">
+                  <%= conv.other_username.charAt(0).toUpperCase() %>
+                </div>
+                <div style="min-width: 0;">
+                  <div style="font-weight: 600; color: var(--text);"><%= conv.other_username %></div>
+                  <div class="text-sm text-light" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 350px;">
+                    <span style="color: var(--text-light);"><%= conv.listing_title %></span>
+                  </div>
+                  <% if (conv.last_message) { %>
+                    <div class="text-sm" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 350px; color: <%= conv.unread_count > 0 ? 'var(--text)' : 'var(--text-light)' %>; font-weight: <%= conv.unread_count > 0 ? '600' : '400' %>;">
+                      <% if (conv.last_sender_id === user.id) { %>You: <% } %><%= conv.last_message %>
+                    </div>
+                  <% } else { %>
+                    <div class="text-sm text-light" style="font-style: italic;">No messages yet</div>
+                  <% } %>
+                </div>
+              </div>
+              <div style="text-align: right; flex-shrink: 0;">
+                <div class="flex-center gap-1" style="justify-content: flex-end;">
+                  <% if (conv.offer_status === 'accepted') { %>
+                    <span class="badge badge-success">Accepted</span>
+                  <% } else if (conv.offer_status === 'completed') { %>
+                    <span class="badge badge-success">Completed</span>
+                  <% } else if (conv.offer_status === 'pending') { %>
+                    <span class="badge badge-gray">Pending</span>
+                  <% } else { %>
+                    <span class="badge badge-danger">Rejected</span>
+                  <% } %>
+                  <% if (conv.unread_count > 0) { %>
+                    <span style="background: var(--primary); color: #fff; border-radius: 999px; min-width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; padding: 0 6px;">
+                      <%= conv.unread_count %>
+                    </span>
+                  <% } %>
+                </div>
+                <% if (conv.last_message_at) { %>
+                  <div class="text-sm text-light" style="margin-top: 0.25rem;">
+                    <%= new Date(conv.last_message_at).toLocaleDateString('en-CH', { month: 'short', day: 'numeric' }) %>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </a>
+      <% }) %>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
