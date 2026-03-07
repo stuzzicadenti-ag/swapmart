@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SwapMart - Scambia, Baratta &amp; Risparmia | Il marketplace pi&ugrave; equo della Svizzera</title>
-  <meta name="description" content="SwapMart &egrave; il marketplace pi&ugrave; equo della Svizzera. Scambia, baratta e vendi con solo il 3% di commissione. Sistema di baratto, offerte Baratto + Contanti e 5 annunci gratuiti al mese.">
+  <meta name="description" content="SwapMart &egrave; il marketplace pi&ugrave; equo della Svizzera. Scambia, baratta e vendi con solo il 5% di commissione. Sistema di baratto, offerte Baratto + Contanti e 3 annunci gratuiti al mese.">
   <meta name="keywords" content="marketplace svizzero, comprare vendere Svizzera, baratto scambio, scambiare articoli, carte Pokemon, auto usate, appartamenti, CHF, commissioni basse">
   <meta name="author" content="SwapMart AG">
   <link rel="canonical" href="https://stuzzicadenti-ag.github.io/swapmart/it/">
@@ -18,7 +18,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://stuzzicadenti-ag.github.io/swapmart/it/">
   <meta property="og:title" content="SwapMart - Scambia, Baratta &amp; Risparmia | Il marketplace pi&ugrave; equo della Svizzera">
-  <meta property="og:description" content="Solo 3% di commissione contro 8-12% altrove. Sistema di baratto unico. 5 annunci gratuiti/mese. Svizzera con CHF, Posta Svizzera e ritiro locale.">
+  <meta property="og:description" content="Solo 5% di commissione contro 8-12% altrove. Sistema di baratto unico. 3 annunci gratuiti/mese. Svizzera con CHF, Posta Svizzera e ritiro locale.">
   <meta property="og:image" content="https://stuzzicadenti-ag.github.io/swapmart/og-image.png">
   <meta property="og:site_name" content="SwapMart">
   <meta property="og:locale" content="it_CH">
@@ -26,7 +26,7 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="SwapMart - Il marketplace pi&ugrave; equo della Svizzera">
-  <meta name="twitter:description" content="Solo 3% di commissione contro 8-12% altrove. Sistema di baratto unico. 5 annunci gratuiti/mese.">
+  <meta name="twitter:description" content="Solo 5% di commissione contro 8-12% altrove. Sistema di baratto unico. 3 annunci gratuiti/mese.">
   <meta name="twitter:image" content="https://stuzzicadenti-ag.github.io/swapmart/og-image.png">
 
   <meta name="theme-color" content="#0d9488">
@@ -74,11 +74,16 @@
       </div>
 
       <div class="nav__actions">
-        <div class="lang-switch" aria-label="Lingua">
-          <a href="../" title="English">EN</a>
-          <a href="../de/" title="Deutsch">DE</a>
-          <a href="../fr/" title="Fran&ccedil;ais">FR</a>
-          <a href="../it/" class="active" title="Italiano">IT</a>
+        <div class="lang-dropdown">
+          <button type="button" class="lang-dropdown__btn" aria-expanded="false" aria-haspopup="true">
+            &#127760; <span class="lang-dropdown__current">IT</span> &#9662;
+          </button>
+          <ul class="lang-dropdown__menu" role="menu">
+            <li><a href="../" role="menuitem">English</a></li>
+            <li><a href="../de/" role="menuitem">Deutsch</a></li>
+            <li><a href="../fr/" role="menuitem">Fran&ccedil;ais</a></li>
+            <li><a href="./" role="menuitem" class="active">Italiano</a></li>
+          </ul>
         </div>
         <button type="button" class="btn btn--sm btn--outline" id="loginBtn">Accedi</button>
         <button type="button" class="btn btn--sm btn--primary" id="registerBtn">Registrati</button>
@@ -112,7 +117,7 @@
         <em>Il marketplace pi&ugrave; <span class="highlight">equo</span> della Svizzera.</em>
       </h1>
       <p class="hero__subtitle">
-        Solo 3% di commissione &mdash; non 12%. Scambia direttamente, combina contanti + baratto, o vendi in modo classico. 5 annunci gratuiti ogni mese.
+        Solo 5% di commissione, non 12%. Scambia direttamente, combina contanti + baratto, o vendi in modo classico. 3 annunci gratuiti ogni mese.
       </p>
 
       <form class="hero__search" action="#" onsubmit="return false;">
@@ -126,7 +131,7 @@
       </div>
 
       <div class="hero__trust">
-        <div class="hero__trust-item">&#x2705; Solo <strong>3% di commissioni</strong></div>
+        <div class="hero__trust-item">&#x2705; Solo <strong>5% di commissioni</strong></div>
         <div class="hero__trust-item">&#x1F4E6; Integrazione Posta Svizzera</div>
         <div class="hero__trust-item">&#x1F91D; Baratto &amp; scambio</div>
         <div class="hero__trust-item">&#x1F512; Scambi sicuri</div>
@@ -176,12 +181,12 @@
           <tbody>
             <tr>
               <td>Commissione di vendita</td>
-              <td class="comparison__ours">3%</td>
-              <td>8&ndash;12%</td>
+              <td class="comparison__ours">5% (max CHF 250)</td>
+              <td>8&ndash;12% (max CHF 290)</td>
             </tr>
             <tr>
               <td>Annunci gratuiti/mese</td>
-              <td class="comparison__ours">5 gratuiti</td>
+              <td class="comparison__ours">3 gratuiti</td>
               <td>Variabile</td>
             </tr>
             <tr>
@@ -201,7 +206,7 @@
             </tr>
             <tr>
               <td>Limite max. commissione</td>
-              <td class="comparison__ours">CHF 50</td>
+              <td class="comparison__ours">CHF 250</td>
               <td>CHF 290</td>
             </tr>
             <tr>
@@ -212,7 +217,7 @@
           </tbody>
         </table>
       </div>
-      <p class="comparison__note">* Tassi di commissione al 2026. Le commissioni Ricardo variano per categoria (PC/Gaming 11%, Moda 12%).</p>
+      <p class="comparison__note">* Tassi di commissione al 2026. Ricardo.ch 8-12% (max CHF 290), Tutti.ch gratuito ma funzionalit&agrave; limitate, eBay 10-13%. Esempi: articolo CHF 50 = CHF 2.50 di commissione, articolo CHF 1'000 = CHF 50 di commissione, articolo CHF 10'000 = CHF 250 (tetto massimo).</p>
     </div>
   </section>
 
@@ -220,7 +225,7 @@
   <section class="section section--alt" id="categories">
     <div class="container">
       <h2 class="section__title">Categorie popolari</h2>
-      <p class="section__subtitle">Dalle carte Pokemon agli appartamenti &mdash; trova (o scambia) quasi tutto.</p>
+      <p class="section__subtitle">Dalle carte Pokemon agli appartamenti, trova (o scambia) quasi tutto.</p>
 
       <div class="categories__grid">
         <a href="#" class="category-card">
@@ -278,7 +283,7 @@
           <div class="step__number">1</div>
           <div class="step__icon">&#128248;</div>
           <h3 class="step__title">Pubblica il tuo articolo</h3>
-          <p class="step__desc">Scatta una foto, imposta un prezzo o contrassegnalo come &laquo;Aperto agli scambi&raquo;. I primi 5 annunci al mese sono gratuiti.</p>
+          <p class="step__desc">Scatta una foto, imposta un prezzo o contrassegnalo come &laquo;Aperto agli scambi&raquo;. I primi 3 annunci al mese sono gratuiti.</p>
         </div>
         <div class="step">
           <div class="step__number">2</div>
@@ -290,7 +295,7 @@
           <div class="step__number">3</div>
           <div class="step__icon">&#129309;</div>
           <h3 class="step__title">Proponi un affare</h3>
-          <p class="step__desc">Offri contanti, uno scambio o un mix di entrambi. &laquo;La mia PS5 + CHF 200 per il tuo PC Gaming&raquo; &mdash; tutto funziona.</p>
+          <p class="step__desc">Offri contanti, uno scambio o un mix di entrambi. &laquo;La mia PS5 + CHF 200 per il tuo PC Gaming&raquo;. Tutto funziona.</p>
           <div class="step__badge">Baratto + Contanti</div>
         </div>
         <div class="step">
@@ -549,7 +554,7 @@
 
         <p class="swap-explainer__text">
           <strong>Nessuna commissione di baratto.</strong> SwapMart addebita commissioni solo sulla parte in contanti di un affare Baratto + Contanti.
-          Gli scambi puri (articolo per articolo) sono completamente gratuiti. Cos&igrave; dovrebbe funzionare il commercio &mdash; equo, flessibile e guidato dalla comunit&agrave;.
+          Gli scambi puri (articolo per articolo) sono completamente gratuiti. Cos&igrave; dovrebbe funzionare il commercio. Equo, flessibile e guidato dalla comunit&agrave;.
         </p>
       </div>
     </div>
@@ -567,8 +572,9 @@
           <div class="pricing-card__price">CHF 0<small></small></div>
           <div class="pricing-card__period">Gratuito per sempre</div>
           <ul class="pricing-card__features">
-            <li>5 annunci al mese</li>
-            <li>3% di commissione di vendita</li>
+            <li>3 annunci gratuiti al mese</li>
+            <li>5% di commissione di vendita (max CHF 250)</li>
+            <li>Annunci extra tramite pubblicit&agrave; o pagamento singolo</li>
             <li>Scambi illimitati (0% commissione)</li>
             <li>Valutazioni acquirenti &amp; venditori</li>
             <li>Messaggistica sicura</li>
@@ -584,7 +590,7 @@
           <div class="pricing-card__period">Fatturato mensilmente</div>
           <ul class="pricing-card__features">
             <li>30 annunci al mese</li>
-            <li>2% di commissione di vendita</li>
+            <li>3.5% di commissione di vendita (max CHF 250)</li>
             <li>Scambi illimitati (0% commissione)</li>
             <li>Posizionamento in evidenza</li>
             <li>Supporto clienti prioritario</li>
@@ -600,7 +606,7 @@
           <div class="pricing-card__period">Fatturato mensilmente</div>
           <ul class="pricing-card__features">
             <li>Annunci illimitati</li>
-            <li>1.5% di commissione di vendita</li>
+            <li>2.5% di commissione di vendita (max CHF 250)</li>
             <li>Scambi illimitati (0% commissione)</li>
             <li>Negozio personalizzato</li>
             <li>Accesso API</li>
@@ -640,6 +646,38 @@
           <div class="trust-card__icon">&#11088;</div>
           <h3 class="trust-card__title">Valutazioni acquirenti &amp; venditori</h3>
           <p class="trust-card__desc">Sistema di reputazione trasparente. Vedi numero di scambi, tempo di risposta e recensioni.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FIDUCIA & VERIFICA ==================== -->
+  <section class="section" id="verification">
+    <div class="container">
+      <div class="section-header">
+        <h3 class="section__title">Fiducia &amp; Verifica</h3>
+        <p class="section__sub">La tua sicurezza &egrave; la nostra priorit&agrave;. Ogni venditore su SwapMart passa attraverso la verifica dell'identit&agrave;.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-card__icon">&#128196;</div>
+          <h4>Verifica dell'identit&agrave; (KYC)</h4>
+          <p>Carica il tuo documento d'identit&agrave; per la verifica automatica. Alimentato da servizi leader come Onfido e Sumsub per controlli d'identit&agrave; istantanei e sicuri.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#9989;</div>
+          <h4>Badge verificato</h4>
+          <p>I venditori verificati ottengono un badge di fiducia sul loro profilo. Gli acquirenti possono comprare con fiducia sapendo che ogni venditore &egrave; una persona reale e verificata.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#11088;</div>
+          <h4>Sistema di reputazione</h4>
+          <p>Valuta acquirenti e venditori dopo ogni transazione. Costruisci il tuo punteggio di fiducia nel tempo con recensioni positive e affari riusciti.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#128737;</div>
+          <h4>SwapMart MoneyGuard</h4>
+          <p>Protezione opzionale dell'acquirente per articoli di alto valore. Una piccola commissione aggiuntiva trattiene il pagamento in deposito fino alla conferma di ricezione da parte dell'acquirente.</p>
         </div>
       </div>
     </div>
@@ -858,6 +896,27 @@
       }
     })();
   </script>
+
+<script>
+(function() {
+  var btn = document.querySelector('.lang-dropdown__btn');
+  var menu = document.querySelector('.lang-dropdown__menu');
+  if (!btn || !menu) return;
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var open = menu.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open);
+  });
+  document.addEventListener('click', function() {
+    menu.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { menu.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+  });
+})();
+(function() { sessionStorage.setItem('lang-chosen', '1'); })();
+</script>
 
 </body>
 </html>

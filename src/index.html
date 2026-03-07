@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SwapMart - Trade, Swap &amp; Save | Switzerland's Fairest Marketplace</title>
-  <meta name="description" content="SwapMart is Switzerland's fairest marketplace. Trade, swap and sell items with only 3% commission. Barter system, Swap + Cash deals, and 5 free listings per month.">
+  <meta name="description" content="SwapMart is Switzerland's fairest marketplace. Trade, swap and sell items with only 5% commission. Barter system, Swap + Cash deals, and 3 free listings per month.">
   <meta name="keywords" content="Swiss marketplace, buy sell Switzerland, barter trade, swap items, Pokemon cards, used cars, apartments, CHF, low fees marketplace">
   <meta name="author" content="SwapMart AG">
   <link rel="canonical" href="https://stuzzicadenti-ag.github.io/swapmart/">
@@ -18,7 +18,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://stuzzicadenti-ag.github.io/swapmart/">
   <meta property="og:title" content="SwapMart - Trade, Swap &amp; Save | Switzerland's Fairest Marketplace">
-  <meta property="og:description" content="Only 3% commission vs 8-12% elsewhere. Unique barter/swap system. 5 free listings/month. Swiss-focused with CHF, Swiss Post and local pickup.">
+  <meta property="og:description" content="Only 5% commission vs 8-12% elsewhere. Unique barter/swap system. 3 free listings/month. Swiss-focused with CHF, Swiss Post and local pickup.">
   <meta property="og:image" content="https://stuzzicadenti-ag.github.io/swapmart/og-image.png">
   <meta property="og:site_name" content="SwapMart">
   <meta property="og:locale" content="en_CH">
@@ -26,7 +26,7 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="SwapMart - Switzerland's Fairest Marketplace">
-  <meta name="twitter:description" content="Only 3% commission vs 8-12% elsewhere. Unique barter/swap system. 5 free listings/month.">
+  <meta name="twitter:description" content="Only 5% commission vs 8-12% elsewhere. Unique barter/swap system. 3 free listings/month.">
   <meta name="twitter:image" content="https://stuzzicadenti-ag.github.io/swapmart/og-image.png">
 
   <meta name="theme-color" content="#0d9488">
@@ -77,14 +77,19 @@
       </div>
 
       <div class="nav__actions">
-        <div class="lang-switch" aria-label="Language">
-          <a href="./" class="active" title="English">EN</a>
-          <a href="./de/" title="Deutsch">DE</a>
-          <a href="./fr/" title="Fran&ccedil;ais">FR</a>
-          <a href="./it/" title="Italiano">IT</a>
-        </div>
         <button type="button" class="btn btn--sm btn--outline" id="loginBtn">Login</button>
         <button type="button" class="btn btn--sm btn--primary" id="registerBtn">Register</button>
+        <div class="lang-dropdown">
+          <button type="button" class="lang-dropdown__btn" aria-expanded="false" aria-haspopup="true">
+            &#127760; <span class="lang-dropdown__current">EN</span> &#9662;
+          </button>
+          <ul class="lang-dropdown__menu" role="menu">
+            <li><a href="./" role="menuitem" class="active">English</a></li>
+            <li><a href="./de/" role="menuitem">Deutsch</a></li>
+            <li><a href="./fr/" role="menuitem">Fran&ccedil;ais</a></li>
+            <li><a href="./it/" role="menuitem">Italiano</a></li>
+          </ul>
+        </div>
         <button type="button" class="nav__burger" id="burger" aria-label="Toggle mobile menu" aria-expanded="false">
           <span></span>
           <span></span>
@@ -115,7 +120,7 @@
         <em>Switzerland's <span class="highlight">Fairest</span> Marketplace.</em>
       </h1>
       <p class="hero__subtitle">
-        Only 3% commission &mdash; not 12%. Swap items directly, mix cash + barter, or sell the classic way. 5 free listings every month.
+        Only 5% commission, not 12%. Swap items directly, mix cash + barter, or sell the classic way. 3 free listings every month.
       </p>
 
       <form class="hero__search" action="#" onsubmit="return false;">
@@ -129,7 +134,7 @@
       </div>
 
       <div class="hero__trust">
-        <div class="hero__trust-item">&#x2705; <strong>3% fees</strong> only</div>
+        <div class="hero__trust-item">&#x2705; <strong>5% fees</strong> only</div>
         <div class="hero__trust-item">&#x1F4E6; Swiss Post integration</div>
         <div class="hero__trust-item">&#x1F91D; Barter &amp; swap</div>
         <div class="hero__trust-item">&#x1F512; Secure trades</div>
@@ -179,12 +184,12 @@
           <tbody>
             <tr>
               <td>Selling Commission</td>
-              <td class="comparison__ours">3%</td>
-              <td>8&ndash;12%</td>
+              <td class="comparison__ours">5% (max CHF 250)</td>
+              <td>8&ndash;12% (max CHF 290)</td>
             </tr>
             <tr>
               <td>Monthly Free Listings</td>
-              <td class="comparison__ours">5 free</td>
+              <td class="comparison__ours">3 free</td>
               <td>Varies</td>
             </tr>
             <tr>
@@ -204,7 +209,7 @@
             </tr>
             <tr>
               <td>Max Commission Cap</td>
-              <td class="comparison__ours">CHF 50</td>
+              <td class="comparison__ours">CHF 250</td>
               <td>CHF 290</td>
             </tr>
             <tr>
@@ -215,7 +220,7 @@
           </tbody>
         </table>
       </div>
-      <p class="comparison__note">* Commission rates as of 2026. Ricardo fees vary by category (PC/Gaming 11%, Fashion 12%).</p>
+      <p class="comparison__note">* Commission rates as of 2026. Ricardo.ch 8-12% (max CHF 290), Tutti.ch free but limited features, eBay 10-13%. Fee examples: CHF 50 item = CHF 2.50 fee, CHF 1,000 item = CHF 50 fee, CHF 10,000 item = CHF 250 (capped).</p>
     </div>
   </section>
 
@@ -223,7 +228,7 @@
   <section class="section section--alt" id="categories">
     <div class="container">
       <h2 class="section__title">Popular Categories</h2>
-      <p class="section__subtitle">From Pokemon cards to apartments &mdash; find (or trade) almost anything.</p>
+      <p class="section__subtitle">From Pokemon cards to apartments. Find (or trade) almost anything.</p>
 
       <div class="categories__grid">
         <a href="#" class="category-card">
@@ -281,7 +286,7 @@
           <div class="step__number">1</div>
           <div class="step__icon">&#128248;</div>
           <h3 class="step__title">List Your Item</h3>
-          <p class="step__desc">Snap a photo, set a price or mark it "Open to Swaps". First 5 listings each month are free.</p>
+          <p class="step__desc">Snap a photo, set a price or mark it "Open to Swaps". First 3 listings each month are free.</p>
         </div>
         <div class="step">
           <div class="step__number">2</div>
@@ -293,7 +298,7 @@
           <div class="step__number">3</div>
           <div class="step__icon">&#129309;</div>
           <h3 class="step__title">Propose a Deal</h3>
-          <p class="step__desc">Offer cash, a swap, or a mix of both. "My PS5 + CHF 200 for your Gaming PC" &mdash; it all works.</p>
+          <p class="step__desc">Offer cash, a swap, or a mix of both. "My PS5 + CHF 200 for your Gaming PC". It all works.</p>
           <div class="step__badge">Swap + Cash</div>
         </div>
         <div class="step">
@@ -558,7 +563,7 @@
 
         <p class="swap-explainer__text">
           <strong>No barter fee.</strong> SwapMart only charges commission on the cash portion of a Swap + Cash deal.
-          Pure swaps (item for item) are completely free. This is how trading should work &mdash; fair, flexible, and community-driven.
+          Pure swaps (item for item) are completely free. This is how trading should work: fair, flexible, and community-driven.
         </p>
       </div>
     </div>
@@ -577,8 +582,9 @@
           <div class="pricing-card__price">CHF 0<small></small></div>
           <div class="pricing-card__period">Free forever</div>
           <ul class="pricing-card__features">
-            <li>5 listings per month</li>
-            <li>3% selling commission</li>
+            <li>3 free listings per month</li>
+            <li>5% selling commission (max CHF 250)</li>
+            <li>Extra listings via ads or pay-per-listing</li>
             <li>Unlimited swaps (0% fee)</li>
             <li>Buyer &amp; seller ratings</li>
             <li>Secure messaging</li>
@@ -595,7 +601,7 @@
           <div class="pricing-card__period">Billed monthly</div>
           <ul class="pricing-card__features">
             <li>30 listings per month</li>
-            <li>2% selling commission</li>
+            <li>3.5% selling commission (max CHF 250)</li>
             <li>Unlimited swaps (0% fee)</li>
             <li>Featured listing placement</li>
             <li>Priority customer support</li>
@@ -612,7 +618,7 @@
           <div class="pricing-card__period">Billed monthly</div>
           <ul class="pricing-card__features">
             <li>Unlimited listings</li>
-            <li>1.5% selling commission</li>
+            <li>2.5% selling commission (max CHF 250)</li>
             <li>Unlimited swaps (0% fee)</li>
             <li>Custom storefront</li>
             <li>API access</li>
@@ -652,6 +658,38 @@
           <div class="trust-card__icon">&#11088;</div>
           <h3 class="trust-card__title">Buyer &amp; Seller Ratings</h3>
           <p class="trust-card__desc">Transparent reputation system. See trade count, response time, and reviews.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TRUST & VERIFICATION ==================== -->
+  <section class="section" id="verification">
+    <div class="container">
+      <div class="section-header">
+        <h3 class="section__title">Trust &amp; Verification</h3>
+        <p class="section__sub">Your safety is our priority. Every seller on SwapMart goes through identity verification.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-card__icon">&#128196;</div>
+          <h4>ID Verification (KYC)</h4>
+          <p>Upload your ID document for automated verification. Powered by industry-leading services like Onfido and Sumsub for instant, secure identity checks.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#9989;</div>
+          <h4>Verified Badge</h4>
+          <p>Verified sellers get a trusted badge on their profile. Buyers can shop with confidence knowing every seller is a real, verified person.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#11088;</div>
+          <h4>Reputation System</h4>
+          <p>Rate buyers and sellers after every transaction. Build your trust score over time with positive reviews and successful deals.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#128737;</div>
+          <h4>SwapMart MoneyGuard</h4>
+          <p>Optional buyer protection for high-value items. A small additional fee holds payment in escrow until the buyer confirms receipt.</p>
         </div>
       </div>
     </div>
@@ -750,8 +788,15 @@
           <input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password" required>
         </div>
         <button type="submit" class="btn btn--primary" style="width:100%;">Login</button>
-        <div class="modal__divider">or</div>
-        <button type="button" class="btn btn--outline" style="width:100%;">Continue with Google</button>
+        <div class="social-login">
+          <p class="social-login__divider">or continue with</p>
+          <div class="social-login__buttons">
+            <button type="button" class="social-btn social-btn--instagram">&#128247; Instagram</button>
+            <button type="button" class="social-btn social-btn--google">&#128269; Google</button>
+            <button type="button" class="social-btn social-btn--facebook">&#128216; Facebook</button>
+          </div>
+          <p class="social-login__note">Import your travel photos directly from Instagram!</p>
+        </div>
         <p class="modal__terms">By continuing, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
       </form>
 
@@ -770,8 +815,15 @@
           <input type="password" id="regPassword" placeholder="Min. 8 characters" autocomplete="new-password" required minlength="8">
         </div>
         <button type="submit" class="btn btn--primary" style="width:100%;">Create Account</button>
-        <div class="modal__divider">or</div>
-        <button type="button" class="btn btn--outline" style="width:100%;">Sign up with Google</button>
+        <div class="social-login">
+          <p class="social-login__divider">or continue with</p>
+          <div class="social-login__buttons">
+            <button type="button" class="social-btn social-btn--instagram">&#128247; Instagram</button>
+            <button type="button" class="social-btn social-btn--google">&#128269; Google</button>
+            <button type="button" class="social-btn social-btn--facebook">&#128216; Facebook</button>
+          </div>
+          <p class="social-login__note">Import your travel photos directly from Instagram!</p>
+        </div>
         <p class="modal__terms">By registering, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
       </form>
     </div>
@@ -873,6 +925,37 @@
           observer.observe(el);
         });
       }
+    })();
+
+    // Language dropdown
+    (function() {
+      var btn = document.querySelector('.lang-dropdown__btn');
+      var menu = document.querySelector('.lang-dropdown__menu');
+      if (!btn || !menu) return;
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var open = menu.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open);
+      });
+      document.addEventListener('click', function() {
+        menu.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') { menu.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+      });
+    })();
+
+    // Auto-detect language (first visit only)
+    (function() {
+      if (sessionStorage.getItem('lang-chosen')) return;
+      var lang = (navigator.language || '').substring(0, 2).toLowerCase();
+      var supported = {de: 'de/', fr: 'fr/', it: 'it/'};
+      if (supported[lang] && !window.location.pathname.includes('/' + lang + '/')) {
+        sessionStorage.setItem('lang-chosen', '1');
+        window.location.href = supported[lang];
+      }
+      sessionStorage.setItem('lang-chosen', '1');
     })();
   </script>
 

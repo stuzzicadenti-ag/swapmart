@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SwapMart - &Eacute;changez, Troquez &amp; &Eacute;conomisez | La place de march&eacute; la plus &eacute;quitable de Suisse</title>
-  <meta name="description" content="SwapMart est la place de march&eacute; la plus &eacute;quitable de Suisse. &Eacute;changez, troquez et vendez avec seulement 3% de commission. Syst&egrave;me de troc, offres Troc + Cash, et 5 annonces gratuites par mois.">
+  <meta name="description" content="SwapMart est la place de march&eacute; la plus &eacute;quitable de Suisse. &Eacute;changez, troquez et vendez avec seulement 5% de commission. Syst&egrave;me de troc, offres Troc + Cash, et 3 annonces gratuites par mois.">
   <meta name="keywords" content="march&eacute; suisse, acheter vendre Suisse, troc &eacute;change, troquer articles, cartes Pokemon, voitures occasion, appartements, CHF, frais r&eacute;duits">
   <meta name="author" content="SwapMart AG">
   <link rel="canonical" href="https://stuzzicadenti-ag.github.io/swapmart/fr/">
@@ -18,7 +18,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://stuzzicadenti-ag.github.io/swapmart/fr/">
   <meta property="og:title" content="SwapMart - &Eacute;changez, Troquez &amp; &Eacute;conomisez | La place de march&eacute; la plus &eacute;quitable de Suisse">
-  <meta property="og:description" content="Seulement 3% de commission contre 8-12% ailleurs. Syst&egrave;me de troc unique. 5 annonces gratuites/mois. Suisse avec CHF, Poste Suisse et retrait local.">
+  <meta property="og:description" content="Seulement 5% de commission contre 8-12% ailleurs. Syst&egrave;me de troc unique. 3 annonces gratuites/mois. Suisse avec CHF, Poste Suisse et retrait local.">
   <meta property="og:image" content="https://stuzzicadenti-ag.github.io/swapmart/og-image.png">
   <meta property="og:site_name" content="SwapMart">
   <meta property="og:locale" content="fr_CH">
@@ -26,7 +26,7 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="SwapMart - La place de march&eacute; la plus &eacute;quitable de Suisse">
-  <meta name="twitter:description" content="Seulement 3% de commission contre 8-12% ailleurs. Syst&egrave;me de troc unique. 5 annonces gratuites/mois.">
+  <meta name="twitter:description" content="Seulement 5% de commission contre 8-12% ailleurs. Syst&egrave;me de troc unique. 3 annonces gratuites/mois.">
   <meta name="twitter:image" content="https://stuzzicadenti-ag.github.io/swapmart/og-image.png">
 
   <meta name="theme-color" content="#0d9488">
@@ -74,11 +74,16 @@
       </div>
 
       <div class="nav__actions">
-        <div class="lang-switch" aria-label="Langue">
-          <a href="../" title="English">EN</a>
-          <a href="../de/" title="Deutsch">DE</a>
-          <a href="../fr/" class="active" title="Fran&ccedil;ais">FR</a>
-          <a href="../it/" title="Italiano">IT</a>
+        <div class="lang-dropdown">
+          <button type="button" class="lang-dropdown__btn" aria-expanded="false" aria-haspopup="true">
+            &#127760; <span class="lang-dropdown__current">FR</span> &#9662;
+          </button>
+          <ul class="lang-dropdown__menu" role="menu">
+            <li><a href="../" role="menuitem">English</a></li>
+            <li><a href="../de/" role="menuitem">Deutsch</a></li>
+            <li><a href="./" role="menuitem" class="active">Fran&ccedil;ais</a></li>
+            <li><a href="../it/" role="menuitem">Italiano</a></li>
+          </ul>
         </div>
         <button type="button" class="btn btn--sm btn--outline" id="loginBtn">Connexion</button>
         <button type="button" class="btn btn--sm btn--primary" id="registerBtn">S'inscrire</button>
@@ -112,7 +117,7 @@
         <em>La place de march&eacute; la plus <span class="highlight">&eacute;quitable</span> de Suisse.</em>
       </h1>
       <p class="hero__subtitle">
-        Seulement 3% de commission &mdash; pas 12%. &Eacute;changez directement, m&eacute;langez cash + troc, ou vendez classiquement. 5 annonces gratuites chaque mois.
+        Seulement 5% de commission, pas 12%. &Eacute;changez directement, m&eacute;langez cash + troc, ou vendez classiquement. 3 annonces gratuites chaque mois.
       </p>
 
       <form class="hero__search" action="#" onsubmit="return false;">
@@ -126,7 +131,7 @@
       </div>
 
       <div class="hero__trust">
-        <div class="hero__trust-item">&#x2705; Seulement <strong>3% de frais</strong></div>
+        <div class="hero__trust-item">&#x2705; Seulement <strong>5% de frais</strong></div>
         <div class="hero__trust-item">&#x1F4E6; Int&eacute;gration Poste Suisse</div>
         <div class="hero__trust-item">&#x1F91D; Troc &amp; &eacute;change</div>
         <div class="hero__trust-item">&#x1F512; &Eacute;changes s&eacute;curis&eacute;s</div>
@@ -176,12 +181,12 @@
           <tbody>
             <tr>
               <td>Commission de vente</td>
-              <td class="comparison__ours">3%</td>
-              <td>8&ndash;12%</td>
+              <td class="comparison__ours">5% (max CHF 250)</td>
+              <td>8&ndash;12% (max CHF 290)</td>
             </tr>
             <tr>
               <td>Annonces gratuites/mois</td>
-              <td class="comparison__ours">5 gratuites</td>
+              <td class="comparison__ours">3 gratuites</td>
               <td>Variable</td>
             </tr>
             <tr>
@@ -201,7 +206,7 @@
             </tr>
             <tr>
               <td>Plafond de commission</td>
-              <td class="comparison__ours">CHF 50</td>
+              <td class="comparison__ours">CHF 250</td>
               <td>CHF 290</td>
             </tr>
             <tr>
@@ -212,7 +217,7 @@
           </tbody>
         </table>
       </div>
-      <p class="comparison__note">* Taux de commission en 2026. Les frais Ricardo varient selon la cat&eacute;gorie (PC/Gaming 11%, Mode 12%).</p>
+      <p class="comparison__note">* Taux de commission en 2026. Ricardo.ch 8-12% (max CHF 290), Tutti.ch gratuit mais fonctionnalit&eacute;s limit&eacute;es, eBay 10-13%. Exemples : article CHF 50 = CHF 2.50 de frais, article CHF 1'000 = CHF 50 de frais, article CHF 10'000 = CHF 250 (plafonn&eacute;).</p>
     </div>
   </section>
 
@@ -220,7 +225,7 @@
   <section class="section section--alt" id="categories">
     <div class="container">
       <h2 class="section__title">Cat&eacute;gories populaires</h2>
-      <p class="section__subtitle">Des cartes Pokemon aux appartements &mdash; trouvez (ou &eacute;changez) presque tout.</p>
+      <p class="section__subtitle">Des cartes Pokemon aux appartements, trouvez (ou &eacute;changez) presque tout.</p>
 
       <div class="categories__grid">
         <a href="#" class="category-card">
@@ -278,7 +283,7 @@
           <div class="step__number">1</div>
           <div class="step__icon">&#128248;</div>
           <h3 class="step__title">Publiez votre article</h3>
-          <p class="step__desc">Prenez une photo, fixez un prix ou indiquez &laquo;Ouvert aux &eacute;changes&raquo;. Les 5 premi&egrave;res annonces du mois sont gratuites.</p>
+          <p class="step__desc">Prenez une photo, fixez un prix ou indiquez &laquo;Ouvert aux &eacute;changes&raquo;. Les 3 premi&egrave;res annonces du mois sont gratuites.</p>
         </div>
         <div class="step">
           <div class="step__number">2</div>
@@ -290,7 +295,7 @@
           <div class="step__number">3</div>
           <div class="step__icon">&#129309;</div>
           <h3 class="step__title">Proposez un deal</h3>
-          <p class="step__desc">Offrez du cash, un &eacute;change, ou un m&eacute;lange des deux. &laquo;Ma PS5 + CHF 200 pour votre PC Gaming&raquo; &mdash; tout est possible.</p>
+          <p class="step__desc">Offrez du cash, un &eacute;change, ou un m&eacute;lange des deux. &laquo;Ma PS5 + CHF 200 pour votre PC Gaming&raquo;. Tout est possible.</p>
           <div class="step__badge">Troc + Cash</div>
         </div>
         <div class="step">
@@ -549,7 +554,7 @@
 
         <p class="swap-explainer__text">
           <strong>Pas de frais de troc.</strong> SwapMart ne facture une commission que sur la partie cash d'un deal Troc + Cash.
-          Les &eacute;changes purs (article contre article) sont enti&egrave;rement gratuits. C'est ainsi que le commerce devrait fonctionner &mdash; &eacute;quitable, flexible et communautaire.
+          Les &eacute;changes purs (article contre article) sont enti&egrave;rement gratuits. C'est ainsi que le commerce devrait fonctionner. &Eacute;quitable, flexible et communautaire.
         </p>
       </div>
     </div>
@@ -567,8 +572,9 @@
           <div class="pricing-card__price">CHF 0<small></small></div>
           <div class="pricing-card__period">Gratuit pour toujours</div>
           <ul class="pricing-card__features">
-            <li>5 annonces par mois</li>
-            <li>3% de commission de vente</li>
+            <li>3 annonces gratuites par mois</li>
+            <li>5% de commission de vente (max CHF 250)</li>
+            <li>Annonces suppl&eacute;mentaires via publicit&eacute;s ou paiement unitaire</li>
             <li>&Eacute;changes illimit&eacute;s (0% de frais)</li>
             <li>&Eacute;valuations acheteurs &amp; vendeurs</li>
             <li>Messagerie s&eacute;curis&eacute;e</li>
@@ -584,7 +590,7 @@
           <div class="pricing-card__period">Factur&eacute; mensuellement</div>
           <ul class="pricing-card__features">
             <li>30 annonces par mois</li>
-            <li>2% de commission de vente</li>
+            <li>3.5% de commission de vente (max CHF 250)</li>
             <li>&Eacute;changes illimit&eacute;s (0% de frais)</li>
             <li>Placement en vedette</li>
             <li>Support client prioritaire</li>
@@ -600,7 +606,7 @@
           <div class="pricing-card__period">Factur&eacute; mensuellement</div>
           <ul class="pricing-card__features">
             <li>Annonces illimit&eacute;es</li>
-            <li>1.5% de commission de vente</li>
+            <li>2.5% de commission de vente (max CHF 250)</li>
             <li>&Eacute;changes illimit&eacute;s (0% de frais)</li>
             <li>Boutique personnalis&eacute;e</li>
             <li>Acc&egrave;s API</li>
@@ -640,6 +646,38 @@
           <div class="trust-card__icon">&#11088;</div>
           <h3 class="trust-card__title">&Eacute;valuations acheteurs &amp; vendeurs</h3>
           <p class="trust-card__desc">Syst&egrave;me de r&eacute;putation transparent. Voyez le nombre d'&eacute;changes, le temps de r&eacute;ponse et les avis.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CONFIANCE & V&Eacute;RIFICATION ==================== -->
+  <section class="section" id="verification">
+    <div class="container">
+      <div class="section-header">
+        <h3 class="section__title">Confiance &amp; V&eacute;rification</h3>
+        <p class="section__sub">Votre s&eacute;curit&eacute; est notre priorit&eacute;. Chaque vendeur sur SwapMart passe par une v&eacute;rification d'identit&eacute;.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-card__icon">&#128196;</div>
+          <h4>V&eacute;rification d'identit&eacute; (KYC)</h4>
+          <p>T&eacute;l&eacute;chargez votre pi&egrave;ce d'identit&eacute; pour une v&eacute;rification automatis&eacute;e. Propuls&eacute; par des services leaders comme Onfido et Sumsub pour des v&eacute;rifications instantan&eacute;es et s&eacute;curis&eacute;es.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#9989;</div>
+          <h4>Badge v&eacute;rifi&eacute;</h4>
+          <p>Les vendeurs v&eacute;rifi&eacute;s obtiennent un badge de confiance sur leur profil. Les acheteurs peuvent acheter en toute confiance sachant que chaque vendeur est une personne r&eacute;elle et v&eacute;rifi&eacute;e.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#11088;</div>
+          <h4>Syst&egrave;me de r&eacute;putation</h4>
+          <p>&Eacute;valuez acheteurs et vendeurs apr&egrave;s chaque transaction. Construisez votre score de confiance au fil du temps avec des avis positifs et des transactions r&eacute;ussies.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#128737;</div>
+          <h4>SwapMart MoneyGuard</h4>
+          <p>Protection optionnelle de l'acheteur pour les articles de grande valeur. Un petit frais suppl&eacute;mentaire conserve le paiement sous s&eacute;questre jusqu'&agrave; confirmation de r&eacute;ception par l'acheteur.</p>
         </div>
       </div>
     </div>
@@ -858,6 +896,27 @@
       }
     })();
   </script>
+
+<script>
+(function() {
+  var btn = document.querySelector('.lang-dropdown__btn');
+  var menu = document.querySelector('.lang-dropdown__menu');
+  if (!btn || !menu) return;
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var open = menu.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open);
+  });
+  document.addEventListener('click', function() {
+    menu.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { menu.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+  });
+})();
+(function() { sessionStorage.setItem('lang-chosen', '1'); })();
+</script>
 
 </body>
 </html>

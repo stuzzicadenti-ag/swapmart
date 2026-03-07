@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SwapMart - Tauschen, Handeln &amp; Sparen | Der fairste Marktplatz der Schweiz</title>
-  <meta name="description" content="SwapMart ist der fairste Marktplatz der Schweiz. Tauschen, handeln und verkaufen Sie mit nur 3% Provision. Tauschsystem, Tausch + Bargeld-Deals und 5 kostenlose Inserate pro Monat.">
+  <meta name="description" content="SwapMart ist der fairste Marktplatz der Schweiz. Tauschen, handeln und verkaufen Sie mit nur 5% Provision. Tauschsystem, Tausch + Bargeld-Deals und 3 kostenlose Inserate pro Monat.">
   <meta name="keywords" content="Schweizer Marktplatz, kaufen verkaufen Schweiz, Tauschhandel, Artikel tauschen, Pokemon Karten, Gebrauchtwagen, Wohnungen, CHF, g&uuml;nstige Geb&uuml;hren">
   <meta name="author" content="SwapMart AG">
   <link rel="canonical" href="https://stuzzicadenti-ag.github.io/swapmart/de/">
@@ -18,7 +18,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://stuzzicadenti-ag.github.io/swapmart/de/">
   <meta property="og:title" content="SwapMart - Tauschen, Handeln &amp; Sparen | Der fairste Marktplatz der Schweiz">
-  <meta property="og:description" content="Nur 3% Provision statt 8-12%. Einzigartiges Tausch-System. 5 kostenlose Inserate/Monat. Schweiz-fokussiert mit CHF, Schweizer Post und lokaler Abholung.">
+  <meta property="og:description" content="Nur 5% Provision statt 8-12%. Einzigartiges Tausch-System. 3 kostenlose Inserate/Monat. Schweiz-fokussiert mit CHF, Schweizer Post und lokaler Abholung.">
   <meta property="og:image" content="https://stuzzicadenti-ag.github.io/swapmart/og-image.png">
   <meta property="og:site_name" content="SwapMart">
   <meta property="og:locale" content="de_CH">
@@ -26,7 +26,7 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="SwapMart - Der fairste Marktplatz der Schweiz">
-  <meta name="twitter:description" content="Nur 3% Provision statt 8-12%. Einzigartiges Tausch-System. 5 kostenlose Inserate/Monat.">
+  <meta name="twitter:description" content="Nur 5% Provision statt 8-12%. Einzigartiges Tausch-System. 3 kostenlose Inserate/Monat.">
   <meta name="twitter:image" content="https://stuzzicadenti-ag.github.io/swapmart/og-image.png">
 
   <meta name="theme-color" content="#0d9488">
@@ -74,14 +74,19 @@
       </div>
 
       <div class="nav__actions">
-        <div class="lang-switch" aria-label="Sprache">
-          <a href="../" title="English">EN</a>
-          <a href="../de/" class="active" title="Deutsch">DE</a>
-          <a href="../fr/" title="Fran&ccedil;ais">FR</a>
-          <a href="../it/" title="Italiano">IT</a>
-        </div>
         <button type="button" class="btn btn--sm btn--outline" id="loginBtn">Anmelden</button>
         <button type="button" class="btn btn--sm btn--primary" id="registerBtn">Registrieren</button>
+        <div class="lang-dropdown">
+          <button type="button" class="lang-dropdown__btn" aria-expanded="false" aria-haspopup="true">
+            &#127760; <span class="lang-dropdown__current">DE</span> &#9662;
+          </button>
+          <ul class="lang-dropdown__menu" role="menu">
+            <li><a href="../" role="menuitem">English</a></li>
+            <li><a href="../de/" role="menuitem" class="active">Deutsch</a></li>
+            <li><a href="../fr/" role="menuitem">Fran&ccedil;ais</a></li>
+            <li><a href="../it/" role="menuitem">Italiano</a></li>
+          </ul>
+        </div>
         <button type="button" class="nav__burger" id="burger" aria-label="Mobiles Men&uuml; umschalten" aria-expanded="false">
           <span></span>
           <span></span>
@@ -112,7 +117,7 @@
         <em>Der <span class="highlight">fairste</span> Marktplatz der Schweiz.</em>
       </h1>
       <p class="hero__subtitle">
-        Nur 3% Provision &mdash; nicht 12%. Tauschen Sie direkt, mischen Sie Bargeld + Tausch, oder verkaufen Sie klassisch. 5 kostenlose Inserate jeden Monat.
+        Nur 5% Provision, nicht 12%. Tauschen Sie direkt, mischen Sie Bargeld + Tausch, oder verkaufen Sie klassisch. 3 kostenlose Inserate jeden Monat.
       </p>
 
       <form class="hero__search" action="#" onsubmit="return false;">
@@ -126,7 +131,7 @@
       </div>
 
       <div class="hero__trust">
-        <div class="hero__trust-item">&#x2705; Nur <strong>3% Geb&uuml;hren</strong></div>
+        <div class="hero__trust-item">&#x2705; Nur <strong>5% Geb&uuml;hren</strong></div>
         <div class="hero__trust-item">&#x1F4E6; Schweizer Post Integration</div>
         <div class="hero__trust-item">&#x1F91D; Tausch &amp; Handel</div>
         <div class="hero__trust-item">&#x1F512; Sichere Gesch&auml;fte</div>
@@ -176,12 +181,12 @@
           <tbody>
             <tr>
               <td>Verkaufsprovision</td>
-              <td class="comparison__ours">3%</td>
-              <td>8&ndash;12%</td>
+              <td class="comparison__ours">5% (max CHF 250)</td>
+              <td>8&ndash;12% (max CHF 290)</td>
             </tr>
             <tr>
               <td>Monatliche Gratis-Inserate</td>
-              <td class="comparison__ours">5 gratis</td>
+              <td class="comparison__ours">3 gratis</td>
               <td>Variiert</td>
             </tr>
             <tr>
@@ -201,7 +206,7 @@
             </tr>
             <tr>
               <td>Max. Provisionslimit</td>
-              <td class="comparison__ours">CHF 50</td>
+              <td class="comparison__ours">CHF 250</td>
               <td>CHF 290</td>
             </tr>
             <tr>
@@ -212,7 +217,7 @@
           </tbody>
         </table>
       </div>
-      <p class="comparison__note">* Provisionss&auml;tze Stand 2026. Ricardo-Geb&uuml;hren variieren je nach Kategorie (PC/Gaming 11%, Mode 12%).</p>
+      <p class="comparison__note">* Provisionss&auml;tze Stand 2026. Ricardo.ch 8-12% (max CHF 290), Tutti.ch gratis aber eingeschr&auml;nkte Funktionen, eBay 10-13%. Beispiele: CHF 50 Artikel = CHF 2.50 Geb&uuml;hr, CHF 1'000 Artikel = CHF 50 Geb&uuml;hr, CHF 10'000 Artikel = CHF 250 (gedeckelt).</p>
     </div>
   </section>
 
@@ -220,7 +225,7 @@
   <section class="section section--alt" id="categories">
     <div class="container">
       <h2 class="section__title">Beliebte Kategorien</h2>
-      <p class="section__subtitle">Von Pokemon-Karten bis Wohnungen &mdash; finden (oder tauschen) Sie fast alles.</p>
+      <p class="section__subtitle">Von Pokemon-Karten bis Wohnungen. Finden (oder tauschen) Sie fast alles.</p>
 
       <div class="categories__grid">
         <a href="#" class="category-card">
@@ -278,7 +283,7 @@
           <div class="step__number">1</div>
           <div class="step__icon">&#128248;</div>
           <h3 class="step__title">Artikel inserieren</h3>
-          <p class="step__desc">Foto machen, Preis festlegen oder als &laquo;Offen f&uuml;r Tausch&raquo; markieren. Die ersten 5 Inserate pro Monat sind gratis.</p>
+          <p class="step__desc">Foto machen, Preis festlegen oder als &laquo;Offen f&uuml;r Tausch&raquo; markieren. Die ersten 3 Inserate pro Monat sind gratis.</p>
         </div>
         <div class="step">
           <div class="step__number">2</div>
@@ -290,7 +295,7 @@
           <div class="step__number">3</div>
           <div class="step__icon">&#129309;</div>
           <h3 class="step__title">Angebot machen</h3>
-          <p class="step__desc">Bargeld, Tausch oder beides anbieten. &laquo;Meine PS5 + CHF 200 f&uuml;r deinen Gaming-PC&raquo; &mdash; alles geht.</p>
+          <p class="step__desc">Bargeld, Tausch oder beides anbieten. &laquo;Meine PS5 + CHF 200 f&uuml;r deinen Gaming-PC&raquo;. Alles geht.</p>
           <div class="step__badge">Tausch + Bargeld</div>
         </div>
         <div class="step">
@@ -549,7 +554,7 @@
 
         <p class="swap-explainer__text">
           <strong>Keine Tausch-Geb&uuml;hr.</strong> SwapMart erhebt nur Provision auf den Bargeld-Anteil eines Tausch + Bargeld-Deals.
-          Reine Tauschgesch&auml;fte (Artikel gegen Artikel) sind komplett kostenlos. So sollte Handel funktionieren &mdash; fair, flexibel und community-getrieben.
+          Reine Tauschgesch&auml;fte (Artikel gegen Artikel) sind komplett kostenlos. So sollte Handel funktionieren: fair, flexibel und community-getrieben.
         </p>
       </div>
     </div>
@@ -567,8 +572,9 @@
           <div class="pricing-card__price">CHF 0<small></small></div>
           <div class="pricing-card__period">F&uuml;r immer gratis</div>
           <ul class="pricing-card__features">
-            <li>5 Inserate pro Monat</li>
-            <li>3% Verkaufsprovision</li>
+            <li>3 Gratis-Inserate pro Monat</li>
+            <li>5% Verkaufsprovision (max CHF 250)</li>
+            <li>Weitere Inserate via Werbung oder Einzelkauf</li>
             <li>Unbegrenzte Tauschgesch&auml;fte (0% Geb&uuml;hr)</li>
             <li>K&auml;ufer- &amp; Verk&auml;ufer-Bewertungen</li>
             <li>Sichere Nachrichten</li>
@@ -584,7 +590,7 @@
           <div class="pricing-card__period">Monatlich abgerechnet</div>
           <ul class="pricing-card__features">
             <li>30 Inserate pro Monat</li>
-            <li>2% Verkaufsprovision</li>
+            <li>3.5% Verkaufsprovision (max CHF 250)</li>
             <li>Unbegrenzte Tauschgesch&auml;fte (0% Geb&uuml;hr)</li>
             <li>Hervorgehobene Platzierung</li>
             <li>Priorit&auml;ts-Kundensupport</li>
@@ -600,7 +606,7 @@
           <div class="pricing-card__period">Monatlich abgerechnet</div>
           <ul class="pricing-card__features">
             <li>Unbegrenzte Inserate</li>
-            <li>1.5% Verkaufsprovision</li>
+            <li>2.5% Verkaufsprovision (max CHF 250)</li>
             <li>Unbegrenzte Tauschgesch&auml;fte (0% Geb&uuml;hr)</li>
             <li>Eigener Shop</li>
             <li>API-Zugang</li>
@@ -640,6 +646,38 @@
           <div class="trust-card__icon">&#11088;</div>
           <h3 class="trust-card__title">K&auml;ufer- &amp; Verk&auml;ufer-Bewertungen</h3>
           <p class="trust-card__desc">Transparentes Bewertungssystem. Sehen Sie Handelsanzahl, Antwortzeit und Rezensionen.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VERTRAUEN & VERIFIZIERUNG ==================== -->
+  <section class="section" id="verification">
+    <div class="container">
+      <div class="section-header">
+        <h3 class="section__title">Vertrauen &amp; Verifizierung</h3>
+        <p class="section__sub">Ihre Sicherheit hat Priorit&auml;t. Jeder Verk&auml;ufer auf SwapMart durchl&auml;uft eine Identit&auml;tspr&uuml;fung.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-card__icon">&#128196;</div>
+          <h4>ID-Verifizierung (KYC)</h4>
+          <p>Laden Sie Ihr Ausweisdokument f&uuml;r die automatische Verifizierung hoch. Angetrieben von branchenf&uuml;hrenden Diensten wie Onfido und Sumsub f&uuml;r sofortige, sichere Identit&auml;tspr&uuml;fungen.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#9989;</div>
+          <h4>Verifiziertes Abzeichen</h4>
+          <p>Verifizierte Verk&auml;ufer erhalten ein vertrauensw&uuml;rdiges Abzeichen auf ihrem Profil. K&auml;ufer k&ouml;nnen mit Vertrauen einkaufen, da jeder Verk&auml;ufer eine echte, verifizierte Person ist.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#11088;</div>
+          <h4>Reputationssystem</h4>
+          <p>Bewerten Sie K&auml;ufer und Verk&auml;ufer nach jeder Transaktion. Bauen Sie Ihren Vertrauenswert mit positiven Bewertungen und erfolgreichen Gesch&auml;ften auf.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#128737;</div>
+          <h4>SwapMart MoneyGuard</h4>
+          <p>Optionaler K&auml;uferschutz f&uuml;r hochwertige Artikel. Eine kleine zus&auml;tzliche Geb&uuml;hr h&auml;lt die Zahlung treuh&auml;nderisch, bis der K&auml;ufer den Empfang best&auml;tigt.</p>
         </div>
       </div>
     </div>
@@ -858,6 +896,28 @@
       }
     })();
   </script>
+
+<script>
+// Language dropdown
+(function() {
+  var btn = document.querySelector('.lang-dropdown__btn');
+  var menu = document.querySelector('.lang-dropdown__menu');
+  if (!btn || !menu) return;
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var open = menu.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open);
+  });
+  document.addEventListener('click', function() {
+    menu.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { menu.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+  });
+})();
+(function() { sessionStorage.setItem('lang-chosen', '1'); })();
+</script>
 
 </body>
 </html>
