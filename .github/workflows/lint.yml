@@ -1,0 +1,31 @@
+name: Lint
+
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+    branches: [dev, main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate HTML
+        run: |
+          sudo apt-get install -y tidy > /dev/null 2>&1
+          find src -name "*.html" -exec tidy -q -e {} \; 2>&1 || true
+
+      - name: Check for secrets
+        run: |
+          FOUND=0
+          if find . -name ".env*" -not -path "./.git/*" | grep -q .; then
+            echo "::error::.env files found in repository!"
+            find . -name ".env*" -not -path "./.git/*"
+            FOUND=1
+          fi
+          if grep -rn "PRIVATE.KEY\|api_key\|api_token\|secret_key" --include="*.js" --include="*.ts" --include="*.py" --include="*.html" . 2>/dev/null | grep -v ".git/" | grep -v "node_modules/"; then
+            echo "::warning::Potential secrets found in code"
+          fi
+          exit $FOUND
