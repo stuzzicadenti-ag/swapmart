@@ -35,6 +35,20 @@ export default async function profileRoutes(fastify) {
   fastify.post('/settings', { preHandler: requireAuth }, async (request, reply) => {
     const { name, bio, location } = request.body;
 
+    // Input length limits
+    if ((name && name.length > 255) || (bio && bio.length > 2000) || (location && location.length > 255)) {
+      const result = await db.query(
+        'SELECT id, email, username, name, bio, location, avatar_path, plan, kyc_status, created_at FROM users WHERE id = $1',
+        [request.user.id]
+      );
+      return reply.view('profile/settings.ejs', {
+        user: request.user,
+        profile: result.rows[0],
+        error: 'Input too long.',
+        success: null,
+      });
+    }
+
     try {
       await db.query(
         'UPDATE users SET name = $1, bio = $2, location = $3 WHERE id = $4',

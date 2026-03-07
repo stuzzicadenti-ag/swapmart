@@ -47,6 +47,16 @@
               </div>
             </div>
 
+            <div class="form-group">
+              <label for="sort">Sort By</label>
+              <select id="sort" name="sort" class="form-control">
+                <option value="newest" <%= (filters.sort || 'newest') === 'newest' ? 'selected' : '' %>>Newest First</option>
+                <option value="oldest" <%= filters.sort === 'oldest' ? 'selected' : '' %>>Oldest First</option>
+                <option value="price_asc" <%= filters.sort === 'price_asc' ? 'selected' : '' %>>Price: Low to High</option>
+                <option value="price_desc" <%= filters.sort === 'price_desc' ? 'selected' : '' %>>Price: High to Low</option>
+              </select>
+            </div>
+
             <button type="submit" class="btn btn-primary btn-block">Apply Filters</button>
             <a href="/listings" class="btn btn-outline btn-block mt-1" style="text-align: center;">Clear</a>
           </div>
@@ -117,17 +127,17 @@
           <% if (pagination.totalPages > 1) { %>
             <div class="pagination">
               <% if (pagination.page > 1) { %>
-                <a href="/listings?page=<%= pagination.page - 1 %>&<%= new URLSearchParams(filters).toString() %>">Prev</a>
+                <a href="/listings?page=<%= pagination.page - 1 %>&<%= new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([,v]) => v))).toString() %>">Prev</a>
               <% } %>
               <% for (let i = 1; i <= pagination.totalPages; i++) { %>
                 <% if (i === pagination.page) { %>
                   <span class="active"><%= i %></span>
                 <% } else { %>
-                  <a href="/listings?page=<%= i %>&<%= new URLSearchParams(filters).toString() %>"><%= i %></a>
+                  <a href="/listings?page=<%= i %>&<%= new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([,v]) => v))).toString() %>"><%= i %></a>
                 <% } %>
               <% } %>
               <% if (pagination.page < pagination.totalPages) { %>
-                <a href="/listings?page=<%= pagination.page + 1 %>&<%= new URLSearchParams(filters).toString() %>">Next</a>
+                <a href="/listings?page=<%= pagination.page + 1 %>&<%= new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([,v]) => v))).toString() %>">Next</a>
               <% } %>
             </div>
           <% } %>

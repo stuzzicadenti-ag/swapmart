@@ -70,6 +70,10 @@ export default async function messagesRoutes(fastify) {
       return reply.redirect(`/messages/${offerId}`);
     }
 
+    if (content.length > 5000) {
+      return reply.redirect(`/messages/${offerId}`);
+    }
+
     try {
       // Verify user is buyer or seller
       const offerResult = await db.query(

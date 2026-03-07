@@ -14,6 +14,7 @@ export default async function authRoutes(fastify) {
 
   // POST /auth/register
   fastify.post('/register', async (request, reply) => {
+    if (fastify.checkAuthRateLimit && !fastify.checkAuthRateLimit(request, reply)) return;
     const { email, username, password, name, location } = request.body;
 
     if (!email || !username || !password) {
@@ -28,11 +29,11 @@ export default async function authRoutes(fastify) {
       return reply.view('auth/register.ejs', { user: request.user, error: 'Username must be 3-50 characters.' });
     }
 
-    if (password.length < 8) {
-      return reply.view('auth/register.ejs', { user: request.user, error: 'Password must be at least 8 characters.' });
+    if (password.length < 8 || password.length > 1000) {
+      return reply.view('auth/register.ejs', { user: request.user, error: 'Password must be 8-1000 characters.' });
     }
 
-    if (email.length > 255) {
+    if (email.length > 255 || (name && name.length > 255) || (location && location.length > 255)) {
       return reply.view('auth/register.ejs', { user: request.user, error: 'Input too long.' });
     }
 
@@ -82,6 +83,7 @@ export default async function authRoutes(fastify) {
 
   // POST /auth/login
   fastify.post('/login', async (request, reply) => {
+    if (fastify.checkAuthRateLimit && !fastify.checkAuthRateLimit(request, reply)) return;
     const { email, password } = request.body;
 
     if (!email || !password) {

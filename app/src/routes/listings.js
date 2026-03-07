@@ -14,7 +14,9 @@ export default async function listingsRoutes(fastify) {
 
   // GET /listings - Browse with filters
   fastify.get('/', async (request, reply) => {
-    const { category, min_price, max_price, type, q, page = 1 } = request.query;
+    const { category, min_price, max_price, type, q, search, sort, page = 1 } = request.query;
+    // Support both ?q= and ?search= for text search
+    const searchTerm = q || search || '';
     const limit = 12;
     const offset = (Math.max(1, parseInt(page)) - 1) * limit;
 
@@ -42,13 +44,23 @@ export default async function listingsRoutes(fastify) {
       params.push(type);
       idx++;
     }
-    if (q) {
+    if (searchTerm) {
       where.push(`(l.title ILIKE $${idx} OR l.description ILIKE $${idx})`);
-      params.push(`%${q}%`);
+      params.push(`%${searchTerm}%`);
       idx++;
     }
 
     const whereClause = where.join(' AND ');
+
+    // Determine sort order
+    let orderClause = 'l.created_at DESC'; // default: newest
+    if (sort === 'price_asc') {
+      orderClause = 'l.price ASC NULLS LAST';
+    } else if (sort === 'price_desc') {
+      orderClause = 'l.price DESC NULLS LAST';
+    } else if (sort === 'oldest') {
+      orderClause = 'l.created_at ASC';
+    }
 
     try {
       const countResult = await db.query(
@@ -65,7 +77,7 @@ export default async function listingsRoutes(fastify) {
          JOIN users u ON l.seller_id = u.id
          JOIN categories c ON l.category_id = c.id
          WHERE ${whereClause}
-         ORDER BY l.created_at DESC
+         ORDER BY ${orderClause}
          LIMIT $${idx} OFFSET $${idx + 1}`,
         [...params, limit, offset]
       );
@@ -76,7 +88,7 @@ export default async function listingsRoutes(fastify) {
         user: request.user,
         listings: listingsResult.rows,
         categories: catResult.rows,
-        filters: { category, min_price, max_price, type, q },
+        filters: { category, min_price, max_price, type, q: searchTerm, sort },
         pagination: { page: parseInt(page), totalPages, total },
       });
     } catch (err) {
@@ -111,7 +123,9 @@ export default async function listingsRoutes(fastify) {
       for await (const part of parts) {
         if (part.type === 'file' && part.filename) {
           const ext = path.extname(part.filename).toLowerCase();
+          const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp'];
           if (!['.jpg', '.jpeg', '.png', '.webp'].includes(ext)) continue;
+          if (!ALLOWED_MIMES.includes(part.mimetype)) continue;
 
           const filename = `${randomUUID()}${ext}`;
           const uploadDir = config.UPLOAD_DIR;
@@ -139,6 +153,24 @@ export default async function listingsRoutes(fastify) {
       }
 
       const { title, description, price, category_id, condition, location, type } = fields;
+
+      // Input length limits
+      if (title && title.length > 255) {
+        const catResult = await db.query('SELECT * FROM categories ORDER BY name');
+        return reply.view('listings/new.ejs', {
+          user: request.user,
+          categories: catResult.rows,
+          error: 'Title is too long (max 255 characters).',
+        });
+      }
+      if (description && description.length > 10000) {
+        const catResult = await db.query('SELECT * FROM categories ORDER BY name');
+        return reply.view('listings/new.ejs', {
+          user: request.user,
+          categories: catResult.rows,
+          error: 'Description is too long (max 10,000 characters).',
+        });
+      }
 
       if (!title || !category_id || !condition || !type) {
         const catResult = await db.query('SELECT * FROM categories ORDER BY name');
@@ -240,14 +272,19 @@ export default async function listingsRoutes(fastify) {
       const similarResult = results[1];
       const userListings = results[2] ? results[2].rows : [];
 
+      // Check for offer feedback from query params
+      const offerStatus = request.query.offer;
+      const success = offerStatus === 'sent' ? 'Your offer has been sent to the seller!' : null;
+      const error = offerStatus === 'error' ? 'Failed to send offer. Please try again.' : null;
+
       return reply.view('listings/detail.ejs', {
         user: request.user,
         listing,
         images: imagesResult.rows,
         similar: similarResult.rows,
         userListings,
-        error: null,
-        success: null,
+        error,
+        success,
       });
     } catch (err) {
       fastify.log.error(err);
@@ -283,10 +320,10 @@ export default async function listingsRoutes(fastify) {
         ]
       );
 
-      return reply.redirect(`/listings/${id}`);
+      return reply.redirect(`/listings/${id}?offer=sent`);
     } catch (err) {
       fastify.log.error(err);
-      return reply.redirect(`/listings/${id}`);
+      return reply.redirect(`/listings/${id}?offer=error`);
     }
   });
 }
