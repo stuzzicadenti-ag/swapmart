@@ -990,6 +990,17 @@ button {
   flex-shrink: 0;
 }
 
+/* --- Pricing Examples --- */
+.pricing__examples { margin-top: 48px; text-align: center; }
+.pricing__examples h3 { font-size: 1.3rem; margin-bottom: 24px; color: var(--gray-800); }
+.pricing__example-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; max-width: 900px; margin: 0 auto; }
+.pricing__example { background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px; padding: 16px; text-align: center; }
+.pricing__example-item { display: block; font-weight: 600; color: var(--gray-700); margin-bottom: 4px; }
+.pricing__example-price { display: block; font-size: 1.2rem; font-weight: 700; color: var(--primary-dark); }
+.pricing__example-fee { display: block; font-size: 0.85rem; color: var(--gray-500); margin-top: 4px; }
+.pricing__example-compare { margin-top: 20px; font-size: 0.9rem; color: var(--gray-600); font-style: italic; }
+.pricing__example-tagline { margin-top: 12px; font-size: 1rem; font-weight: 700; color: var(--primary-dark); }
+
 /* --- Trust Section --- */
 .trust__grid {
   display: grid;
