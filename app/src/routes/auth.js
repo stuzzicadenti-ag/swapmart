@@ -50,13 +50,13 @@ export default async function authRoutes(fastify) {
       const passwordHash = await bcrypt.hash(password, 10);
       const result = await db.query(
         `INSERT INTO users (email, password_hash, username, name, location)
-         VALUES ($1, $2, $3, $4, $5) RETURNING id, email, username, name, plan`,
+         VALUES ($1, $2, $3, $4, $5) RETURNING id, email, username, name, plan, role`,
         [email.toLowerCase(), passwordHash, username, name || null, location || null]
       );
 
       const user = result.rows[0];
       const token = jwt.sign(
-        { id: user.id, email: user.email, username: user.username, name: user.name, plan: user.plan },
+        { id: user.id, email: user.email, username: user.username, name: user.name, plan: user.plan, role: user.role || 'user' },
         config.JWT_SECRET,
         { expiresIn: '7d' }
       );
@@ -92,7 +92,7 @@ export default async function authRoutes(fastify) {
 
     try {
       const result = await db.query(
-        'SELECT id, email, password_hash, username, name, plan FROM users WHERE email = $1',
+        'SELECT id, email, password_hash, username, name, plan, role, banned FROM users WHERE email = $1',
         [email.toLowerCase()]
       );
 
@@ -101,6 +101,11 @@ export default async function authRoutes(fastify) {
       }
 
       const user = result.rows[0];
+
+      if (user.banned) {
+        return reply.view('auth/login.ejs', { user: request.user, error: 'This account has been suspended.' });
+      }
+
       const valid = await bcrypt.compare(password, user.password_hash);
 
       if (!valid) {
@@ -108,7 +113,7 @@ export default async function authRoutes(fastify) {
       }
 
       const token = jwt.sign(
-        { id: user.id, email: user.email, username: user.username, name: user.name, plan: user.plan },
+        { id: user.id, email: user.email, username: user.username, name: user.name, plan: user.plan, role: user.role || 'user' },
         config.JWT_SECRET,
         { expiresIn: '7d' }
       );

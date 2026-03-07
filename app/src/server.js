@@ -18,6 +18,7 @@ import offersRoutes from './routes/offers.js';
 import messagesRoutes from './routes/messages.js';
 import profileRoutes from './routes/profile.js';
 import invoicesRoutes from './routes/invoices.js';
+import adminRoutes from './routes/admin.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -97,11 +98,20 @@ app.decorate('config', { UPLOAD_DIR, JWT_SECRET, COOKIE_SECRET });
 
 // Auth decorator - attaches user to request if valid JWT cookie
 app.decorateRequest('user', null);
-app.addHook('onRequest', async (request) => {
+app.addHook('onRequest', async (request, reply) => {
   const token = request.cookies?.token;
   if (token) {
     try {
       const decoded = jwt.verify(token, JWT_SECRET);
+      // Check if user is banned
+      const banCheck = await pool.query('SELECT banned, role FROM users WHERE id = $1', [decoded.id]);
+      if (banCheck.rows[0]?.banned) {
+        reply.clearCookie('token', { path: '/' });
+        request.user = null;
+        return;
+      }
+      // Attach role from DB (always fresh)
+      decoded.role = banCheck.rows[0]?.role || 'user';
       request.user = decoded;
     } catch {
       request.user = null;
@@ -158,6 +168,7 @@ await app.register(offersRoutes, { prefix: '/offers' });
 await app.register(messagesRoutes, { prefix: '/messages' });
 await app.register(profileRoutes, { prefix: '/profile' });
 await app.register(invoicesRoutes, { prefix: '/invoices' });
+await app.register(adminRoutes, { prefix: '/admin' });
 
 // Fees page
 app.get('/fees', async (request, reply) => {

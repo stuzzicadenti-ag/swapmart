@@ -11,7 +11,7 @@ export default async function profileRoutes(fastify) {
   fastify.get('/settings', { preHandler: requireAuth }, async (request, reply) => {
     try {
       const result = await db.query(
-        'SELECT id, email, username, name, bio, location, avatar_path, plan, kyc_status, created_at FROM users WHERE id = $1',
+        'SELECT id, email, username, name, bio, location, avatar_path, plan, kyc_status, phone, address_line1, address_line2, city, postal_code, country, created_at FROM users WHERE id = $1',
         [request.user.id]
       );
 
@@ -33,12 +33,15 @@ export default async function profileRoutes(fastify) {
 
   // POST /profile/settings - Update profile
   fastify.post('/settings', { preHandler: requireAuth }, async (request, reply) => {
-    const { name, bio, location } = request.body;
+    const { name, bio, location, phone, address_line1, address_line2, city, postal_code, country } = request.body;
 
     // Input length limits
-    if ((name && name.length > 255) || (bio && bio.length > 2000) || (location && location.length > 255)) {
+    if ((name && name.length > 255) || (bio && bio.length > 2000) || (location && location.length > 255) ||
+        (phone && phone.length > 50) || (address_line1 && address_line1.length > 255) ||
+        (address_line2 && address_line2.length > 255) || (city && city.length > 100) ||
+        (postal_code && postal_code.length > 20) || (country && country.length > 100)) {
       const result = await db.query(
-        'SELECT id, email, username, name, bio, location, avatar_path, plan, kyc_status, created_at FROM users WHERE id = $1',
+        'SELECT id, email, username, name, bio, location, avatar_path, plan, kyc_status, phone, address_line1, address_line2, city, postal_code, country, created_at FROM users WHERE id = $1',
         [request.user.id]
       );
       return reply.view('profile/settings.ejs', {
@@ -51,12 +54,16 @@ export default async function profileRoutes(fastify) {
 
     try {
       await db.query(
-        'UPDATE users SET name = $1, bio = $2, location = $3 WHERE id = $4',
-        [name || null, bio || null, location || null, request.user.id]
+        `UPDATE users SET name = $1, bio = $2, location = $3, phone = $4,
+         address_line1 = $5, address_line2 = $6, city = $7, postal_code = $8, country = $9
+         WHERE id = $10`,
+        [name || null, bio || null, location || null, phone || null,
+         address_line1 || null, address_line2 || null, city || null,
+         postal_code || null, country || null, request.user.id]
       );
 
       const result = await db.query(
-        'SELECT id, email, username, name, bio, location, avatar_path, plan, kyc_status, created_at FROM users WHERE id = $1',
+        'SELECT id, email, username, name, bio, location, avatar_path, plan, kyc_status, phone, address_line1, address_line2, city, postal_code, country, created_at FROM users WHERE id = $1',
         [request.user.id]
       );
 
@@ -69,7 +76,7 @@ export default async function profileRoutes(fastify) {
     } catch (err) {
       fastify.log.error(err);
       const result = await db.query(
-        'SELECT id, email, username, name, bio, location, avatar_path, plan, kyc_status, created_at FROM users WHERE id = $1',
+        'SELECT id, email, username, name, bio, location, avatar_path, plan, kyc_status, phone, address_line1, address_line2, city, postal_code, country, created_at FROM users WHERE id = $1',
         [request.user.id]
       );
       return reply.view('profile/settings.ejs', {

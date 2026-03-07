@@ -137,6 +137,54 @@ const migrate = async () => {
     await client.query('CREATE INDEX IF NOT EXISTS idx_reviews_transaction ON reviews(transaction_id);');
     await client.query('CREATE INDEX IF NOT EXISTS idx_reviews_reviewee ON reviews(reviewee_id);');
 
+    // --- Admin system columns ---
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'user'`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50)`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS address_line1 VARCHAR(255)`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS address_line2 VARCHAR(255)`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS city VARCHAR(100)`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS postal_code VARCHAR(20)`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS country VARCHAR(100) DEFAULT 'Switzerland'`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS banned BOOLEAN DEFAULT false`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS banned_reason TEXT`);
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS banned_at TIMESTAMP`);
+
+    // Flags table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS flags (
+        id SERIAL PRIMARY KEY,
+        type VARCHAR(50) NOT NULL,
+        listing_id INTEGER REFERENCES listings(id),
+        user_id INTEGER,
+        details TEXT,
+        status VARCHAR(20) DEFAULT 'pending',
+        reviewed_by INTEGER,
+        reviewed_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    // Admin log table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS admin_log (
+        id SERIAL PRIMARY KEY,
+        admin_id INTEGER NOT NULL,
+        action VARCHAR(100) NOT NULL,
+        target_type VARCHAR(50),
+        target_id INTEGER,
+        details TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    // Admin system indices
+    await client.query('CREATE INDEX IF NOT EXISTS idx_flags_status ON flags(status)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_flags_listing ON flags(listing_id)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_flags_created ON flags(created_at DESC)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_admin_log_created ON admin_log(created_at DESC)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_users_banned ON users(banned)');
+
     await client.query('COMMIT');
     console.log('Migration completed successfully.');
   } catch (err) {

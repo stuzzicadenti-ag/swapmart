@@ -96,6 +96,19 @@
           </div>
         </div>
 
+        <!-- Report Button -->
+        <% if (user && user.id !== listing.seller_user_id) { %>
+          <div style="margin-bottom: 1rem; text-align: right;">
+            <form action="/listings/<%= listing.id %>/report" method="POST" style="display: inline;"
+                  onsubmit="var r = prompt('Why are you reporting this listing?'); if (!r) return false; this.querySelector('[name=reason]').value = r;">
+              <input type="hidden" name="reason" value="">
+              <button type="submit" class="btn btn--outline btn--sm" style="color: var(--text-light); border-color: var(--gray-300); font-size: 0.8rem; padding: 0.3rem 0.75rem;">
+                &#9873; Report
+              </button>
+            </form>
+          </div>
+        <% } %>
+
         <!-- Make an Offer -->
         <% if (user && user.id !== listing.seller_user_id && listing.status === 'active') { %>
           <div class="card">

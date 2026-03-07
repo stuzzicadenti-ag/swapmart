@@ -1,0 +1,149 @@
+<%- include('../partials/header', { pageTitle: 'Admin - Flags', user }) %>
+
+<style>
+  .admin-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - var(--nav-h)); }
+  .admin-sidebar { background: var(--gray-900); padding: 1.5rem 0; position: sticky; top: var(--nav-h); height: calc(100vh - var(--nav-h)); overflow-y: auto; }
+  .admin-sidebar__logo { padding: 0 1.25rem 1.25rem; border-bottom: 1px solid var(--gray-700); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--white); font-weight: 700; font-size: 1.1rem; }
+  .admin-sidebar__logo span { color: var(--amber-400); }
+  .admin-nav { list-style: none; padding: 0; }
+  .admin-nav a { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1.25rem; color: var(--gray-400); font-size: 0.9rem; font-weight: 500; transition: all 0.15s; text-decoration: none; border-left: 3px solid transparent; }
+  .admin-nav a:hover, .admin-nav a.active { background: rgba(255,255,255,0.05); color: var(--white); border-left-color: var(--primary); }
+  .admin-nav a.active { color: var(--teal-300); }
+  .admin-nav__icon { font-size: 1.1rem; width: 1.5rem; text-align: center; }
+  .admin-content { padding: 1.5rem 2rem; background: var(--bg-alt); min-width: 0; }
+  .admin-content h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+  .filter-bar { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: flex-end; }
+  .filter-bar .form-group { margin-bottom: 0; }
+  .filter-bar .form-control { padding: 0.45rem 0.65rem; font-size: 0.85rem; }
+  .flag-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: start;
+  }
+  .flag-card--pending { border-left: 4px solid var(--amber-500); }
+  .flag-card--reviewed { border-left: 4px solid var(--success); opacity: 0.7; }
+  .flag-card--dismissed { border-left: 4px solid var(--gray-400); opacity: 0.6; }
+  .flag-icon { font-size: 1.5rem; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+  .flag-icon--phone { background: #fef3c7; }
+  .flag-icon--profanity { background: #fef2f2; }
+  .flag-icon--email { background: #dbeafe; }
+  .flag-icon--url { background: #e0e7ff; }
+  .flag-icon--report { background: #fce7f3; }
+  .flag-actions { display: flex; gap: 0.5rem; flex-direction: column; }
+  @media (max-width: 768px) {
+    .admin-layout { grid-template-columns: 1fr; }
+    .admin-sidebar { position: relative; top: 0; height: auto; display: flex; overflow-x: auto; padding: 0.75rem 0; }
+    .admin-sidebar__logo { display: none; }
+    .admin-nav { display: flex; gap: 0; white-space: nowrap; }
+    .admin-nav a { padding: 0.5rem 1rem; border-left: none; border-bottom: 3px solid transparent; font-size: 0.8rem; }
+    .admin-content { padding: 1rem; }
+    .flag-card { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="admin-layout">
+  <%- include('_sidebar', { activePage: 'flags' }) %>
+
+  <div class="admin-content">
+    <h1>Flag Queue (<%= pagination.total %>)</h1>
+
+    <form class="filter-bar" method="GET" action="/admin/flags">
+      <div class="form-group">
+        <label class="text-sm">Status</label>
+        <select name="status" class="form-control">
+          <option value="">All</option>
+          <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Pending</option>
+          <option value="reviewed" <%= filters.status === 'reviewed' ? 'selected' : '' %>>Reviewed</option>
+          <option value="dismissed" <%= filters.status === 'dismissed' ? 'selected' : '' %>>Dismissed</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn--primary btn--sm">Filter</button>
+      <a href="/admin/flags" class="btn btn--outline btn--sm">Reset</a>
+    </form>
+
+    <% if (flags.length === 0) { %>
+      <div class="card">
+        <div class="card-body text-center" style="padding: 3rem;">
+          <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">&#9989;</div>
+          <p class="text-light">No flags to review. All clear!</p>
+        </div>
+      </div>
+    <% } %>
+
+    <% flags.forEach(f => { %>
+      <%
+        let iconClass = 'flag-icon--report';
+        let iconEmoji = '&#9873;';
+        if (f.type === 'auto_phone') { iconClass = 'flag-icon--phone'; iconEmoji = '&#128222;'; }
+        else if (f.type === 'auto_profanity') { iconClass = 'flag-icon--profanity'; iconEmoji = '&#129324;'; }
+        else if (f.type === 'auto_email') { iconClass = 'flag-icon--email'; iconEmoji = '&#128231;'; }
+        else if (f.type === 'auto_url') { iconClass = 'flag-icon--url'; iconEmoji = '&#128279;'; }
+        else if (f.type === 'user_report') { iconClass = 'flag-icon--report'; iconEmoji = '&#128680;'; }
+      %>
+      <div class="flag-card flag-card--<%= f.status %>">
+        <div class="flag-icon <%= iconClass %>"><%- iconEmoji %></div>
+        <div>
+          <div class="flex-center gap-1 mb-1">
+            <span class="badge <%= f.type.startsWith('auto_') ? 'badge-amber' : 'badge-danger' %>"><%= f.type.replace('auto_', '').replace('_', ' ') %></span>
+            <span class="badge <%= f.status === 'pending' ? 'badge-amber' : f.status === 'dismissed' ? 'badge-gray' : 'badge-success' %>"><%= f.status %></span>
+            <% if (f.listing_status) { %>
+              <span class="badge badge-gray">Listing: <%= f.listing_status %></span>
+            <% } %>
+          </div>
+          <div style="font-weight: 600; margin-bottom: 0.35rem;">
+            <% if (f.listing_id) { %>
+              <a href="/listings/<%= f.listing_id %>"><%= f.listing_title || 'Listing #' + f.listing_id %></a>
+            <% } else { %>
+              No listing
+            <% } %>
+          </div>
+          <% if (f.details) { %>
+            <p class="text-sm" style="margin-bottom: 0.35rem; color: var(--text);"><%= f.details %></p>
+          <% } %>
+          <div class="text-sm text-light">
+            <% if (f.reporter_name) { %>Reported by <strong><%= f.reporter_name %></strong> &middot; <% } %>
+            <%= new Date(f.created_at).toLocaleString('en-CH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+            <% if (f.reviewer_name) { %>&middot; Reviewed by <strong><%= f.reviewer_name %></strong><% } %>
+          </div>
+        </div>
+        <div class="flag-actions">
+          <% if (f.status === 'pending') { %>
+            <% if (f.listing_id) { %>
+              <a href="/listings/<%= f.listing_id %>" class="btn btn--outline btn--sm" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">View</a>
+            <% } %>
+            <form action="/admin/flags/<%= f.id %>/dismiss" method="POST" style="display: inline;">
+              <button type="submit" class="btn btn--outline btn--sm" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Dismiss</button>
+            </form>
+            <% if (f.listing_id) { %>
+              <form action="/admin/flags/<%= f.id %>/action" method="POST" style="display: inline;"
+                    onsubmit="return confirm('Remove this listing?')">
+                <button type="submit" class="btn btn-danger btn--sm" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Remove Listing</button>
+              </form>
+            <% } %>
+          <% } %>
+        </div>
+      </div>
+    <% }) %>
+
+    <% if (pagination.totalPages > 1) { %>
+      <div class="pagination">
+        <% if (pagination.page > 1) { %>
+          <a href="/admin/flags?page=<%= pagination.page - 1 %>&status=<%= filters.status || '' %>">&laquo; Prev</a>
+        <% } %>
+        <span class="text-sm text-light">Page <%= pagination.page %> of <%= pagination.totalPages %></span>
+        <% if (pagination.page < pagination.totalPages) { %>
+          <a href="/admin/flags?page=<%= pagination.page + 1 %>&status=<%= filters.status || '' %>">Next &raquo;</a>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

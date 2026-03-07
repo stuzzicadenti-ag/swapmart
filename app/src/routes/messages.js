@@ -98,11 +98,25 @@ export default async function messagesRoutes(fastify) {
         );
       }
 
+      // Fetch other party's contact info if transaction is completed
+      let contactInfo = null;
+      if (offer.status === 'completed') {
+        const otherUserId = request.user.id === offer.buyer_id ? offer.seller_id : offer.buyer_id;
+        const contactResult = await db.query(
+          'SELECT name, email, phone, address_line1, address_line2, city, postal_code, country FROM users WHERE id = $1',
+          [otherUserId]
+        );
+        if (contactResult.rows.length > 0) {
+          contactInfo = contactResult.rows[0];
+        }
+      }
+
       return reply.view('messages/chat.ejs', {
         user: request.user,
         offer,
         messages: messagesResult.rows,
         chatUnlocked,
+        contactInfo,
       });
     } catch (err) {
       fastify.log.error(err);

@@ -1,0 +1,160 @@
+<%- include('../partials/header', { pageTitle: 'Admin - Listings', user }) %>
+
+<style>
+  .admin-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - var(--nav-h)); }
+  .admin-sidebar { background: var(--gray-900); padding: 1.5rem 0; position: sticky; top: var(--nav-h); height: calc(100vh - var(--nav-h)); overflow-y: auto; }
+  .admin-sidebar__logo { padding: 0 1.25rem 1.25rem; border-bottom: 1px solid var(--gray-700); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--white); font-weight: 700; font-size: 1.1rem; }
+  .admin-sidebar__logo span { color: var(--amber-400); }
+  .admin-nav { list-style: none; padding: 0; }
+  .admin-nav a { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1.25rem; color: var(--gray-400); font-size: 0.9rem; font-weight: 500; transition: all 0.15s; text-decoration: none; border-left: 3px solid transparent; }
+  .admin-nav a:hover, .admin-nav a.active { background: rgba(255,255,255,0.05); color: var(--white); border-left-color: var(--primary); }
+  .admin-nav a.active { color: var(--teal-300); }
+  .admin-nav__icon { font-size: 1.1rem; width: 1.5rem; text-align: center; }
+  .admin-content { padding: 1.5rem 2rem; background: var(--bg-alt); min-width: 0; }
+  .admin-content h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+  .admin-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  .admin-table th { text-align: left; padding: 0.6rem 0.75rem; background: var(--gray-50); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-light); border-bottom: 2px solid var(--border); }
+  .admin-table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .admin-table tr:hover { background: var(--gray-50); }
+  .filter-bar { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: flex-end; }
+  .filter-bar .form-group { margin-bottom: 0; }
+  .filter-bar .form-control { padding: 0.45rem 0.65rem; font-size: 0.85rem; }
+  .flag-badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--danger); color: var(--white); font-size: 0.7rem; font-weight: 700; margin-left: 0.25rem; }
+  @media (max-width: 768px) {
+    .admin-layout { grid-template-columns: 1fr; }
+    .admin-sidebar { position: relative; top: 0; height: auto; display: flex; overflow-x: auto; padding: 0.75rem 0; }
+    .admin-sidebar__logo { display: none; }
+    .admin-nav { display: flex; gap: 0; white-space: nowrap; }
+    .admin-nav a { padding: 0.5rem 1rem; border-left: none; border-bottom: 3px solid transparent; font-size: 0.8rem; }
+    .admin-content { padding: 1rem; }
+    .admin-table { display: block; overflow-x: auto; }
+  }
+</style>
+
+<div class="admin-layout">
+  <%- include('_sidebar', { activePage: 'listings' }) %>
+
+  <div class="admin-content">
+    <h1>Listings (<%= pagination.total %>)</h1>
+
+    <form class="filter-bar" method="GET" action="/admin/listings">
+      <div class="form-group">
+        <label class="text-sm">Search</label>
+        <input type="text" name="q" class="form-control" placeholder="Title or description..." value="<%= (filters.q || '') %>">
+      </div>
+      <div class="form-group">
+        <label class="text-sm">Status</label>
+        <select name="status" class="form-control">
+          <option value="">All</option>
+          <option value="active" <%= filters.status === 'active' ? 'selected' : '' %>>Active</option>
+          <option value="sold" <%= filters.status === 'sold' ? 'selected' : '' %>>Sold</option>
+          <option value="swapped" <%= filters.status === 'swapped' ? 'selected' : '' %>>Swapped</option>
+          <option value="blocked" <%= filters.status === 'blocked' ? 'selected' : '' %>>Blocked</option>
+          <option value="removed" <%= filters.status === 'removed' ? 'selected' : '' %>>Removed</option>
+          <option value="expired" <%= filters.status === 'expired' ? 'selected' : '' %>>Expired</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="text-sm">Flagged</label>
+        <select name="flagged" class="form-control">
+          <option value="">All</option>
+          <option value="true" <%= filters.flagged === 'true' ? 'selected' : '' %>>Flagged Only</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn--primary btn--sm">Filter</button>
+      <a href="/admin/listings" class="btn btn--outline btn--sm">Reset</a>
+    </form>
+
+    <div class="card" style="overflow: visible;">
+      <div style="overflow-x: auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Image</th>
+              <th>Title</th>
+              <th>Seller</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Flags</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (listings.length === 0) { %>
+              <tr><td colspan="10" class="text-center text-light" style="padding: 2rem;">No listings found.</td></tr>
+            <% } %>
+            <% listings.forEach(l => { %>
+              <tr>
+                <td><%= l.id %></td>
+                <td>
+                  <% if (l.image) { %>
+                    <img src="/uploads/<%= l.image %>" alt="" style="width: 40px; height: 30px; object-fit: cover; border-radius: 4px;">
+                  <% } else { %>
+                    <div style="width: 40px; height: 30px; background: var(--gray-100); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;">N/A</div>
+                  <% } %>
+                </td>
+                <td>
+                  <a href="/listings/<%= l.id %>" style="font-weight: 600; max-width: 200px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <%= l.title %>
+                  </a>
+                </td>
+                <td><a href="/profile/<%= l.seller_id %>"><%= l.seller_name %></a></td>
+                <td class="text-sm"><%= l.category_name %></td>
+                <td><%= l.price ? 'CHF ' + parseFloat(l.price).toFixed(2) : 'Swap' %></td>
+                <td>
+                  <span class="badge <%=
+                    l.status === 'active' ? 'badge-success' :
+                    l.status === 'blocked' ? 'badge-danger' :
+                    l.status === 'removed' ? 'badge-danger' :
+                    l.status === 'sold' || l.status === 'swapped' ? 'badge-primary' :
+                    'badge-gray'
+                  %>"><%= l.status %></span>
+                </td>
+                <td>
+                  <% if (parseInt(l.flag_count) > 0) { %>
+                    <span class="flag-badge"><%= l.flag_count %></span>
+                  <% } else { %>
+                    <span class="text-light">0</span>
+                  <% } %>
+                </td>
+                <td class="text-sm text-light"><%= new Date(l.created_at).toLocaleDateString('en-CH') %></td>
+                <td>
+                  <div style="display: flex; gap: 0.35rem;">
+                    <% if (l.status === 'active' || l.status === 'blocked') { %>
+                      <form action="/admin/listings/<%= l.id %>/remove" method="POST" style="display: inline;"
+                            onsubmit="return confirm('Remove this listing?')">
+                        <button type="submit" class="btn btn-danger btn--sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">Remove</button>
+                      </form>
+                    <% } %>
+                    <% if (l.status === 'blocked' || l.status === 'removed') { %>
+                      <form action="/admin/listings/<%= l.id %>/approve" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn--primary btn--sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">Approve</button>
+                      </form>
+                    <% } %>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <% if (pagination.totalPages > 1) { %>
+      <div class="pagination">
+        <% if (pagination.page > 1) { %>
+          <a href="/admin/listings?page=<%= pagination.page - 1 %>&q=<%= filters.q || '' %>&status=<%= filters.status || '' %>&flagged=<%= filters.flagged || '' %>">&laquo; Prev</a>
+        <% } %>
+        <span class="text-sm text-light">Page <%= pagination.page %> of <%= pagination.totalPages %></span>
+        <% if (pagination.page < pagination.totalPages) { %>
+          <a href="/admin/listings?page=<%= pagination.page + 1 %>&q=<%= filters.q || '' %>&status=<%= filters.status || '' %>&flagged=<%= filters.flagged || '' %>">Next &raquo;</a>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

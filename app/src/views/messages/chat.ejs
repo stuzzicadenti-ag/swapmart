@@ -32,6 +32,44 @@
       </div>
     </div>
 
+    <!-- Contact Info (only after completed transaction) -->
+    <% if (typeof contactInfo !== 'undefined' && contactInfo && offer.status === 'completed') { %>
+      <div class="card mb-2" style="border-left: 4px solid var(--success);">
+        <div class="card-body" style="padding: 1.25rem;">
+          <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);">
+            &#128101; Contact Information
+          </h3>
+          <p class="text-sm text-light mb-1" style="font-style: italic;">
+            This information is shared because the transaction is complete. Use it to arrange shipping or meetup.
+          </p>
+          <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 1rem; font-size: 0.9rem; margin-top: 0.75rem;">
+            <% if (contactInfo.name) { %>
+              <strong>Name:</strong>
+              <span><%= contactInfo.name %></span>
+            <% } %>
+            <% if (contactInfo.email) { %>
+              <strong>Email:</strong>
+              <span><a href="mailto:<%= contactInfo.email %>"><%= contactInfo.email %></a></span>
+            <% } %>
+            <% if (contactInfo.phone) { %>
+              <strong>Phone:</strong>
+              <span><a href="tel:<%= contactInfo.phone %>"><%= contactInfo.phone %></a></span>
+            <% } %>
+            <% if (contactInfo.address_line1) { %>
+              <strong>Address:</strong>
+              <span>
+                <%= contactInfo.address_line1 %><% if (contactInfo.address_line2) { %>, <%= contactInfo.address_line2 %><% } %><br>
+                <% if (contactInfo.postal_code || contactInfo.city) { %>
+                  <%= contactInfo.postal_code || '' %> <%= contactInfo.city || '' %><br>
+                <% } %>
+                <% if (contactInfo.country) { %><%= contactInfo.country %><% } %>
+              </span>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    <% } %>
+
     <!-- Messages -->
     <div class="card" style="min-height: 400px; display: flex; flex-direction: column;">
       <div style="flex: 1; padding: 1rem; overflow-y: auto; max-height: 500px;" id="messagesContainer">

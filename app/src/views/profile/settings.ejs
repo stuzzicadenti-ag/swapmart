@@ -52,6 +52,48 @@
                    value="<%= profile.location || '' %>" placeholder="e.g. Zurich, CH">
           </div>
 
+          <div style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem; margin-bottom: 1rem;">
+            <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text);">Contact & Address</h3>
+            <p class="text-sm text-light mb-2">This information is shared with the other party only after a transaction is completed.</p>
+
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" name="phone" class="form-control"
+                     value="<%= profile.phone || '' %>" placeholder="+41 xx xxx xx xx">
+            </div>
+
+            <div class="form-group">
+              <label for="address_line1">Address Line 1</label>
+              <input type="text" id="address_line1" name="address_line1" class="form-control"
+                     value="<%= profile.address_line1 || '' %>" placeholder="Street and number">
+            </div>
+
+            <div class="form-group">
+              <label for="address_line2">Address Line 2 (optional)</label>
+              <input type="text" id="address_line2" name="address_line2" class="form-control"
+                     value="<%= profile.address_line2 || '' %>" placeholder="Apartment, floor, etc.">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" class="form-control"
+                       value="<%= profile.city || '' %>" placeholder="Zurich">
+              </div>
+              <div class="form-group">
+                <label for="postal_code">Postal Code</label>
+                <input type="text" id="postal_code" name="postal_code" class="form-control"
+                       value="<%= profile.postal_code || '' %>" placeholder="8001">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="country">Country</label>
+              <input type="text" id="country" name="country" class="form-control"
+                     value="<%= profile.country || 'Switzerland' %>" placeholder="Switzerland">
+            </div>
+          </div>
+
           <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
         </form>
       </div>

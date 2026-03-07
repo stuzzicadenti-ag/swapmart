@@ -1,6 +1,7 @@
 import path from 'path';
 import { randomUUID } from 'crypto';
 import fs from 'fs/promises';
+import { scanContent } from '../utils/moderation.js';
 
 export default async function listingsRoutes(fastify) {
   const { db, config } = fastify;
@@ -198,13 +199,18 @@ export default async function listingsRoutes(fastify) {
         });
       }
 
+      // Content moderation
+      const moderationResult = scanContent((title || '') + ' ' + (description || ''));
+      const hasPhone = moderationResult.flags.some(f => f.type === 'auto_phone');
+      const listingStatus = hasPhone ? 'blocked' : 'active';
+
       const result = await db.query(
-        `INSERT INTO listings (seller_id, title, description, price, category_id, condition, location, type)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+        `INSERT INTO listings (seller_id, title, description, price, category_id, condition, location, type, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
         [
           request.user.id, title, description || null,
           price ? parseFloat(price) : null, parseInt(category_id),
-          condition, location || null, type,
+          condition, location || null, type, listingStatus,
         ]
       );
 
@@ -223,6 +229,26 @@ export default async function listingsRoutes(fastify) {
           `INSERT INTO listing_images (listing_id, file_path, position) VALUES ${values.join(', ')}`,
           params
         );
+      }
+
+      // Create flags if moderation found issues
+      if (moderationResult.flags.length > 0) {
+        for (const flag of moderationResult.flags) {
+          await db.query(
+            'INSERT INTO flags (type, listing_id, user_id, details) VALUES ($1, $2, $3, $4)',
+            [flag.type, listingId, request.user.id, flag.detail]
+          );
+        }
+      }
+
+      // If phone detected, block and show error
+      if (hasPhone) {
+        const catResult = await db.query('SELECT * FROM categories ORDER BY name');
+        return reply.view('listings/new.ejs', {
+          user: request.user,
+          categories: catResult.rows,
+          error: 'Listing blocked: phone numbers are not allowed in listings. Contact info is exchanged after a completed transaction.',
+        });
       }
 
       return reply.redirect(`/listings/${listingId}`);
@@ -291,7 +317,10 @@ export default async function listingsRoutes(fastify) {
 
       // Check for offer feedback from query params
       const offerStatus = request.query.offer;
-      const success = offerStatus === 'sent' ? 'Your offer has been sent to the seller!' : null;
+      let success = null;
+      if (offerStatus === 'sent') success = 'Your offer has been sent to the seller!';
+      if (offerStatus === 'reported') success = 'Listing has been reported. Thank you for helping keep SwapMart safe.';
+      if (offerStatus === 'already_reported') success = 'You have already reported this listing.';
       const error = offerStatus === 'error' ? 'Failed to send offer. Please try again.' : null;
 
       return reply.view('listings/detail.ejs', {
@@ -306,6 +335,45 @@ export default async function listingsRoutes(fastify) {
     } catch (err) {
       fastify.log.error(err);
       return reply.redirect('/listings');
+    }
+  });
+
+  // POST /listings/:id/report - Report a listing
+  fastify.post('/:id/report', { preHandler: requireAuth }, async (request, reply) => {
+    const { id } = request.params;
+    const { reason } = request.body;
+
+    try {
+      // Verify listing exists and user is not the seller
+      const listingResult = await db.query('SELECT * FROM listings WHERE id = $1', [parseInt(id)]);
+      if (listingResult.rows.length === 0) {
+        return reply.redirect('/listings');
+      }
+
+      const listing = listingResult.rows[0];
+      if (listing.seller_id === request.user.id) {
+        return reply.redirect(`/listings/${id}`);
+      }
+
+      // Check if user already reported this listing
+      const existingFlag = await db.query(
+        "SELECT id FROM flags WHERE listing_id = $1 AND user_id = $2 AND type = 'user_report' AND status = 'pending'",
+        [parseInt(id), request.user.id]
+      );
+
+      if (existingFlag.rows.length > 0) {
+        return reply.redirect(`/listings/${id}?offer=already_reported`);
+      }
+
+      await db.query(
+        "INSERT INTO flags (type, listing_id, user_id, details) VALUES ('user_report', $1, $2, $3)",
+        [parseInt(id), request.user.id, reason || 'No reason provided']
+      );
+
+      return reply.redirect(`/listings/${id}?offer=reported`);
+    } catch (err) {
+      fastify.log.error(err);
+      return reply.redirect(`/listings/${id}`);
     }
   });
 
