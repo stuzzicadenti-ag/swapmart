@@ -64,7 +64,7 @@ export default async function authRoutes(fastify) {
       reply.setCookie('token', token, {
         path: '/',
         httpOnly: true,
-        secure: IS_PROD,
+        secure: false, // behind Caddy reverse proxy on HTTP/Tailscale
         sameSite: 'lax',
         maxAge: 7 * 24 * 60 * 60,
       });
@@ -116,7 +116,7 @@ export default async function authRoutes(fastify) {
       reply.setCookie('token', token, {
         path: '/',
         httpOnly: true,
-        secure: IS_PROD,
+        secure: false, // behind Caddy reverse proxy on HTTP/Tailscale
         sameSite: 'lax',
         maxAge: 7 * 24 * 60 * 60,
       });
