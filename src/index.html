@@ -8,6 +8,11 @@
   <meta name="keywords" content="Swiss marketplace, buy sell Switzerland, barter trade, swap items, Pokemon cards, used cars, apartments, CHF, low fees marketplace">
   <meta name="author" content="SwapMart AG">
   <link rel="canonical" href="https://stuzzicadenti-ag.github.io/swapmart/">
+  <link rel="alternate" hreflang="en" href="https://stuzzicadenti-ag.github.io/swapmart/">
+  <link rel="alternate" hreflang="de" href="https://stuzzicadenti-ag.github.io/swapmart/de/">
+  <link rel="alternate" hreflang="fr" href="https://stuzzicadenti-ag.github.io/swapmart/fr/">
+  <link rel="alternate" hreflang="it" href="https://stuzzicadenti-ag.github.io/swapmart/it/">
+  <link rel="alternate" hreflang="x-default" href="https://stuzzicadenti-ag.github.io/swapmart/">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
@@ -63,12 +68,21 @@
       <div class="nav__links">
         <a href="#" class="nav__link">Home</a>
         <a href="#categories" class="nav__link">Categories</a>
+        <a href="#housing" class="nav__link">Housing</a>
+        <a href="#vehicles" class="nav__link">Vehicles</a>
+        <a href="#cards" class="nav__link">Cards</a>
         <a href="#how-it-works" class="nav__link">How It Works</a>
         <a href="#pricing" class="nav__link">Pricing</a>
         <a href="#listings" class="nav__link">Browse</a>
       </div>
 
       <div class="nav__actions">
+        <div class="lang-switch" aria-label="Language">
+          <a href="./" class="active" title="English">EN</a>
+          <a href="./de/" title="Deutsch">DE</a>
+          <a href="./fr/" title="Fran&ccedil;ais">FR</a>
+          <a href="./it/" title="Italiano">IT</a>
+        </div>
         <button type="button" class="btn btn--sm btn--outline" id="loginBtn">Login</button>
         <button type="button" class="btn btn--sm btn--primary" id="registerBtn">Register</button>
         <button type="button" class="nav__burger" id="burger" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -82,6 +96,9 @@
     <div class="nav__mobile" id="mobileMenu" role="menu">
       <a href="#" role="menuitem">Home</a>
       <a href="#categories" role="menuitem">Categories</a>
+      <a href="#housing" role="menuitem">Housing</a>
+      <a href="#vehicles" role="menuitem">Vehicles</a>
+      <a href="#cards" role="menuitem">Cards</a>
       <a href="#how-it-works" role="menuitem">How It Works</a>
       <a href="#pricing" role="menuitem">Pricing</a>
       <a href="#listings" role="menuitem">Browse</a>
@@ -396,6 +413,120 @@
             <span>&#11088; 4.6 &middot; 12 trades</span>
             <span>8h ago</span>
           </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== HOUSING & REAL ESTATE ==================== -->
+  <section class="section" id="housing">
+    <div class="container">
+      <h2 class="section__title">Housing &amp; Real Estate</h2>
+      <p class="section__subtitle">Find your next home or list your property. Apartments, rooms, houses, and commercial spaces across Switzerland.</p>
+
+      <div class="listings__grid">
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Studio apartment Zurich">&#127969;<span class="listing-card__badge listing-card__badge--new">New</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Studio Apartment &middot; Zurich Wiedikon</h3>
+            <p class="listing-card__meta">Apartments &middot; Zurich &middot; 32m&sup2;</p>
+            <div class="listing-card__price">CHF 1,450/mo</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.8 &middot; Verified</span><span>3h ago</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="3-room apartment Bern">&#127960;<span class="listing-card__badge listing-card__badge--new">New</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">3.5-Room Apartment &middot; Bern B&uuml;mpliz</h3>
+            <p class="listing-card__meta">Apartments &middot; Bern &middot; 78m&sup2;</p>
+            <div class="listing-card__price">CHF 1,850/mo</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 5.0 &middot; Verified</span><span>1d ago</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="WG room Basel">&#128716;<span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">WG Room &middot; Basel Gundeldingen</h3>
+            <p class="listing-card__meta">Rooms &middot; Basel &middot; 18m&sup2;</p>
+            <div class="listing-card__price">CHF 750/mo</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.6 &middot; 5 trades</span><span>5h ago</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CARS & VEHICLES ==================== -->
+  <section class="section section--alt" id="vehicles">
+    <div class="container">
+      <h2 class="section__title">Cars &amp; Vehicles</h2>
+      <p class="section__subtitle">Buy, sell, or swap cars, motorcycles, and more. Swiss-inspected, with full MFK history.</p>
+
+      <div class="listings__grid">
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="VW Golf 2021">&#128663;<span class="listing-card__badge listing-card__badge--cash">Swap + Cash</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">VW Golf VIII 2021 &middot; 42k km</h3>
+            <p class="listing-card__meta">Cars &middot; Lucerne &middot; MFK 2025</p>
+            <div class="listing-card__price">CHF 24,900</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.9 &middot; 12 trades</span><span>2h ago</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="BMW M3 2020">&#128665;<span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">BMW M3 Competition 2020 &middot; 35k km</h3>
+            <p class="listing-card__meta">Cars &middot; Geneva &middot; MFK 2024</p>
+            <div class="listing-card__price">CHF 68,500</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 5.0 &middot; 28 trades</span><span>4h ago</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Vespa scooter">&#128757;<span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Vespa Primavera 125 &middot; 2023</h3>
+            <p class="listing-card__meta">Motorcycles &middot; Lugano</p>
+            <div class="listing-card__price">CHF 3,800</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.7 &middot; 6 trades</span><span>8h ago</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TRADING CARDS ==================== -->
+  <section class="section" id="cards">
+    <div class="container">
+      <h2 class="section__title">Trading Cards &amp; Collectibles</h2>
+      <p class="section__subtitle">Pokemon, Yu-Gi-Oh, Magic: The Gathering, sports cards, and rare collectibles. Swap or sell with fellow collectors.</p>
+
+      <div class="listings__grid">
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Pokemon Pikachu VMAX">&#127183;<span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Pokemon Pikachu VMAX Rainbow</h3>
+            <p class="listing-card__meta">Pokemon TCG &middot; Zurich</p>
+            <div class="listing-card__price">CHF 180</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.9 &middot; 45 trades</span><span>1h ago</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="MTG Black Lotus">&#127183;<span class="listing-card__badge listing-card__badge--cash">Swap + Cash</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">MTG Black Lotus (Beta) Graded PSA 7</h3>
+            <p class="listing-card__meta">Magic TCG &middot; Bern</p>
+            <div class="listing-card__price">CHF 12,500</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 5.0 &middot; 67 trades</span><span>3h ago</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Panini World Cup sticker album">&#128293;<span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Panini World Cup 2026 Complete Set</h3>
+            <p class="listing-card__meta">Sports Cards &middot; Basel</p>
+            <div class="listing-card__price">CHF 350</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.5 &middot; 19 trades</span><span>6h ago</span></div>
         </article>
       </div>
     </div>

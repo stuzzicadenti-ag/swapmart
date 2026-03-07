@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SwapMart - &Eacute;changez, Troquez &amp; &Eacute;conomisez | La place de march&eacute; la plus &eacute;quitable de Suisse</title>
+  <meta name="description" content="SwapMart est la place de march&eacute; la plus &eacute;quitable de Suisse. &Eacute;changez, troquez et vendez avec seulement 3% de commission. Syst&egrave;me de troc, offres Troc + Cash, et 5 annonces gratuites par mois.">
+  <meta name="keywords" content="march&eacute; suisse, acheter vendre Suisse, troc &eacute;change, troquer articles, cartes Pokemon, voitures occasion, appartements, CHF, frais r&eacute;duits">
+  <meta name="author" content="SwapMart AG">
+  <link rel="canonical" href="https://stuzzicadenti-ag.github.io/swapmart/fr/">
+  <link rel="alternate" hreflang="en" href="https://stuzzicadenti-ag.github.io/swapmart/">
+  <link rel="alternate" hreflang="de" href="https://stuzzicadenti-ag.github.io/swapmart/de/">
+  <link rel="alternate" hreflang="fr" href="https://stuzzicadenti-ag.github.io/swapmart/fr/">
+  <link rel="alternate" hreflang="it" href="https://stuzzicadenti-ag.github.io/swapmart/it/">
+  <link rel="alternate" hreflang="x-default" href="https://stuzzicadenti-ag.github.io/swapmart/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://stuzzicadenti-ag.github.io/swapmart/fr/">
+  <meta property="og:title" content="SwapMart - &Eacute;changez, Troquez &amp; &Eacute;conomisez | La place de march&eacute; la plus &eacute;quitable de Suisse">
+  <meta property="og:description" content="Seulement 3% de commission contre 8-12% ailleurs. Syst&egrave;me de troc unique. 5 annonces gratuites/mois. Suisse avec CHF, Poste Suisse et retrait local.">
+  <meta property="og:image" content="https://stuzzicadenti-ag.github.io/swapmart/og-image.png">
+  <meta property="og:site_name" content="SwapMart">
+  <meta property="og:locale" content="fr_CH">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SwapMart - La place de march&eacute; la plus &eacute;quitable de Suisse">
+  <meta name="twitter:description" content="Seulement 3% de commission contre 8-12% ailleurs. Syst&egrave;me de troc unique. 5 annonces gratuites/mois.">
+  <meta name="twitter:image" content="https://stuzzicadenti-ag.github.io/swapmart/og-image.png">
+
+  <meta name="theme-color" content="#0d9488">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cloud.umami.is; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://cloud.umami.is; frame-ancestors 'none';">
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "SwapMart",
+    "url": "https://stuzzicadenti-ag.github.io/swapmart/",
+    "description": "La place de march&eacute; la plus &eacute;quitable de Suisse pour &eacute;changer, troquer et vendre.",
+    "foundingDate": "2026",
+    "areaServed": {
+      "@type": "Country",
+      "name": "Switzerland"
+    },
+    "sameAs": []
+  }
+  </script>
+
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+</head>
+<body>
+
+  <!-- ==================== NAVIGATION ==================== -->
+  <nav class="nav" id="nav" role="navigation" aria-label="Navigation principale">
+    <div class="nav__inner">
+      <a href="#" class="nav__logo" aria-label="SwapMart accueil">
+        <span class="nav__logo-icon">&#x1F501;</span>
+        Swap<span>Mart</span>
+      </a>
+
+      <div class="nav__links">
+        <a href="#" class="nav__link">Accueil</a>
+        <a href="#categories" class="nav__link">Cat&eacute;gories</a>
+        <a href="#housing" class="nav__link">Logement</a>
+        <a href="#vehicles" class="nav__link">V&eacute;hicules</a>
+        <a href="#cards" class="nav__link">Cartes</a>
+        <a href="#how-it-works" class="nav__link">Comment &ccedil;a marche</a>
+        <a href="#pricing" class="nav__link">Tarifs</a>
+        <a href="#listings" class="nav__link">Parcourir</a>
+      </div>
+
+      <div class="nav__actions">
+        <div class="lang-switch" aria-label="Langue">
+          <a href="../" title="English">EN</a>
+          <a href="../de/" title="Deutsch">DE</a>
+          <a href="../fr/" class="active" title="Fran&ccedil;ais">FR</a>
+          <a href="../it/" title="Italiano">IT</a>
+        </div>
+        <button type="button" class="btn btn--sm btn--outline" id="loginBtn">Connexion</button>
+        <button type="button" class="btn btn--sm btn--primary" id="registerBtn">S'inscrire</button>
+        <button type="button" class="nav__burger" id="burger" aria-label="Basculer le menu mobile" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav__mobile" id="mobileMenu" role="menu">
+      <a href="#" role="menuitem">Accueil</a>
+      <a href="#categories" role="menuitem">Cat&eacute;gories</a>
+      <a href="#housing" role="menuitem">Logement</a>
+      <a href="#vehicles" role="menuitem">V&eacute;hicules</a>
+      <a href="#cards" role="menuitem">Cartes</a>
+      <a href="#how-it-works" role="menuitem">Comment &ccedil;a marche</a>
+      <a href="#pricing" role="menuitem">Tarifs</a>
+      <a href="#listings" role="menuitem">Parcourir</a>
+      <button type="button" class="btn btn--primary" id="mobileRegisterBtn">Cr&eacute;er un compte</button>
+    </div>
+  </nav>
+
+  <!-- ==================== HERO ==================== -->
+  <header class="hero">
+    <div class="container">
+      <div class="hero__badge">&#127464;&#127469; Made in Switzerland</div>
+      <h1 class="hero__title">
+        &Eacute;changez. Troquez. &Eacute;conomisez.<br>
+        <em>La place de march&eacute; la plus <span class="highlight">&eacute;quitable</span> de Suisse.</em>
+      </h1>
+      <p class="hero__subtitle">
+        Seulement 3% de commission &mdash; pas 12%. &Eacute;changez directement, m&eacute;langez cash + troc, ou vendez classiquement. 5 annonces gratuites chaque mois.
+      </p>
+
+      <form class="hero__search" action="#" onsubmit="return false;">
+        <input type="search" placeholder="Rechercher cartes Pokemon, meubles, appartements, voitures..." aria-label="Rechercher des annonces">
+        <button type="submit">Rechercher</button>
+      </form>
+
+      <div class="hero__ctas">
+        <a href="#how-it-works" class="btn btn--primary btn--lg">&#x1F501; Commencer &agrave; &eacute;changer</a>
+        <a href="#pricing" class="btn btn--accent btn--lg">Publier gratuitement</a>
+      </div>
+
+      <div class="hero__trust">
+        <div class="hero__trust-item">&#x2705; Seulement <strong>3% de frais</strong></div>
+        <div class="hero__trust-item">&#x1F4E6; Int&eacute;gration Poste Suisse</div>
+        <div class="hero__trust-item">&#x1F91D; Troc &amp; &eacute;change</div>
+        <div class="hero__trust-item">&#x1F512; &Eacute;changes s&eacute;curis&eacute;s</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== STATS BAR ==================== -->
+  <section class="stats-bar" aria-label="Statistiques de la plateforme">
+    <div class="container">
+      <div class="stats-bar__inner">
+        <div class="stats-bar__item">
+          <div class="stats-bar__value">10'000+</div>
+          <div class="stats-bar__label">Annonces actives</div>
+        </div>
+        <div class="stats-bar__item">
+          <div class="stats-bar__value">5'000+</div>
+          <div class="stats-bar__label">&Eacute;changeurs satisfaits</div>
+        </div>
+        <div class="stats-bar__item">
+          <div class="stats-bar__value">CHF 2M+</div>
+          <div class="stats-bar__label">Total &eacute;chang&eacute;</div>
+        </div>
+        <div class="stats-bar__item">
+          <div class="stats-bar__value">0%</div>
+          <div class="stats-bar__label">Frais de troc</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== POURQUOI SWAPMART ==================== -->
+  <section class="section" id="comparison">
+    <div class="container">
+      <h2 class="section__title">Pourquoi SwapMart ?</h2>
+      <p class="section__subtitle">D&eacute;couvrez comment nous nous comparons &agrave; la plus grande place de march&eacute; suisse. Frais r&eacute;duits, plus de flexibilit&eacute; et un syst&egrave;me de troc unique.</p>
+
+      <div class="comparison">
+        <table class="comparison__table" role="table">
+          <thead>
+            <tr>
+              <th scope="col">Fonctionnalit&eacute;</th>
+              <th scope="col" class="comparison__ours">&#x1F501; SwapMart</th>
+              <th scope="col">Ricardo.ch</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Commission de vente</td>
+              <td class="comparison__ours">3%</td>
+              <td>8&ndash;12%</td>
+            </tr>
+            <tr>
+              <td>Annonces gratuites/mois</td>
+              <td class="comparison__ours">5 gratuites</td>
+              <td>Variable</td>
+            </tr>
+            <tr>
+              <td>Troc / &Eacute;change</td>
+              <td class="comparison__ours"><span class="comparison__check">&#x2713;</span> Oui</td>
+              <td><span class="comparison__cross">&#x2717;</span> Non</td>
+            </tr>
+            <tr>
+              <td>Troc + Cash</td>
+              <td class="comparison__ours"><span class="comparison__check">&#x2713;</span> Oui</td>
+              <td><span class="comparison__cross">&#x2717;</span> Non</td>
+            </tr>
+            <tr>
+              <td>Protection de l'argent</td>
+              <td class="comparison__ours">Gratuit</td>
+              <td>Obligatoire (payant)</td>
+            </tr>
+            <tr>
+              <td>Plafond de commission</td>
+              <td class="comparison__ours">CHF 50</td>
+              <td>CHF 290</td>
+            </tr>
+            <tr>
+              <td>Retrait local</td>
+              <td class="comparison__ours"><span class="comparison__check">&#x2713;</span> Int&eacute;gr&eacute;</td>
+              <td>Limit&eacute;</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="comparison__note">* Taux de commission en 2026. Les frais Ricardo varient selon la cat&eacute;gorie (PC/Gaming 11%, Mode 12%).</p>
+    </div>
+  </section>
+
+  <!-- ==================== CAT&Eacute;GORIES ==================== -->
+  <section class="section section--alt" id="categories">
+    <div class="container">
+      <h2 class="section__title">Cat&eacute;gories populaires</h2>
+      <p class="section__subtitle">Des cartes Pokemon aux appartements &mdash; trouvez (ou &eacute;changez) presque tout.</p>
+
+      <div class="categories__grid">
+        <a href="#" class="category-card">
+          <div class="category-card__icon">&#127183;</div>
+          <div class="category-card__name">Cartes &agrave; collectionner</div>
+          <div class="category-card__count">2'400+ annonces</div>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-card__icon">&#128187;</div>
+          <div class="category-card__name">&Eacute;lectronique</div>
+          <div class="category-card__count">1'800+ annonces</div>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-card__icon">&#128663;</div>
+          <div class="category-card__name">Voitures &amp; V&eacute;hicules</div>
+          <div class="category-card__count">950+ annonces</div>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-card__icon">&#127969;</div>
+          <div class="category-card__name">Appartements &amp; Chambres</div>
+          <div class="category-card__count">620+ annonces</div>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-card__icon">&#128087;</div>
+          <div class="category-card__name">Mode</div>
+          <div class="category-card__count">1'500+ annonces</div>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-card__icon">&#128717;</div>
+          <div class="category-card__name">Meubles</div>
+          <div class="category-card__count">870+ annonces</div>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-card__icon">&#9917;</div>
+          <div class="category-card__name">Sports &amp; Plein air</div>
+          <div class="category-card__count">1'100+ annonces</div>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-card__icon">&#127942;</div>
+          <div class="category-card__name">Objets de collection</div>
+          <div class="category-card__count">760+ annonces</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== COMMENT &Ccedil;A MARCHE ==================== -->
+  <section class="section" id="how-it-works">
+    <div class="container">
+      <h2 class="section__title">Comment fonctionne le troc</h2>
+      <p class="section__subtitle">Quatre &eacute;tapes simples pour &eacute;changer, troquer ou vendre. Aucun processus compliqu&eacute;.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step__number">1</div>
+          <div class="step__icon">&#128248;</div>
+          <h3 class="step__title">Publiez votre article</h3>
+          <p class="step__desc">Prenez une photo, fixez un prix ou indiquez &laquo;Ouvert aux &eacute;changes&raquo;. Les 5 premi&egrave;res annonces du mois sont gratuites.</p>
+        </div>
+        <div class="step">
+          <div class="step__number">2</div>
+          <div class="step__icon">&#128269;</div>
+          <h3 class="step__title">Parcourez &amp; Trouvez</h3>
+          <p class="step__desc">Recherchez par cat&eacute;gorie, localisation ou pr&eacute;f&eacute;rence d'&eacute;change. Filtrez les annonces ouvertes au troc.</p>
+        </div>
+        <div class="step">
+          <div class="step__number">3</div>
+          <div class="step__icon">&#129309;</div>
+          <h3 class="step__title">Proposez un deal</h3>
+          <p class="step__desc">Offrez du cash, un &eacute;change, ou un m&eacute;lange des deux. &laquo;Ma PS5 + CHF 200 pour votre PC Gaming&raquo; &mdash; tout est possible.</p>
+          <div class="step__badge">Troc + Cash</div>
+        </div>
+        <div class="step">
+          <div class="step__number">4</div>
+          <div class="step__icon">&#127881;</div>
+          <h3 class="step__title">Rencontrez &amp; &Eacute;changez</h3>
+          <p class="step__desc">Exp&eacute;diez via la Poste Suisse ou rencontrez-vous localement. &Eacute;valuez votre partenaire et construisez votre r&eacute;putation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== ANNONCES EN VEDETTE ==================== -->
+  <section class="section section--alt" id="listings">
+    <div class="container">
+      <h2 class="section__title">Annonces en vedette</h2>
+      <p class="section__subtitle">S&eacute;lection fra&icirc;che de notre communaut&eacute;. Quelque chose vous pla&icirc;t ? Faites une offre.</p>
+
+      <div class="listings__grid">
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Carte Pokemon Dracaufeu Holo">
+            &#127183;
+            <span class="listing-card__badge listing-card__badge--swap">Ouvert aux &eacute;changes</span>
+          </div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Pokemon Dracaufeu Holo 1&egrave;re &Eacute;d.</h3>
+            <p class="listing-card__meta">Cartes &agrave; collectionner &middot; Zurich</p>
+            <div class="listing-card__price">CHF 1'200</div>
+          </div>
+          <div class="listing-card__footer">
+            <span>&#11088; 4.9 &middot; 23 &eacute;changes</span>
+            <span>il y a 2h</span>
+          </div>
+        </article>
+
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="BMW 320i voiture">
+            &#128663;
+            <span class="listing-card__badge listing-card__badge--cash">Troc + Cash</span>
+          </div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">BMW 320i 2019 &middot; 68'000 km</h3>
+            <p class="listing-card__meta">Voitures &amp; V&eacute;hicules &middot; Berne</p>
+            <div class="listing-card__price">CHF 22'500</div>
+          </div>
+          <div class="listing-card__footer">
+            <span>&#11088; 4.7 &middot; 8 &eacute;changes</span>
+            <span>il y a 5h</span>
+          </div>
+        </article>
+
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Appartement 3 pi&egrave;ces &agrave; Zurich">
+            &#127969;
+            <span class="listing-card__badge listing-card__badge--new">Nouveau</span>
+          </div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Appartement 3 pi&egrave;ces &middot; Zurich Oerlikon</h3>
+            <p class="listing-card__meta">Appartements &amp; Chambres &middot; Zurich</p>
+            <div class="listing-card__price">CHF 1'950/mois</div>
+          </div>
+          <div class="listing-card__footer">
+            <span>&#11088; 5.0 &middot; V&eacute;rifi&eacute;</span>
+            <span>il y a 1j</span>
+          </div>
+        </article>
+
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Pack console PS5">
+            &#127918;
+            <span class="listing-card__badge listing-card__badge--swap">Ouvert aux &eacute;changes</span>
+          </div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">PS5 Bundle &middot; 2 manettes + 5 jeux</h3>
+            <p class="listing-card__meta">&Eacute;lectronique &middot; B&acirc;le</p>
+            <div class="listing-card__swap-label">&#x1F501; Ouvert aux &eacute;changes</div>
+          </div>
+          <div class="listing-card__footer">
+            <span>&#11088; 4.8 &middot; 15 &eacute;changes</span>
+            <span>il y a 3h</span>
+          </div>
+        </article>
+
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Rolex Submariner vintage">
+            &#9201;
+            <span class="listing-card__badge listing-card__badge--cash">Troc + Cash</span>
+          </div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Vintage Rolex Submariner 1985</h3>
+            <p class="listing-card__meta">Objets de collection &middot; Gen&egrave;ve</p>
+            <div class="listing-card__price">CHF 8'900</div>
+          </div>
+          <div class="listing-card__footer">
+            <span>&#11088; 5.0 &middot; 41 &eacute;changes</span>
+            <span>il y a 6h</span>
+          </div>
+        </article>
+
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Carte Yu-Gi-Oh Dragon Blanc aux Yeux Bleus">
+            &#128293;
+            <span class="listing-card__badge listing-card__badge--swap">Ouvert aux &eacute;changes</span>
+          </div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Yu-Gi-Oh Dragon Blanc aux Yeux Bleus 1&egrave;re &Eacute;d.</h3>
+            <p class="listing-card__meta">Cartes &agrave; collectionner &middot; Lugano</p>
+            <div class="listing-card__price">CHF 450</div>
+          </div>
+          <div class="listing-card__footer">
+            <span>&#11088; 4.6 &middot; 12 &eacute;changes</span>
+            <span>il y a 8h</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== LOGEMENT & IMMOBILIER ==================== -->
+  <section class="section" id="housing">
+    <div class="container">
+      <h2 class="section__title">Logement &amp; Immobilier</h2>
+      <p class="section__subtitle">Trouvez votre prochain logement ou publiez votre bien. Appartements, chambres, maisons et espaces commerciaux dans toute la Suisse.</p>
+
+      <div class="listings__grid">
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Studio Zurich">&#127969;<span class="listing-card__badge listing-card__badge--new">Nouveau</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Studio &middot; Zurich Wiedikon</h3>
+            <p class="listing-card__meta">Appartements &middot; Zurich &middot; 32m&sup2;</p>
+            <div class="listing-card__price">CHF 1'450/mois</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.8 &middot; V&eacute;rifi&eacute;</span><span>il y a 3h</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Appartement 3.5 pi&egrave;ces Berne">&#127960;<span class="listing-card__badge listing-card__badge--new">Nouveau</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Appartement 3.5 pi&egrave;ces &middot; Berne B&uuml;mpliz</h3>
+            <p class="listing-card__meta">Appartements &middot; Berne &middot; 78m&sup2;</p>
+            <div class="listing-card__price">CHF 1'850/mois</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 5.0 &middot; V&eacute;rifi&eacute;</span><span>il y a 1j</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Chambre en colocation B&acirc;le">&#128716;<span class="listing-card__badge listing-card__badge--swap">Ouvert aux &eacute;changes</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Chambre en colocation &middot; B&acirc;le Gundeldingen</h3>
+            <p class="listing-card__meta">Chambres &middot; B&acirc;le &middot; 18m&sup2;</p>
+            <div class="listing-card__price">CHF 750/mois</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.6 &middot; 5 &eacute;changes</span><span>il y a 5h</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VOITURES & V&Eacute;HICULES ==================== -->
+  <section class="section section--alt" id="vehicles">
+    <div class="container">
+      <h2 class="section__title">Voitures &amp; V&eacute;hicules</h2>
+      <p class="section__subtitle">Achetez, vendez ou &eacute;changez des voitures, motos et plus. Contr&ocirc;l&eacute;s en Suisse, avec historique MFK complet.</p>
+
+      <div class="listings__grid">
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="VW Golf 2021">&#128663;<span class="listing-card__badge listing-card__badge--cash">Troc + Cash</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">VW Golf VIII 2021 &middot; 42'000 km</h3>
+            <p class="listing-card__meta">Voitures &middot; Lucerne &middot; MFK 2025</p>
+            <div class="listing-card__price">CHF 24'900</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.9 &middot; 12 &eacute;changes</span><span>il y a 2h</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="BMW M3 2020">&#128665;<span class="listing-card__badge listing-card__badge--swap">Ouvert aux &eacute;changes</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">BMW M3 Competition 2020 &middot; 35'000 km</h3>
+            <p class="listing-card__meta">Voitures &middot; Gen&egrave;ve &middot; MFK 2024</p>
+            <div class="listing-card__price">CHF 68'500</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 5.0 &middot; 28 &eacute;changes</span><span>il y a 4h</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Vespa scooter">&#128757;<span class="listing-card__badge listing-card__badge--swap">Ouvert aux &eacute;changes</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Vespa Primavera 125 &middot; 2023</h3>
+            <p class="listing-card__meta">Motos &middot; Lugano</p>
+            <div class="listing-card__price">CHF 3'800</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.7 &middot; 6 &eacute;changes</span><span>il y a 8h</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CARTES &Agrave; COLLECTIONNER ==================== -->
+  <section class="section" id="cards">
+    <div class="container">
+      <h2 class="section__title">Cartes &agrave; collectionner &amp; Objets de collection</h2>
+      <p class="section__subtitle">Pokemon, Yu-Gi-Oh, Magic: The Gathering, cartes de sport et objets rares. &Eacute;changez ou vendez avec d'autres collectionneurs.</p>
+
+      <div class="listings__grid">
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Pokemon Pikachu VMAX">&#127183;<span class="listing-card__badge listing-card__badge--swap">Ouvert aux &eacute;changes</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Pokemon Pikachu VMAX Rainbow</h3>
+            <p class="listing-card__meta">Pokemon TCG &middot; Zurich</p>
+            <div class="listing-card__price">CHF 180</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.9 &middot; 45 &eacute;changes</span><span>il y a 1h</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="MTG Black Lotus">&#127183;<span class="listing-card__badge listing-card__badge--cash">Troc + Cash</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">MTG Black Lotus (Beta) PSA 7</h3>
+            <p class="listing-card__meta">Magic TCG &middot; Berne</p>
+            <div class="listing-card__price">CHF 12'500</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 5.0 &middot; 67 &eacute;changes</span><span>il y a 3h</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Album Panini Coupe du Monde">&#128293;<span class="listing-card__badge listing-card__badge--swap">Ouvert aux &eacute;changes</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Panini Coupe du Monde 2026 Set Complet</h3>
+            <p class="listing-card__meta">Cartes de sport &middot; B&acirc;le</p>
+            <div class="listing-card__price">CHF 350</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.5 &middot; 19 &eacute;changes</span><span>il y a 6h</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TROC + CASH ==================== -->
+  <section class="section" id="swap-cash">
+    <div class="container">
+      <h2 class="section__title">Troc + Cash : Le meilleur des deux mondes</h2>
+      <p class="section__subtitle">Pas assez d'argent ? Proposez votre article plus un peu de cash. C'est du commerce flexible, &agrave; la mani&egrave;re SwapMart.</p>
+
+      <div class="swap-explainer">
+        <div class="swap-explainer__visual">
+          <div class="swap-explainer__side">
+            <div class="swap-explainer__side-icon">&#127918;</div>
+            <div class="swap-explainer__side-title">Ma PS5 Bundle</div>
+            <div class="swap-explainer__side-sub">Valeur ~CHF 400</div>
+            <div class="swap-explainer__side-cash">+ CHF 200 cash</div>
+          </div>
+
+          <div class="swap-explainer__arrow">&#x21C6;</div>
+
+          <div class="swap-explainer__side">
+            <div class="swap-explainer__side-icon">&#128187;</div>
+            <div class="swap-explainer__side-title">Votre PC Gaming</div>
+            <div class="swap-explainer__side-sub">Valeur ~CHF 600</div>
+          </div>
+        </div>
+
+        <p class="swap-explainer__text">
+          <strong>Pas de frais de troc.</strong> SwapMart ne facture une commission que sur la partie cash d'un deal Troc + Cash.
+          Les &eacute;changes purs (article contre article) sont enti&egrave;rement gratuits. C'est ainsi que le commerce devrait fonctionner &mdash; &eacute;quitable, flexible et communautaire.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TARIFS ==================== -->
+  <section class="section section--alt" id="pricing">
+    <div class="container">
+      <h2 class="section__title">Tarifs simples et &eacute;quitables</h2>
+      <p class="section__subtitle">Pas de frais cach&eacute;s. Pas de services obligatoires. Juste des tarifs honn&ecirc;tes qui respectent les vendeurs.</p>
+
+      <div class="pricing__grid">
+        <div class="pricing-card">
+          <div class="pricing-card__name">Gratuit</div>
+          <div class="pricing-card__price">CHF 0<small></small></div>
+          <div class="pricing-card__period">Gratuit pour toujours</div>
+          <ul class="pricing-card__features">
+            <li>5 annonces par mois</li>
+            <li>3% de commission de vente</li>
+            <li>&Eacute;changes illimit&eacute;s (0% de frais)</li>
+            <li>&Eacute;valuations acheteurs &amp; vendeurs</li>
+            <li>Messagerie s&eacute;curis&eacute;e</li>
+            <li>Exp&eacute;dition Poste Suisse</li>
+          </ul>
+          <a href="#" class="btn btn--outline" style="width:100%;">Commencer</a>
+        </div>
+
+        <div class="pricing-card pricing-card--popular">
+          <div class="pricing-card__badge">Le plus populaire</div>
+          <div class="pricing-card__name">Seller Pro</div>
+          <div class="pricing-card__price">CHF 9.90<small>/mois</small></div>
+          <div class="pricing-card__period">Factur&eacute; mensuellement</div>
+          <ul class="pricing-card__features">
+            <li>30 annonces par mois</li>
+            <li>2% de commission de vente</li>
+            <li>&Eacute;changes illimit&eacute;s (0% de frais)</li>
+            <li>Placement en vedette</li>
+            <li>Support client prioritaire</li>
+            <li>S&eacute;questre Troc + Cash</li>
+            <li>Tableau de bord analytique</li>
+          </ul>
+          <a href="#" class="btn btn--primary" style="width:100%;">Essai gratuit</a>
+        </div>
+
+        <div class="pricing-card">
+          <div class="pricing-card__name">Business</div>
+          <div class="pricing-card__price">CHF 29.90<small>/mois</small></div>
+          <div class="pricing-card__period">Factur&eacute; mensuellement</div>
+          <ul class="pricing-card__features">
+            <li>Annonces illimit&eacute;es</li>
+            <li>1.5% de commission de vente</li>
+            <li>&Eacute;changes illimit&eacute;s (0% de frais)</li>
+            <li>Boutique personnalis&eacute;e</li>
+            <li>Acc&egrave;s API</li>
+            <li>Outils d'import en masse</li>
+            <li>Analyses &amp; rapports avanc&eacute;s</li>
+            <li>Gestionnaire de compte d&eacute;di&eacute;</li>
+          </ul>
+          <a href="#" class="btn btn--outline" style="width:100%;">Contacter les ventes</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CONFIANCE & S&Eacute;CURIT&Eacute; ==================== -->
+  <section class="section" id="trust">
+    <div class="container">
+      <h2 class="section__title">&Eacute;changez en toute confiance</h2>
+      <p class="section__subtitle">Des fonctionnalit&eacute;s de s&eacute;curit&eacute; int&eacute;gr&eacute;es pour que vous puissiez vous concentrer sur les bonnes affaires.</p>
+
+      <div class="trust__grid">
+        <div class="trust-card">
+          <div class="trust-card__icon">&#128100;</div>
+          <h3 class="trust-card__title">Profils v&eacute;rifi&eacute;s</h3>
+          <p class="trust-card__desc">&Eacute;changeurs v&eacute;rifi&eacute;s par ID avec historique public et &eacute;valuations communautaires.</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-card__icon">&#128172;</div>
+          <h3 class="trust-card__title">Messagerie s&eacute;curis&eacute;e</h3>
+          <p class="trust-card__desc">N&eacute;gociez directement dans SwapMart. Pas besoin de partager vos coordonn&eacute;es personnelles.</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-card__icon">&#128230;</div>
+          <h3 class="trust-card__title">Suivi Poste Suisse</h3>
+          <p class="trust-card__desc">&Eacute;tiquettes d'exp&eacute;dition int&eacute;gr&eacute;es avec suivi complet. Ou choisissez le retrait local gratuit.</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-card__icon">&#11088;</div>
+          <h3 class="trust-card__title">&Eacute;valuations acheteurs &amp; vendeurs</h3>
+          <p class="trust-card__desc">Syst&egrave;me de r&eacute;putation transparent. Voyez le nombre d'&eacute;changes, le temps de r&eacute;ponse et les avis.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CTA SECTION ==================== -->
+  <section class="section section--primary cta-section">
+    <div class="container">
+      <h2 class="cta-section__title">Pr&ecirc;t &agrave; commencer ?</h2>
+      <p class="cta-section__subtitle">Rejoignez des milliers d'&eacute;changeurs suisses qui &eacute;conomisent gr&acirc;ce &agrave; des frais plus &eacute;quitables et des &eacute;changes plus intelligents.</p>
+      <div class="cta-section__buttons">
+        <button type="button" class="btn btn--white btn--lg" id="ctaRegisterBtn">Cr&eacute;er un compte gratuit</button>
+        <a href="#categories" class="btn btn--outline btn--lg" style="border-color:rgba(255,255,255,0.4);color:#fff;">Parcourir les annonces</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="footer__logo">
+            &#x1F501; Swap<span>Mart</span>
+          </div>
+          <p class="footer__desc">
+            La place de march&eacute; la plus &eacute;quitable de Suisse. &Eacute;changez, troquez et vendez avec des frais r&eacute;duits, un syst&egrave;me de troc unique et une approche communautaire.
+          </p>
+          <div class="footer__swiss">&#127464;&#127469; Made in Switzerland</div>
+        </div>
+
+        <div class="footer__col">
+          <div class="footer__col-title">Cat&eacute;gories</div>
+          <a href="#">Cartes &agrave; collectionner</a>
+          <a href="#">&Eacute;lectronique</a>
+          <a href="#">Voitures &amp; V&eacute;hicules</a>
+          <a href="#">Appartements &amp; Chambres</a>
+          <a href="#">Mode</a>
+          <a href="#">Meubles</a>
+          <a href="#">Sports &amp; Plein air</a>
+          <a href="#">Objets de collection</a>
+        </div>
+
+        <div class="footer__col">
+          <div class="footer__col-title">Entreprise</div>
+          <a href="#">&Agrave; propos de SwapMart</a>
+          <a href="#">Comment &ccedil;a marche</a>
+          <a href="#">Tarifs</a>
+          <a href="#">Blog</a>
+          <a href="#">Carri&egrave;res</a>
+          <a href="#">Presse</a>
+        </div>
+
+        <div class="footer__col">
+          <div class="footer__col-title">L&eacute;gal</div>
+          <a href="#">Conditions g&eacute;n&eacute;rales</a>
+          <a href="#">Politique de confidentialit&eacute;</a>
+          <a href="#">Politique de cookies</a>
+          <a href="#">Grille tarifaire</a>
+          <a href="#">Directives de s&eacute;curit&eacute;</a>
+          <a href="#">Contactez-nous</a>
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <span>&copy; 2026 SwapMart. Tous droits r&eacute;serv&eacute;s.</span>
+        <div class="footer__social">
+          <a href="#" aria-label="Instagram">IG</a>
+          <a href="#" aria-label="Twitter / X">X</a>
+          <a href="#" aria-label="LinkedIn">LI</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== LOGIN / REGISTER MODAL ==================== -->
+  <div class="modal-overlay" id="authModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <button type="button" class="modal__close" id="modalClose" aria-label="Fermer le dialogue">&times;</button>
+      <h2 class="modal__title" id="modalTitle">Bienvenue sur SwapMart</h2>
+      <p class="modal__subtitle">Commencez &agrave; &eacute;changer sur la place de march&eacute; la plus &eacute;quitable de Suisse.</p>
+
+      <div class="modal__tabs" role="tablist">
+        <button type="button" class="modal__tab active" role="tab" aria-selected="true" data-tab="login">Connexion</button>
+        <button type="button" class="modal__tab" role="tab" aria-selected="false" data-tab="register">S'inscrire</button>
+      </div>
+
+      <!-- Login Form -->
+      <form class="modal__form active" id="loginForm" data-form="login" onsubmit="return false;">
+        <div class="modal__field">
+          <label for="loginEmail">E-mail</label>
+          <input type="email" id="loginEmail" placeholder="vous@exemple.com" autocomplete="email" required>
+        </div>
+        <div class="modal__field">
+          <label for="loginPassword">Mot de passe</label>
+          <input type="password" id="loginPassword" placeholder="Votre mot de passe" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn btn--primary" style="width:100%;">Connexion</button>
+        <div class="modal__divider">ou</div>
+        <button type="button" class="btn btn--outline" style="width:100%;">Continuer avec Google</button>
+        <p class="modal__terms">En continuant, vous acceptez nos <a href="#">Conditions</a> et notre <a href="#">Politique de confidentialit&eacute;</a>.</p>
+      </form>
+
+      <!-- Register Form -->
+      <form class="modal__form" id="registerForm" data-form="register" onsubmit="return false;">
+        <div class="modal__field">
+          <label for="regName">Nom complet</label>
+          <input type="text" id="regName" placeholder="Jean Dupont" autocomplete="name" required>
+        </div>
+        <div class="modal__field">
+          <label for="regEmail">E-mail</label>
+          <input type="email" id="regEmail" placeholder="vous@exemple.com" autocomplete="email" required>
+        </div>
+        <div class="modal__field">
+          <label for="regPassword">Mot de passe</label>
+          <input type="password" id="regPassword" placeholder="Min. 8 caract&egrave;res" autocomplete="new-password" required minlength="8">
+        </div>
+        <button type="submit" class="btn btn--primary" style="width:100%;">Cr&eacute;er un compte</button>
+        <div class="modal__divider">ou</div>
+        <button type="button" class="btn btn--outline" style="width:100%;">S'inscrire avec Google</button>
+        <p class="modal__terms">En vous inscrivant, vous acceptez nos <a href="#">Conditions</a> et notre <a href="#">Politique de confidentialit&eacute;</a>.</p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      var nav = document.getElementById('nav');
+      window.addEventListener('scroll', function () {
+        nav.classList.toggle('nav--scrolled', window.scrollY > 10);
+      }, { passive: true });
+
+      var burger = document.getElementById('burger');
+      var mobileMenu = document.getElementById('mobileMenu');
+
+      burger.addEventListener('click', function () {
+        var expanded = burger.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+        burger.setAttribute('aria-expanded', expanded);
+      });
+
+      mobileMenu.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+          burger.classList.remove('active');
+          mobileMenu.classList.remove('active');
+          burger.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      var modal = document.getElementById('authModal');
+      var modalClose = document.getElementById('modalClose');
+      var tabs = document.querySelectorAll('.modal__tab');
+      var forms = document.querySelectorAll('.modal__form');
+
+      function openModal(tab) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        if (tab) switchTab(tab);
+      }
+
+      function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      function switchTab(tabName) {
+        tabs.forEach(function (t) {
+          var isActive = t.getAttribute('data-tab') === tabName;
+          t.classList.toggle('active', isActive);
+          t.setAttribute('aria-selected', isActive);
+        });
+        forms.forEach(function (f) {
+          f.classList.toggle('active', f.getAttribute('data-form') === tabName);
+        });
+      }
+
+      document.getElementById('loginBtn').addEventListener('click', function () { openModal('login'); });
+      document.getElementById('registerBtn').addEventListener('click', function () { openModal('register'); });
+      document.getElementById('mobileRegisterBtn').addEventListener('click', function () {
+        burger.classList.remove('active');
+        mobileMenu.classList.remove('active');
+        openModal('register');
+      });
+      document.getElementById('ctaRegisterBtn').addEventListener('click', function () { openModal('register'); });
+
+      modalClose.addEventListener('click', closeModal);
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+      });
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          switchTab(this.getAttribute('data-tab'));
+        });
+      });
+
+      if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.category-card, .listing-card, .pricing-card, .trust-card, .step').forEach(function (el) {
+          observer.observe(el);
+        });
+      }
+    })();
+  </script>
+
+</body>
+</html>
