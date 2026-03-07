@@ -4,30 +4,84 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' | SwapMart' : 'SwapMart' %></title>
+  <meta name="theme-color" content="#0d9488">
+  <link rel="icon" type="image/svg+xml" href="/public/favicon.svg">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --primary: #0d9488;
-      --primary-dark: #0f766e;
-      --primary-light: #99f6e4;
-      --amber: #f59e0b;
-      --amber-dark: #d97706;
-      --bg: #f8fafc;
-      --surface: #fff;
-      --text: #1e293b;
-      --text-light: #64748b;
-      --border: #e2e8f0;
-      --danger: #ef4444;
-      --success: #22c55e;
-      --radius: 8px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.1);
-      --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+      /* Teal / Emerald */
+      --teal-50: #f0fdfa;
+      --teal-100: #ccfbf1;
+      --teal-200: #99f6e4;
+      --teal-300: #5eead4;
+      --teal-400: #2dd4bf;
+      --teal-500: #14b8a6;
+      --teal-600: #0d9488;
+      --teal-700: #0f766e;
+      --teal-800: #115e59;
+      --teal-900: #134e4a;
+
+      /* Warm Amber */
+      --amber-50: #fffbeb;
+      --amber-100: #fef3c7;
+      --amber-200: #fde68a;
+      --amber-300: #fcd34d;
+      --amber-400: #fbbf24;
+      --amber-500: #f59e0b;
+      --amber-600: #d97706;
+      --amber-700: #b45309;
+
+      /* Neutrals */
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+
+      --white: #ffffff;
+      --red-500: #ef4444;
+      --green-500: #22c55e;
+
+      --primary: var(--teal-600);
+      --primary-dark: var(--teal-700);
+      --primary-light: var(--teal-200);
+      --accent: var(--amber-500);
+      --accent-dark: var(--amber-600);
+      --bg: var(--white);
+      --bg-alt: var(--gray-50);
+      --surface: var(--white);
+      --text: var(--gray-800);
+      --text-light: var(--gray-500);
+      --text-dark: var(--gray-900);
+      --border: var(--gray-200);
+      --danger: var(--red-500);
+      --success: var(--green-500);
+      --radius: 10px;
+      --radius-sm: 6px;
+      --radius-lg: 16px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+      --transition: 0.2s ease;
+      --nav-h: 68px;
+      --max-w: 1200px;
+
+      /* Legacy compat for inner pages */
+      --amber: var(--amber-500);
+      --amber-dark: var(--amber-600);
     }
 
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-alt);
       color: var(--text);
       line-height: 1.6;
       min-height: 100vh;
@@ -35,73 +89,91 @@
       flex-direction: column;
     }
 
-    a { color: var(--primary); text-decoration: none; }
+    a { color: var(--primary); text-decoration: none; transition: color var(--transition); }
     a:hover { color: var(--primary-dark); }
+    ul, ol { list-style: none; }
+    button { cursor: pointer; font-family: inherit; border: none; background: none; }
 
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; width: 100%; }
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 20px; width: 100%; }
 
-    /* Navigation */
-    nav {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0.75rem 0;
+    /* Navigation - matching landing page style */
+    .nav {
       position: sticky;
       top: 0;
-      z-index: 100;
+      height: var(--nav-h);
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 1000;
       box-shadow: var(--shadow);
     }
-    nav .container {
+    .nav__inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1rem;
+      height: 100%;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 20px;
     }
-    .nav-logo {
+    .nav__logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-size: 1.5rem;
       font-weight: 800;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      color: var(--primary-dark);
+      text-decoration: none;
     }
-    .nav-logo span { color: var(--amber); }
-    .nav-links {
+    .nav__logo-icon { font-size: 1.75rem; }
+    .nav__logo span { color: var(--accent); }
+
+    .nav__links {
       display: flex;
       align-items: center;
-      gap: 1.25rem;
+      gap: 20px;
       list-style: none;
     }
-    .nav-links a {
-      color: var(--text);
+    .nav__links a {
+      font-size: 0.9375rem;
       font-weight: 500;
-      font-size: 0.9rem;
-      transition: color 0.2s;
+      color: var(--gray-600);
+      transition: color var(--transition);
     }
-    .nav-links a:hover { color: var(--primary); }
+    .nav__links a:hover { color: var(--primary); }
+
+    .nav__actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
     /* Buttons */
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1.25rem;
-      border-radius: var(--radius);
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 24px;
+      font-size: 0.9375rem;
       font-weight: 600;
-      font-size: 0.875rem;
+      border-radius: var(--radius);
+      transition: all var(--transition);
+      white-space: nowrap;
+      text-decoration: none;
       cursor: pointer;
       border: none;
-      transition: all 0.2s;
-      text-decoration: none;
     }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-dark); color: #fff; }
-    .btn-amber { background: var(--amber); color: #fff; }
-    .btn-amber:hover { background: var(--amber-dark); color: #fff; }
-    .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
-    .btn-outline:hover { background: var(--primary); color: #fff; }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-danger:hover { background: #dc2626; color: #fff; }
-    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+    .btn--primary, .btn-primary { background: var(--primary); color: var(--white); }
+    .btn--primary:hover, .btn-primary:hover { background: var(--primary-dark); color: var(--white); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .btn--accent, .btn-amber { background: var(--accent); color: var(--gray-900); }
+    .btn--accent:hover, .btn-amber:hover { background: var(--accent-dark); color: var(--white); transform: translateY(-1px); }
+    .btn--outline, .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+    .btn--outline:hover, .btn-outline:hover { background: var(--primary); color: var(--white); transform: translateY(-1px); }
+    .btn--sm, .btn-sm { padding: 8px 18px; font-size: 0.875rem; }
+    .btn-danger { background: var(--danger); color: var(--white); }
+    .btn-danger:hover { background: #dc2626; color: var(--white); }
     .btn-block { display: flex; width: 100%; justify-content: center; }
 
     /* Cards */
@@ -111,7 +183,7 @@
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       overflow: hidden;
-      transition: box-shadow 0.2s, transform 0.2s;
+      transition: box-shadow var(--transition), transform var(--transition);
     }
     .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
     .card-body { padding: 1rem; }
@@ -128,14 +200,14 @@
     .form-control {
       width: 100%;
       padding: 0.6rem 0.75rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
       font-size: 0.9rem;
       background: var(--surface);
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
     }
     .form-control:focus {
-      outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(13,148,136,0.15);
     }
@@ -145,7 +217,7 @@
     /* Alerts */
     .alert {
       padding: 0.75rem 1rem;
-      border-radius: var(--radius);
+      border-radius: var(--radius-sm);
       margin-bottom: 1rem;
       font-size: 0.9rem;
     }
@@ -160,11 +232,11 @@
       font-size: 0.75rem;
       font-weight: 600;
     }
-    .badge-primary { background: var(--primary-light); color: var(--primary-dark); }
-    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-primary { background: var(--teal-100); color: var(--teal-800); }
+    .badge-amber { background: var(--amber-100); color: var(--amber-700); }
     .badge-success { background: #dcfce7; color: #166534; }
     .badge-danger { background: #fef2f2; color: #991b1b; }
-    .badge-gray { background: #f1f5f9; color: var(--text-light); }
+    .badge-gray { background: var(--gray-100); color: var(--text-light); }
 
     /* Grid */
     .grid { display: grid; gap: 1.25rem; }
@@ -174,7 +246,7 @@
 
     @media (max-width: 768px) {
       .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-      .nav-links { gap: 0.75rem; }
+      .nav__links { gap: 0.75rem; }
       .hide-mobile { display: none; }
     }
     @media (min-width: 769px) and (max-width: 1024px) {
@@ -209,23 +281,13 @@
     .listing-img-placeholder {
       width: 100%;
       aspect-ratio: 4/3;
-      background: linear-gradient(135deg, var(--primary-light), var(--border));
+      background: linear-gradient(135deg, var(--teal-100), var(--border));
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--primary);
       font-size: 2rem;
     }
-
-    /* Footer */
-    footer {
-      background: var(--text);
-      color: #cbd5e1;
-      padding: 2rem 0;
-      margin-top: auto;
-      font-size: 0.875rem;
-    }
-    footer a { color: var(--primary-light); }
 
     /* Pagination */
     .pagination {
@@ -238,12 +300,12 @@
     }
     .pagination a, .pagination span {
       padding: 0.4rem 0.8rem;
-      border-radius: var(--radius);
+      border-radius: var(--radius-sm);
       font-size: 0.875rem;
     }
     .pagination a { border: 1px solid var(--border); color: var(--text); }
-    .pagination a:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
-    .pagination .active { background: var(--primary); color: #fff; font-weight: 600; }
+    .pagination a:hover { background: var(--primary); color: var(--white); border-color: var(--primary); }
+    .pagination .active { background: var(--primary); color: var(--white); font-weight: 600; }
 
     /* Tabs */
     .tabs {
@@ -259,7 +321,7 @@
       cursor: pointer;
       border-bottom: 2px solid transparent;
       margin-bottom: -2px;
-      transition: all 0.2s;
+      transition: all var(--transition);
     }
     .tab.active, .tab:hover { color: var(--primary); border-bottom-color: var(--primary); }
 
@@ -275,22 +337,26 @@
   </style>
 </head>
 <body>
-  <nav>
-    <div class="container">
-      <a href="/" class="nav-logo">Swap<span>Mart</span></a>
-      <ul class="nav-links">
-        <li><a href="/listings">Browse</a></li>
+  <nav class="nav">
+    <div class="nav__inner">
+      <a href="/" class="nav__logo" aria-label="SwapMart home">
+        <span class="nav__logo-icon">&#x1F501;</span>
+        Swap<span>Mart</span>
+      </a>
+      <div class="nav__links">
+        <a href="/listings">Browse</a>
         <% if (user) { %>
-          <li><a href="/listings/new">Sell / Swap</a></li>
-          <li><a href="/offers">Offers</a></li>
-          <li class="hide-mobile"><a href="/profile/<%= user.id %>"><%= user.username %></a></li>
-          <li><a href="/profile/settings">Settings</a></li>
-          <li><a href="/auth/logout" class="btn btn-outline btn-sm">Logout</a></li>
+          <a href="/listings/new">Sell / Swap</a>
+          <a href="/offers">Offers</a>
+          <a href="/messages">Messages</a>
+          <a class="hide-mobile" href="/profile/<%= user.id %>"><%= user.username %></a>
+          <a href="/profile/settings">Settings</a>
+          <a href="/auth/logout" class="btn btn--outline btn--sm">Logout</a>
         <% } else { %>
-          <li><a href="/auth/login">Login</a></li>
-          <li><a href="/auth/register" class="btn btn-primary btn-sm">Sign Up</a></li>
+          <a href="/auth/login">Login</a>
+          <a href="/auth/register" class="btn btn--primary btn--sm">Sign Up</a>
         <% } %>
-      </ul>
+      </div>
     </div>
   </nav>
   <main>

@@ -70,6 +70,11 @@ await app.register(fastifyView, {
 });
 
 await app.register(fastifyStatic, {
+  root: path.join(__dirname, 'public'),
+  prefix: '/public/',
+});
+
+await app.register(fastifyStatic, {
   root: UPLOAD_DIR,
   prefix: '/uploads/',
   decorateReply: false,

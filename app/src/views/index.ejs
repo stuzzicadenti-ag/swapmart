@@ -1,124 +1,922 @@
-<%- include('partials/header', { pageTitle: 'Home', user }) %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SwapMart - Trade, Swap &amp; Save | Switzerland's Fairest Marketplace</title>
+  <meta name="description" content="SwapMart is Switzerland's fairest marketplace. From 4% commission on high-value items. Tiered pricing that rewards bigger sales. Barter system, Swap + Cash deals, and 3 free listings per month.">
+  <meta name="keywords" content="Swiss marketplace, buy sell Switzerland, barter trade, swap items, Pokemon cards, used cars, apartments, CHF, low fees marketplace">
+  <meta name="author" content="SwapMart AG">
 
-<!-- Hero -->
-<section style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: #fff; padding: 3.5rem 0;">
-  <div class="container text-center">
-    <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">
-      Buy. Sell. <span style="color: var(--amber);">Swap.</span>
-    </h1>
-    <p style="font-size: 1.15rem; opacity: 0.9; max-width: 500px; margin: 0 auto 1.5rem;">
-      The Swiss marketplace for trading anything - from trading cards to cars. No middlemen, fair commissions.
-    </p>
-    <form action="/listings" method="GET" style="max-width: 500px; margin: 0 auto; display: flex; gap: 0.5rem;">
-      <input type="text" name="q" class="form-control" placeholder="Search listings..." style="flex: 1; padding: 0.75rem 1rem; font-size: 1rem;">
-      <button type="submit" class="btn btn-amber" style="padding: 0.75rem 1.5rem;">Search</button>
-    </form>
-  </div>
-</section>
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="SwapMart - Trade, Swap &amp; Save | Switzerland's Fairest Marketplace">
+  <meta property="og:description" content="From 4% commission on high-value items. Tiered pricing that rewards bigger sales. Unique barter/swap system. 3 free listings/month. Swiss-focused with CHF, Swiss Post and local pickup.">
+  <meta property="og:site_name" content="SwapMart">
+  <meta property="og:locale" content="en_CH">
 
-<!-- Categories -->
-<section class="py-4">
-  <div class="container">
-    <h2 class="mb-2" style="font-size: 1.5rem;">Browse Categories</h2>
-    <div class="grid grid-4">
-      <% categories.forEach(cat => { %>
-        <a href="/listings?category=<%= cat.slug %>" class="card" style="text-decoration: none;">
-          <div class="card-body text-center" style="padding: 1.25rem;">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">
-              <% const icons = { cards: '&#127183;', cpu: '&#128187;', car: '&#128663;', home: '&#127968;', shirt: '&#128085;', sofa: '&#128715;', trophy: '&#127942;', gem: '&#128142;' }; %>
-              <%- icons[cat.icon] || '&#128230;' %>
-            </div>
-            <div style="font-weight: 600; color: var(--text);"><%= cat.name %></div>
-          </div>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SwapMart - Switzerland's Fairest Marketplace">
+  <meta name="twitter:description" content="From 4% commission on high-value items. Tiered pricing that rewards bigger sales. Unique barter/swap system. 3 free listings/month.">
+
+  <meta name="theme-color" content="#0d9488">
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "SwapMart",
+    "description": "Switzerland's fairest marketplace for trading, swapping and selling items.",
+    "foundingDate": "2026",
+    "areaServed": {
+      "@type": "Country",
+      "name": "Switzerland"
+    },
+    "sameAs": []
+  }
+  </script>
+
+  <link rel="stylesheet" href="/public/landing.css">
+  <link rel="icon" type="image/svg+xml" href="/public/favicon.svg">
+</head>
+<body>
+
+  <!-- ==================== NAVIGATION ==================== -->
+  <nav class="nav" id="nav" role="navigation" aria-label="Main navigation">
+    <div class="nav__inner">
+      <a href="/" class="nav__logo" aria-label="SwapMart home">
+        <span class="nav__logo-icon">&#x1F501;</span>
+        Swap<span>Mart</span>
+      </a>
+
+      <div class="nav__links">
+        <a href="/" class="nav__link">Home</a>
+        <a href="#categories" class="nav__link">Categories</a>
+        <a href="/listings" class="nav__link">Browse</a>
+        <a href="#how-it-works" class="nav__link">How It Works</a>
+        <a href="#pricing" class="nav__link">Pricing</a>
+        <% if (user) { %>
+          <a href="/listings/new" class="nav__link">Sell / Swap</a>
+          <a href="/offers" class="nav__link">Offers</a>
+          <a href="/messages" class="nav__link">Messages</a>
+        <% } %>
+      </div>
+
+      <div class="nav__actions">
+        <% if (user) { %>
+          <a href="/profile/<%= user.id %>" class="btn btn--sm btn--outline"><%= user.username %></a>
+          <a href="/auth/logout" class="btn btn--sm btn--primary">Logout</a>
+        <% } else { %>
+          <a href="/auth/login" class="btn btn--sm btn--outline">Login</a>
+          <a href="/auth/register" class="btn btn--sm btn--primary">Register</a>
+        <% } %>
+        <div class="lang-dropdown">
+          <button type="button" class="lang-dropdown__btn" aria-expanded="false" aria-haspopup="true">
+            &#127760; <span class="lang-dropdown__current">EN</span> &#9662;
+          </button>
+          <ul class="lang-dropdown__menu" role="menu">
+            <li><a href="/" role="menuitem" class="active">English</a></li>
+            <li><a href="/" role="menuitem">Deutsch</a></li>
+            <li><a href="/" role="menuitem">Fran&ccedil;ais</a></li>
+            <li><a href="/" role="menuitem">Italiano</a></li>
+          </ul>
+        </div>
+        <button type="button" class="nav__burger" id="burger" aria-label="Toggle mobile menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav__mobile" id="mobileMenu" role="menu">
+      <a href="/" role="menuitem">Home</a>
+      <a href="#categories" role="menuitem">Categories</a>
+      <a href="/listings" role="menuitem">Browse</a>
+      <a href="#how-it-works" role="menuitem">How It Works</a>
+      <a href="#pricing" role="menuitem">Pricing</a>
+      <% if (user) { %>
+        <a href="/listings/new" role="menuitem">Sell / Swap</a>
+        <a href="/offers" role="menuitem">Offers</a>
+        <a href="/messages" role="menuitem">Messages</a>
+        <a href="/profile/<%= user.id %>" role="menuitem">My Profile</a>
+        <a href="/auth/logout" class="btn btn--primary">Logout</a>
+      <% } else { %>
+        <a href="/auth/login" role="menuitem">Login</a>
+        <a href="/auth/register" class="btn btn--primary">Create Account</a>
+      <% } %>
+    </div>
+  </nav>
+
+  <!-- ==================== HERO ==================== -->
+  <header class="hero">
+    <div class="container">
+      <div class="hero__badge">&#127464;&#127469; Made in Switzerland</div>
+      <h1 class="hero__title">
+        Trade. Swap. Save.<br>
+        <em>Switzerland's <span class="highlight">Fairest</span> Marketplace.</em>
+      </h1>
+      <p class="hero__subtitle">
+        From 4% on cars and real estate, 5% on small items. Always cheaper than Ricardo. Swap items directly, mix cash + barter, or sell the classic way. 3 free listings every month.
+      </p>
+
+      <form class="hero__search" action="/listings" method="GET">
+        <input type="search" name="q" placeholder="Search Pokemon cards, furniture, apartments, cars..." aria-label="Search listings">
+        <button type="submit">Search</button>
+      </form>
+
+      <div class="hero__ctas">
+        <a href="/auth/register" class="btn btn--primary btn--lg">&#x1F501; Start Trading</a>
+        <a href="/listings" class="btn btn--accent btn--lg">Browse Listings</a>
+      </div>
+
+      <div class="hero__trust">
+        <div class="hero__trust-item">&#x2705; From <strong>4% fees</strong></div>
+        <div class="hero__trust-item">&#x1F4E6; Swiss Post integration</div>
+        <div class="hero__trust-item">&#x1F91D; Barter &amp; swap</div>
+        <div class="hero__trust-item">&#x1F512; Secure trades</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== STATS BAR ==================== -->
+  <section class="stats-bar" aria-label="Platform statistics">
+    <div class="container">
+      <div class="stats-bar__inner">
+        <div class="stats-bar__item">
+          <div class="stats-bar__value">10,000+</div>
+          <div class="stats-bar__label">Active Listings</div>
+        </div>
+        <div class="stats-bar__item">
+          <div class="stats-bar__value">5,000+</div>
+          <div class="stats-bar__label">Happy Traders</div>
+        </div>
+        <div class="stats-bar__item">
+          <div class="stats-bar__value">CHF 2M+</div>
+          <div class="stats-bar__label">Total Traded</div>
+        </div>
+        <div class="stats-bar__item">
+          <div class="stats-bar__value">0%</div>
+          <div class="stats-bar__label">Barter Fee</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== WHY SWAPMART ==================== -->
+  <section class="section" id="comparison">
+    <div class="container">
+      <h2 class="section__title">Why SwapMart?</h2>
+      <p class="section__subtitle">See how we compare to Switzerland's largest marketplace. Lower fees, more flexibility, and a unique barter system.</p>
+
+      <div class="comparison">
+        <table class="comparison__table" role="table">
+          <thead>
+            <tr>
+              <th scope="col">Feature</th>
+              <th scope="col" class="comparison__ours">&#x1F501; SwapMart</th>
+              <th scope="col">Ricardo.ch</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Selling Commission</td>
+              <td class="comparison__ours">4&ndash;8% (tiered)</td>
+              <td>8&ndash;12% (max CHF 290)</td>
+            </tr>
+            <tr>
+              <td>Monthly Free Listings</td>
+              <td class="comparison__ours">3 free</td>
+              <td>Varies</td>
+            </tr>
+            <tr>
+              <td>Barter / Swap</td>
+              <td class="comparison__ours"><span class="comparison__check">&#x2713;</span> Yes</td>
+              <td><span class="comparison__cross">&#x2717;</span> No</td>
+            </tr>
+            <tr>
+              <td>Swap + Cash Deals</td>
+              <td class="comparison__ours"><span class="comparison__check">&#x2713;</span> Yes</td>
+              <td><span class="comparison__cross">&#x2717;</span> No</td>
+            </tr>
+            <tr>
+              <td>Money Guard</td>
+              <td class="comparison__ours">Free</td>
+              <td>Mandatory (paid)</td>
+            </tr>
+            <tr>
+              <td>Max Commission Cap</td>
+              <td class="comparison__ours">CHF 250</td>
+              <td>CHF 290</td>
+            </tr>
+            <tr>
+              <td>Local Pickup</td>
+              <td class="comparison__ours"><span class="comparison__check">&#x2713;</span> Built-in</td>
+              <td>Limited</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="comparison__note">* Commission rates as of 2026. Ricardo.ch 8-12% (max CHF 290), Tutti.ch free but limited features, eBay 10-13%. Fee examples: CHF 50 item = CHF 2.50 fee, CHF 1,000 item = CHF 50 fee, CHF 10,000 item = CHF 250 (capped).</p>
+    </div>
+  </section>
+
+  <!-- ==================== CATEGORIES ==================== -->
+  <section class="section section--alt" id="categories">
+    <div class="container">
+      <h2 class="section__title">Popular Categories</h2>
+      <p class="section__subtitle">From Pokemon cards to apartments. Find (or trade) almost anything.</p>
+
+      <div class="categories__grid">
+        <a href="/listings?category=trading-cards" class="category-card">
+          <div class="category-card__icon">&#127183;</div>
+          <div class="category-card__name">Trading Cards</div>
+          <div class="category-card__count">2,400+ listings</div>
         </a>
-      <% }) %>
+        <a href="/listings?category=electronics" class="category-card">
+          <div class="category-card__icon">&#128187;</div>
+          <div class="category-card__name">Electronics</div>
+          <div class="category-card__count">1,800+ listings</div>
+        </a>
+        <a href="/listings?category=cars-vehicles" class="category-card">
+          <div class="category-card__icon">&#128663;</div>
+          <div class="category-card__name">Cars &amp; Vehicles</div>
+          <div class="category-card__count">950+ listings</div>
+        </a>
+        <a href="/listings?category=apartments-rooms" class="category-card">
+          <div class="category-card__icon">&#127969;</div>
+          <div class="category-card__name">Apartments &amp; Rooms</div>
+          <div class="category-card__count">620+ listings</div>
+        </a>
+        <a href="/listings?category=fashion" class="category-card">
+          <div class="category-card__icon">&#128087;</div>
+          <div class="category-card__name">Fashion</div>
+          <div class="category-card__count">1,500+ listings</div>
+        </a>
+        <a href="/listings?category=furniture" class="category-card">
+          <div class="category-card__icon">&#128717;</div>
+          <div class="category-card__name">Furniture</div>
+          <div class="category-card__count">870+ listings</div>
+        </a>
+        <a href="/listings?category=sports-outdoors" class="category-card">
+          <div class="category-card__icon">&#9917;</div>
+          <div class="category-card__name">Sports &amp; Outdoors</div>
+          <div class="category-card__count">1,100+ listings</div>
+        </a>
+        <a href="/listings?category=collectibles" class="category-card">
+          <div class="category-card__icon">&#127942;</div>
+          <div class="category-card__name">Collectibles</div>
+          <div class="category-card__count">760+ listings</div>
+        </a>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- Featured Listings -->
-<section class="py-3">
-  <div class="container">
-    <div class="flex-between mb-2">
-      <h2 style="font-size: 1.5rem;">Latest Listings</h2>
-      <a href="/listings" class="btn btn-outline btn-sm">View All</a>
-    </div>
-    <% if (featured.length === 0) { %>
-      <div class="card">
-        <div class="card-body text-center py-4">
-          <p class="text-light">No listings yet. <a href="/listings/new">Be the first to list!</a></p>
+  <!-- ==================== HOW IT WORKS ==================== -->
+  <section class="section" id="how-it-works">
+    <div class="container">
+      <h2 class="section__title">How Swapping Works</h2>
+      <p class="section__subtitle">Four simple steps to trade, swap, or sell. No complicated processes.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step__number">1</div>
+          <div class="step__icon">&#128248;</div>
+          <h3 class="step__title">List Your Item</h3>
+          <p class="step__desc">Snap a photo, set a price or mark it "Open to Swaps". First 3 listings each month are free.</p>
+        </div>
+        <div class="step">
+          <div class="step__number">2</div>
+          <div class="step__icon">&#128269;</div>
+          <h3 class="step__title">Browse &amp; Find</h3>
+          <p class="step__desc">Search by category, location, or swap preference. Filter for barter-friendly listings.</p>
+        </div>
+        <div class="step">
+          <div class="step__number">3</div>
+          <div class="step__icon">&#129309;</div>
+          <h3 class="step__title">Propose a Deal</h3>
+          <p class="step__desc">Offer cash, a swap, or a mix of both. "My PS5 + CHF 200 for your Gaming PC". It all works.</p>
+          <div class="step__badge">Swap + Cash</div>
+        </div>
+        <div class="step">
+          <div class="step__number">4</div>
+          <div class="step__icon">&#127881;</div>
+          <h3 class="step__title">Meet &amp; Trade</h3>
+          <p class="step__desc">Ship via Swiss Post or meet locally. Rate your trading partner and build your reputation.</p>
         </div>
       </div>
-    <% } else { %>
-      <div class="grid grid-4">
-        <% featured.forEach(listing => { %>
-          <a href="/listings/<%= listing.id %>" class="card" style="text-decoration: none;">
-            <% if (listing.image) { %>
-              <img src="/uploads/<%= listing.image %>" alt="<%= listing.title %>" class="listing-img" loading="lazy">
-            <% } else { %>
-              <div class="listing-img-placeholder">
-                <% const catIcons = { 'Trading Cards': '&#127183;', 'Electronics': '&#128187;', 'Cars & Vehicles': '&#128663;', 'Apartments & Housing': '&#127968;', 'Fashion': '&#128085;', 'Furniture': '&#128715;', 'Sports': '&#127942;', 'Collectibles': '&#128142;' }; %>
-                <%- catIcons[listing.category_name] || '&#128230;' %>
-              </div>
-            <% } %>
-            <div class="card-body">
-              <div class="flex-between mb-1">
-                <span class="badge badge-primary"><%= listing.category_name %></span>
-                <% if (listing.type === 'swap') { %>
-                  <span class="badge badge-amber">Swap</span>
-                <% } else if (listing.type === 'both') { %>
-                  <span class="badge badge-amber">Sell / Swap</span>
-                <% } %>
-              </div>
-              <h3 style="font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.35rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                <%= listing.title %>
-              </h3>
-              <div class="flex-between">
-                <% if (listing.price) { %>
-                  <span style="font-weight: 700; color: var(--primary); font-size: 1.05rem;">
-                    CHF <%= parseFloat(listing.price).toLocaleString('de-CH', { minimumFractionDigits: 0 }) %>
-                  </span>
+    </div>
+  </section>
+
+  <!-- ==================== FEATURED LISTINGS (dynamic from DB) ==================== -->
+  <section class="section section--alt" id="listings">
+    <div class="container">
+      <h2 class="section__title">Latest Listings</h2>
+      <p class="section__subtitle">Fresh picks from our community. See something you like? Make an offer.</p>
+
+      <% if (featured.length > 0) { %>
+        <div class="listings__grid">
+          <% featured.forEach(function(listing) { %>
+            <a href="/listings/<%= listing.id %>" style="text-decoration:none; color:inherit;">
+              <article class="listing-card">
+                <% if (listing.image) { %>
+                  <div class="listing-card__img">
+                    <img src="/uploads/<%= listing.image %>" alt="<%= listing.title %>" style="width:100%; height:100%; object-fit:cover;">
+                    <% if (listing.type === 'swap') { %>
+                      <span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span>
+                    <% } else if (listing.type === 'both') { %>
+                      <span class="listing-card__badge listing-card__badge--cash">Sell / Swap</span>
+                    <% } %>
+                  </div>
                 <% } else { %>
-                  <span class="badge badge-amber">Swap Only</span>
+                  <div class="listing-card__img" aria-label="<%= listing.title %>">
+                    <% const catIcons = { 'Trading Cards': '&#127183;', 'Electronics': '&#128187;', 'Cars & Vehicles': '&#128663;', 'Apartments & Housing': '&#127968;', 'Fashion': '&#128085;', 'Furniture': '&#128715;', 'Sports': '&#127942;', 'Collectibles': '&#128142;' }; %>
+                    <%- catIcons[listing.category_name] || '&#128230;' %>
+                    <% if (listing.type === 'swap') { %>
+                      <span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span>
+                    <% } else if (listing.type === 'both') { %>
+                      <span class="listing-card__badge listing-card__badge--cash">Sell / Swap</span>
+                    <% } %>
+                  </div>
                 <% } %>
-                <span class="text-sm text-light"><%= listing.seller_name %></span>
-              </div>
+                <div class="listing-card__body">
+                  <h3 class="listing-card__title"><%= listing.title %></h3>
+                  <p class="listing-card__meta"><%= listing.category_name %> &middot; <%= listing.seller_name %></p>
+                  <% if (listing.price) { %>
+                    <div class="listing-card__price">CHF <%= parseFloat(listing.price).toLocaleString('de-CH', { minimumFractionDigits: 0 }) %></div>
+                  <% } else { %>
+                    <div class="listing-card__swap-label">&#x1F501; Open to Swaps</div>
+                  <% } %>
+                </div>
+              </article>
+            </a>
+          <% }); %>
+        </div>
+        <div style="text-align: center; margin-top: 32px;">
+          <a href="/listings" class="btn btn--outline">View All Listings</a>
+        </div>
+      <% } else { %>
+        <!-- Static showcase listings when DB is empty -->
+        <div class="listings__grid">
+          <article class="listing-card">
+            <div class="listing-card__img" aria-label="Pokemon Charizard Holo card">
+              &#127183;
+              <span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span>
             </div>
-          </a>
-        <% }) %>
-      </div>
-    <% } %>
-  </div>
-</section>
+            <div class="listing-card__body">
+              <h3 class="listing-card__title">Pokemon Charizard Holo 1st Ed.</h3>
+              <p class="listing-card__meta">Trading Cards &middot; Zurich</p>
+              <div class="listing-card__price">CHF 1,200</div>
+            </div>
+            <div class="listing-card__footer">
+              <span>&#11088; 4.9 &middot; 23 trades</span>
+              <span>2h ago</span>
+            </div>
+          </article>
 
-<!-- Commission info -->
-<section class="py-4">
-  <div class="container">
-    <div class="card" style="border: 2px solid var(--primary-light);">
-      <div class="card-body" style="padding: 2rem;">
-        <h2 class="text-center mb-2" style="font-size: 1.5rem;">Fair & Transparent Fees</h2>
-        <p class="text-center text-light mb-2">Pure barter trades are always <strong style="color: var(--primary);">FREE</strong>. Cash transactions have simple tiered commissions:</p>
-        <div class="grid grid-4" style="text-align: center;">
-          <div>
-            <div style="font-size: 1.75rem; font-weight: 800; color: var(--primary);">5%</div>
-            <div class="text-sm text-light">Under CHF 50</div>
+          <article class="listing-card">
+            <div class="listing-card__img" aria-label="BMW 320i car">
+              &#128663;
+              <span class="listing-card__badge listing-card__badge--cash">Swap + Cash</span>
+            </div>
+            <div class="listing-card__body">
+              <h3 class="listing-card__title">BMW 320i 2019 &middot; 68k km</h3>
+              <p class="listing-card__meta">Cars &amp; Vehicles &middot; Bern</p>
+              <div class="listing-card__price">CHF 22,500</div>
+            </div>
+            <div class="listing-card__footer">
+              <span>&#11088; 4.7 &middot; 8 trades</span>
+              <span>5h ago</span>
+            </div>
+          </article>
+
+          <article class="listing-card">
+            <div class="listing-card__img" aria-label="3-room apartment in Zurich">
+              &#127969;
+              <span class="listing-card__badge listing-card__badge--new">New</span>
+            </div>
+            <div class="listing-card__body">
+              <h3 class="listing-card__title">3-Room Apartment &middot; Zurich Oerlikon</h3>
+              <p class="listing-card__meta">Apartments &amp; Rooms &middot; Zurich</p>
+              <div class="listing-card__price">CHF 1,950/mo</div>
+            </div>
+            <div class="listing-card__footer">
+              <span>&#11088; 5.0 &middot; Verified</span>
+              <span>1d ago</span>
+            </div>
+          </article>
+
+          <article class="listing-card">
+            <div class="listing-card__img" aria-label="PS5 gaming console bundle">
+              &#127918;
+              <span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span>
+            </div>
+            <div class="listing-card__body">
+              <h3 class="listing-card__title">PS5 Bundle &middot; 2 Controllers + 5 Games</h3>
+              <p class="listing-card__meta">Electronics &middot; Basel</p>
+              <div class="listing-card__swap-label">&#x1F501; Open to Swaps</div>
+            </div>
+            <div class="listing-card__footer">
+              <span>&#11088; 4.8 &middot; 15 trades</span>
+              <span>3h ago</span>
+            </div>
+          </article>
+
+          <article class="listing-card">
+            <div class="listing-card__img" aria-label="Vintage Rolex Submariner watch">
+              &#9201;
+              <span class="listing-card__badge listing-card__badge--cash">Swap + Cash</span>
+            </div>
+            <div class="listing-card__body">
+              <h3 class="listing-card__title">Vintage Rolex Submariner 1985</h3>
+              <p class="listing-card__meta">Collectibles &middot; Geneva</p>
+              <div class="listing-card__price">CHF 8,900</div>
+            </div>
+            <div class="listing-card__footer">
+              <span>&#11088; 5.0 &middot; 41 trades</span>
+              <span>6h ago</span>
+            </div>
+          </article>
+
+          <article class="listing-card">
+            <div class="listing-card__img" aria-label="Yu-Gi-Oh Blue-Eyes White Dragon card">
+              &#128293;
+              <span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span>
+            </div>
+            <div class="listing-card__body">
+              <h3 class="listing-card__title">Yu-Gi-Oh Blue-Eyes White Dragon 1st Ed.</h3>
+              <p class="listing-card__meta">Trading Cards &middot; Lugano</p>
+              <div class="listing-card__price">CHF 450</div>
+            </div>
+            <div class="listing-card__footer">
+              <span>&#11088; 4.6 &middot; 12 trades</span>
+              <span>8h ago</span>
+            </div>
+          </article>
+        </div>
+        <div style="text-align: center; margin-top: 32px;">
+          <a href="/listings" class="btn btn--outline">View All Listings</a>
+        </div>
+      <% } %>
+    </div>
+  </section>
+
+  <!-- ==================== HOUSING & REAL ESTATE ==================== -->
+  <section class="section" id="housing">
+    <div class="container">
+      <h2 class="section__title">Housing &amp; Real Estate</h2>
+      <p class="section__subtitle">Find your next home or list your property. Apartments, rooms, houses, and commercial spaces across Switzerland.</p>
+
+      <div class="listings__grid">
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Studio apartment Zurich">&#127969;<span class="listing-card__badge listing-card__badge--new">New</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Studio Apartment &middot; Zurich Wiedikon</h3>
+            <p class="listing-card__meta">Apartments &middot; Zurich &middot; 32m&sup2;</p>
+            <div class="listing-card__price">CHF 1,450/mo</div>
           </div>
-          <div>
-            <div style="font-size: 1.75rem; font-weight: 800; color: var(--primary);">8%</div>
-            <div class="text-sm text-light">CHF 50 - 999</div>
+          <div class="listing-card__footer"><span>&#11088; 4.8 &middot; Verified</span><span>3h ago</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="3-room apartment Bern">&#127960;<span class="listing-card__badge listing-card__badge--new">New</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">3.5-Room Apartment &middot; Bern B&uuml;mpliz</h3>
+            <p class="listing-card__meta">Apartments &middot; Bern &middot; 78m&sup2;</p>
+            <div class="listing-card__price">CHF 1,850/mo</div>
           </div>
-          <div>
-            <div style="font-size: 1.75rem; font-weight: 800; color: var(--primary);">6%</div>
-            <div class="text-sm text-light">CHF 1,000 - 9,999</div>
+          <div class="listing-card__footer"><span>&#11088; 5.0 &middot; Verified</span><span>1d ago</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="WG room Basel">&#128716;<span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">WG Room &middot; Basel Gundeldingen</h3>
+            <p class="listing-card__meta">Rooms &middot; Basel &middot; 18m&sup2;</p>
+            <div class="listing-card__price">CHF 750/mo</div>
           </div>
-          <div>
-            <div style="font-size: 1.75rem; font-weight: 800; color: var(--primary);">4%</div>
-            <div class="text-sm text-light">CHF 10,000+</div>
+          <div class="listing-card__footer"><span>&#11088; 4.6 &middot; 5 trades</span><span>5h ago</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CARS & VEHICLES ==================== -->
+  <section class="section section--alt" id="vehicles">
+    <div class="container">
+      <h2 class="section__title">Cars &amp; Vehicles</h2>
+      <p class="section__subtitle">Buy, sell, or swap cars, motorcycles, and more. Swiss-inspected, with full MFK history.</p>
+
+      <div class="listings__grid">
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="VW Golf 2021">&#128663;<span class="listing-card__badge listing-card__badge--cash">Swap + Cash</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">VW Golf VIII 2021 &middot; 42k km</h3>
+            <p class="listing-card__meta">Cars &middot; Lucerne &middot; MFK 2025</p>
+            <div class="listing-card__price">CHF 24,900</div>
           </div>
+          <div class="listing-card__footer"><span>&#11088; 4.9 &middot; 12 trades</span><span>2h ago</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="BMW M3 2020">&#128665;<span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">BMW M3 Competition 2020 &middot; 35k km</h3>
+            <p class="listing-card__meta">Cars &middot; Geneva &middot; MFK 2024</p>
+            <div class="listing-card__price">CHF 68,500</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 5.0 &middot; 28 trades</span><span>4h ago</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Vespa scooter">&#128757;<span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Vespa Primavera 125 &middot; 2023</h3>
+            <p class="listing-card__meta">Motorcycles &middot; Lugano</p>
+            <div class="listing-card__price">CHF 3,800</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.7 &middot; 6 trades</span><span>8h ago</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TRADING CARDS ==================== -->
+  <section class="section" id="cards">
+    <div class="container">
+      <h2 class="section__title">Trading Cards &amp; Collectibles</h2>
+      <p class="section__subtitle">Pokemon, Yu-Gi-Oh, Magic: The Gathering, sports cards, and rare collectibles. Swap or sell with fellow collectors.</p>
+
+      <div class="listings__grid">
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Pokemon Pikachu VMAX">&#127183;<span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Pokemon Pikachu VMAX Rainbow</h3>
+            <p class="listing-card__meta">Pokemon TCG &middot; Zurich</p>
+            <div class="listing-card__price">CHF 180</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.9 &middot; 45 trades</span><span>1h ago</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="MTG Black Lotus">&#127183;<span class="listing-card__badge listing-card__badge--cash">Swap + Cash</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">MTG Black Lotus (Beta) Graded PSA 7</h3>
+            <p class="listing-card__meta">Magic TCG &middot; Bern</p>
+            <div class="listing-card__price">CHF 12,500</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 5.0 &middot; 67 trades</span><span>3h ago</span></div>
+        </article>
+        <article class="listing-card">
+          <div class="listing-card__img" aria-label="Panini World Cup sticker album">&#128293;<span class="listing-card__badge listing-card__badge--swap">Open to Swaps</span></div>
+          <div class="listing-card__body">
+            <h3 class="listing-card__title">Panini World Cup 2026 Complete Set</h3>
+            <p class="listing-card__meta">Sports Cards &middot; Basel</p>
+            <div class="listing-card__price">CHF 350</div>
+          </div>
+          <div class="listing-card__footer"><span>&#11088; 4.5 &middot; 19 trades</span><span>6h ago</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SWAP + CASH EXPLAINER ==================== -->
+  <section class="section" id="swap-cash">
+    <div class="container">
+      <h2 class="section__title">Swap + Cash: The Best of Both Worlds</h2>
+      <p class="section__subtitle">Don't have the full price? Offer your item plus some cash. It's flexible trading, the SwapMart way.</p>
+
+      <div class="swap-explainer">
+        <div class="swap-explainer__visual">
+          <div class="swap-explainer__side">
+            <div class="swap-explainer__side-icon">&#127918;</div>
+            <div class="swap-explainer__side-title">My PS5 Bundle</div>
+            <div class="swap-explainer__side-sub">Worth ~CHF 400</div>
+            <div class="swap-explainer__side-cash">+ CHF 200 cash</div>
+          </div>
+
+          <div class="swap-explainer__arrow">&#x21C6;</div>
+
+          <div class="swap-explainer__side">
+            <div class="swap-explainer__side-icon">&#128187;</div>
+            <div class="swap-explainer__side-title">Your Gaming PC</div>
+            <div class="swap-explainer__side-sub">Worth ~CHF 600</div>
+          </div>
+        </div>
+
+        <p class="swap-explainer__text">
+          <strong>No barter fee.</strong> SwapMart only charges commission on the cash portion of a Swap + Cash deal.
+          Pure swaps (item for item) are completely free. This is how trading should work: fair, flexible, and community-driven.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PRICING ==================== -->
+  <section class="section section--alt" id="pricing">
+    <div class="container">
+      <h2 class="section__title">Simple, Fair Pricing</h2>
+      <p class="section__subtitle">No hidden fees. No mandatory services. Just honest pricing that respects sellers.</p>
+
+      <div class="pricing__grid">
+        <!-- Free -->
+        <div class="pricing-card">
+          <div class="pricing-card__name">Free</div>
+          <div class="pricing-card__price">CHF 0<small></small></div>
+          <div class="pricing-card__period">Free forever</div>
+          <ul class="pricing-card__features">
+            <li>3 free listings per month</li>
+            <li><strong>Tiered commission:</strong></li>
+            <li>&nbsp;&nbsp;Under CHF 50: 5%</li>
+            <li>&nbsp;&nbsp;CHF 50 - 999: 8%</li>
+            <li>&nbsp;&nbsp;CHF 1'000 - 9'999: 6%</li>
+            <li>&nbsp;&nbsp;CHF 10'000+: 4%</li>
+            <li>Pure barter: always FREE</li>
+            <li>Extra listings: CHF 1.90 each</li>
+            <li>Unlimited swaps (0% fee)</li>
+            <li>Buyer &amp; seller ratings</li>
+            <li>Secure messaging</li>
+            <li>Swiss Post shipping</li>
+          </ul>
+          <a href="/auth/register" class="btn btn--outline" style="width:100%;">Get Started</a>
+        </div>
+
+        <!-- Seller Pro -->
+        <div class="pricing-card pricing-card--popular">
+          <div class="pricing-card__badge">Most Popular</div>
+          <div class="pricing-card__name">Seller Pro</div>
+          <div class="pricing-card__price">CHF 9.90<small>/mo</small></div>
+          <div class="pricing-card__period">Billed monthly</div>
+          <ul class="pricing-card__features">
+            <li>30 listings per month</li>
+            <li><strong>Reduced commission:</strong></li>
+            <li>&nbsp;&nbsp;Under CHF 50: 3%</li>
+            <li>&nbsp;&nbsp;CHF 50 - 999: 6%</li>
+            <li>&nbsp;&nbsp;CHF 1'000 - 9'999: 4%</li>
+            <li>&nbsp;&nbsp;CHF 10'000+: 3%</li>
+            <li>Pure barter: always FREE</li>
+            <li>Unlimited swaps (0% fee)</li>
+            <li>Featured listing placement</li>
+            <li>Priority customer support</li>
+            <li>Swap + Cash escrow</li>
+            <li>Seller analytics dashboard</li>
+          </ul>
+          <a href="/auth/register" class="btn btn--primary" style="width:100%;">Start Free Trial</a>
+        </div>
+
+        <!-- Business -->
+        <div class="pricing-card">
+          <div class="pricing-card__name">Business</div>
+          <div class="pricing-card__price">CHF 29.90<small>/mo</small></div>
+          <div class="pricing-card__period">Billed monthly</div>
+          <ul class="pricing-card__features">
+            <li>Unlimited listings</li>
+            <li><strong>Lowest commission:</strong></li>
+            <li>&nbsp;&nbsp;Under CHF 50: 2%</li>
+            <li>&nbsp;&nbsp;CHF 50 - 999: 4%</li>
+            <li>&nbsp;&nbsp;CHF 1'000 - 9'999: 3%</li>
+            <li>&nbsp;&nbsp;CHF 10'000+: 2%</li>
+            <li>Pure barter: always FREE</li>
+            <li>Unlimited swaps (0% fee)</li>
+            <li>Custom storefront</li>
+            <li>API access</li>
+            <li>Bulk import tools</li>
+            <li>Advanced analytics &amp; reports</li>
+            <li>Dedicated account manager</li>
+          </ul>
+          <a href="/auth/register" class="btn btn--outline" style="width:100%;">Contact Sales</a>
+        </div>
+      </div>
+
+      <div class="pricing__examples">
+        <h3>Fee Examples (Free Plan)</h3>
+        <div class="pricing__example-grid">
+          <div class="pricing__example">
+            <span class="pricing__example-item">Pokemon cards</span>
+            <span class="pricing__example-price">CHF 30</span>
+            <span class="pricing__example-fee">CHF 1.50 fee (5%)</span>
+          </div>
+          <div class="pricing__example">
+            <span class="pricing__example-item">iPhone 15</span>
+            <span class="pricing__example-price">CHF 800</span>
+            <span class="pricing__example-fee">CHF 64 fee (8%)</span>
+          </div>
+          <div class="pricing__example">
+            <span class="pricing__example-item">MacBook Pro</span>
+            <span class="pricing__example-price">CHF 2'500</span>
+            <span class="pricing__example-fee">CHF 150 fee (6%)</span>
+          </div>
+          <div class="pricing__example">
+            <span class="pricing__example-item">VW Golf 2020</span>
+            <span class="pricing__example-price">CHF 18'000</span>
+            <span class="pricing__example-fee">CHF 720 fee (4%)</span>
+          </div>
+          <div class="pricing__example">
+            <span class="pricing__example-item">PS5 &#x2194; Xbox (barter)</span>
+            <span class="pricing__example-price">Any value</span>
+            <span class="pricing__example-fee">FREE</span>
+          </div>
+        </div>
+        <p class="pricing__example-compare">Ricardo.ch would charge CHF 1'440 - 2'160 on that same VW Golf (8-12%). You save over CHF 700 with SwapMart.</p>
+        <p class="pricing__example-tagline">Ad-free, instant, reliable. That's the SwapMart difference.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TRUST & SAFETY ==================== -->
+  <section class="section" id="trust">
+    <div class="container">
+      <h2 class="section__title">Trade with Confidence</h2>
+      <p class="section__subtitle">Built-in safety features so you can focus on finding great deals.</p>
+
+      <div class="trust__grid">
+        <div class="trust-card">
+          <div class="trust-card__icon">&#128100;</div>
+          <h3 class="trust-card__title">Verified Profiles</h3>
+          <p class="trust-card__desc">ID-verified traders with public swap history and community ratings.</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-card__icon">&#128172;</div>
+          <h3 class="trust-card__title">Secure Messaging</h3>
+          <p class="trust-card__desc">Negotiate directly within SwapMart. No need to share personal contact details.</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-card__icon">&#128230;</div>
+          <h3 class="trust-card__title">Swiss Post Tracked</h3>
+          <p class="trust-card__desc">Integrated shipping labels with full tracking. Or choose free local pickup.</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-card__icon">&#11088;</div>
+          <h3 class="trust-card__title">Buyer &amp; Seller Ratings</h3>
+          <p class="trust-card__desc">Transparent reputation system. See trade count, response time, and reviews.</p>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<%- include('partials/footer') %>
+  <!-- ==================== TRUST & VERIFICATION ==================== -->
+  <section class="section" id="verification">
+    <div class="container">
+      <h3 class="section__title">Trust &amp; Verification</h3>
+      <p class="section__subtitle">Your safety is our priority. Every seller on SwapMart goes through identity verification.</p>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-card__icon">&#128196;</div>
+          <h4>ID Verification (KYC)</h4>
+          <p>Upload your ID document for automated verification. Powered by industry-leading services like Onfido and Sumsub for instant, secure identity checks.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#9989;</div>
+          <h4>Verified Badge</h4>
+          <p>Verified sellers get a trusted badge on their profile. Buyers can shop with confidence knowing every seller is a real, verified person.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#11088;</div>
+          <h4>Reputation System</h4>
+          <p>Rate buyers and sellers after every transaction. Build your trust score over time with positive reviews and successful deals.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-card__icon">&#128737;</div>
+          <h4>SwapMart MoneyGuard</h4>
+          <p>Optional buyer protection for high-value items. A small additional fee holds payment in escrow until the buyer confirms receipt.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CTA SECTION ==================== -->
+  <section class="section section--primary cta-section">
+    <div class="container">
+      <h2 class="cta-section__title">Ready to Start Trading?</h2>
+      <p class="cta-section__subtitle">Join thousands of Swiss traders who save money with fairer fees and smarter swaps.</p>
+      <div class="cta-section__buttons">
+        <a href="/auth/register" class="btn btn--white btn--lg">Create Free Account</a>
+        <a href="/listings" class="btn btn--outline btn--lg" style="border-color:rgba(255,255,255,0.4);color:#fff;">Browse Listings</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="footer__logo">
+            &#x1F501; Swap<span>Mart</span>
+          </div>
+          <p class="footer__desc">
+            Switzerland's fairest marketplace. Trade, swap and sell with lower fees, a unique barter system, and a community-first approach.
+          </p>
+          <div class="footer__swiss">&#127464;&#127469; Made in Switzerland</div>
+        </div>
+
+        <div class="footer__col">
+          <div class="footer__col-title">Categories</div>
+          <a href="/listings?category=trading-cards">Trading Cards</a>
+          <a href="/listings?category=electronics">Electronics</a>
+          <a href="/listings?category=cars-vehicles">Cars &amp; Vehicles</a>
+          <a href="/listings?category=apartments-rooms">Apartments &amp; Rooms</a>
+          <a href="/listings?category=fashion">Fashion</a>
+          <a href="/listings?category=furniture">Furniture</a>
+          <a href="/listings?category=sports-outdoors">Sports &amp; Outdoors</a>
+          <a href="/listings?category=collectibles">Collectibles</a>
+        </div>
+
+        <div class="footer__col">
+          <div class="footer__col-title">Company</div>
+          <a href="/">About SwapMart</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#pricing">Pricing</a>
+          <a href="/listings">Browse</a>
+          <a href="/auth/register">Join</a>
+        </div>
+
+        <div class="footer__col">
+          <div class="footer__col-title">Legal</div>
+          <a href="#">Terms of Service</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Cookie Policy</a>
+          <a href="#pricing">Fee Schedule</a>
+          <a href="#">Safety Guidelines</a>
+          <a href="#">Contact Us</a>
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <span>&copy; <%= new Date().getFullYear() %> SwapMart. All rights reserved.</span>
+        <div class="footer__social">
+          <a href="#" aria-label="Instagram">IG</a>
+          <a href="#" aria-label="Twitter / X">X</a>
+          <a href="#" aria-label="LinkedIn">LI</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      // --- Nav scroll shadow ---
+      var nav = document.getElementById('nav');
+      window.addEventListener('scroll', function () {
+        nav.classList.toggle('nav--scrolled', window.scrollY > 10);
+      }, { passive: true });
+
+      // --- Mobile menu ---
+      var burger = document.getElementById('burger');
+      var mobileMenu = document.getElementById('mobileMenu');
+
+      burger.addEventListener('click', function () {
+        var expanded = burger.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+        burger.setAttribute('aria-expanded', expanded);
+      });
+
+      // Close mobile menu on link click
+      mobileMenu.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+          burger.classList.remove('active');
+          mobileMenu.classList.remove('active');
+          burger.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      // --- Scroll animations (IntersectionObserver) ---
+      if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.category-card, .listing-card, .pricing-card, .trust-card, .step, .step-card').forEach(function (el) {
+          observer.observe(el);
+        });
+      }
+    })();
+
+    // Language dropdown
+    (function() {
+      var btn = document.querySelector('.lang-dropdown__btn');
+      var menu = document.querySelector('.lang-dropdown__menu');
+      if (!btn || !menu) return;
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var open = menu.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open);
+      });
+      document.addEventListener('click', function() {
+        menu.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') { menu.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+      });
+    })();
+  </script>
+
+</body>
+</html>
