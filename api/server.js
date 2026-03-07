@@ -5,7 +5,7 @@ var cors = require('cors');
 var bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
 var { v4: uuidv4 } = require('uuid');
-var Database = require('better-sqlite3');
+var { DatabaseSync } = require('node:sqlite');
 var fs = require('fs');
 var path = require('path');
 
@@ -20,9 +20,9 @@ var DB_PATH = process.env.DB_PATH || './data/swapmart.db';
 var dataDir = path.dirname(DB_PATH);
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
-var db = new Database(DB_PATH);
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+var db = new DatabaseSync(DB_PATH);
+db.exec('PRAGMA journal_mode = WAL');
+db.exec('PRAGMA foreign_keys = ON');
 
 // ─── App ───────────────────────────────────────────────
 var app = express();
@@ -137,7 +137,7 @@ app.patch('/api/v1/users/me', authenticate, function(req, res) {
   fields.push("updated_at = datetime('now')");
   values.push(req.userId);
 
-  db.prepare('UPDATE users SET ' + fields.join(', ') + ' WHERE id = ?').run.apply(null, values);
+  db.prepare('UPDATE users SET ' + fields.join(', ') + ' WHERE id = ?').run(...values);
   var user = db.prepare('SELECT id, email, display_name, bio, location, avatar_url, rating, trade_count, verified, created_at FROM users WHERE id = ?').get(req.userId);
   res.json(formatUser(user));
 });
@@ -168,13 +168,13 @@ app.get('/api/v1/listings', function(req, res) {
   if (req.query.sort === 'price_desc') orderBy = 'l.price_chf DESC';
 
   var whereClause = where.join(' AND ');
-  var total = db.prepare('SELECT COUNT(*) as count FROM listings l WHERE ' + whereClause).get.apply(null, params).count;
+  var total = db.prepare('SELECT COUNT(*) as count FROM listings l WHERE ' + whereClause).get(...params).count;
 
   var rows = db.prepare(
     'SELECT l.*, u.display_name as seller_name, u.avatar_url as seller_avatar, u.rating as seller_rating ' +
     'FROM listings l JOIN users u ON l.seller_id = u.id WHERE ' + whereClause +
     ' ORDER BY ' + orderBy + ' LIMIT ? OFFSET ?'
-  ).all.apply(null, params.concat([limit, offset]));
+  ).all(...params.concat([limit, offset]));
 
   res.json({
     data: rows.map(formatListing),
@@ -245,7 +245,7 @@ app.patch('/api/v1/listings/:id', authenticate, function(req, res) {
   fields.push("updated_at = datetime('now')");
   values.push(req.params.id);
 
-  db.prepare('UPDATE listings SET ' + fields.join(', ') + ' WHERE id = ?').run.apply(null, values);
+  db.prepare('UPDATE listings SET ' + fields.join(', ') + ' WHERE id = ?').run(...values);
 
   var updated = db.prepare(
     'SELECT l.*, u.display_name as seller_name, u.avatar_url as seller_avatar, u.rating as seller_rating ' +
@@ -294,7 +294,7 @@ app.get('/api/v1/swaps', authenticate, function(req, res) {
 
   if (req.query.status) { where += ' AND s.status = ?'; params.push(req.query.status); }
 
-  var swaps = db.prepare('SELECT * FROM swaps s WHERE ' + where + ' ORDER BY s.created_at DESC').all.apply(null, params);
+  var swaps = db.prepare('SELECT * FROM swaps s WHERE ' + where + ' ORDER BY s.created_at DESC').all(...params);
   res.json(swaps.map(formatSwap));
 });
 
