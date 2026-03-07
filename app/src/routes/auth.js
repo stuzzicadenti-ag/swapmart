@@ -92,7 +92,7 @@ export default async function authRoutes(fastify) {
 
     try {
       const result = await db.query(
-        'SELECT id, email, password_hash, username, name, plan, role, banned FROM users WHERE email = $1',
+        'SELECT id, email, password_hash, username, name, plan, role, banned, banned_reason FROM users WHERE email = $1',
         [email.toLowerCase()]
       );
 
@@ -103,7 +103,7 @@ export default async function authRoutes(fastify) {
       const user = result.rows[0];
 
       if (user.banned) {
-        return reply.view('auth/login.ejs', { user: request.user, error: 'This account has been suspended.' });
+        return reply.view('auth/banned.ejs', { user: null, reason: user.banned_reason || null });
       }
 
       const valid = await bcrypt.compare(password, user.password_hash);

@@ -175,6 +175,11 @@ app.get('/fees', async (request, reply) => {
   return reply.view('fees.ejs', { user: request.user });
 });
 
+// FAQ page
+app.get('/faq', async (request, reply) => {
+  return reply.view('faq.ejs', { user: request.user });
+});
+
 // Homepage
 app.get('/', async (request, reply) => {
   let categories = [];

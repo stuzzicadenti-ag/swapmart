@@ -1,0 +1,57 @@
+<%- include('../partials/header', { pageTitle: 'Account Suspended', user: null }) %>
+
+<section class="py-4">
+  <div class="container" style="max-width: 560px;">
+    <div class="text-center mb-3">
+      <div style="width: 80px; height: 80px; border-radius: 50%; background: #fef2f2; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--gray-900); margin-bottom: 0.5rem;">Your account has been suspended</h1>
+      <p class="text-light" style="font-size: 1.05rem;">Access to your SwapMart account has been restricted.</p>
+    </div>
+
+    <% if (reason) { %>
+      <div class="card mb-3" style="border: 1px solid #fecaca; background: #fef2f2;">
+        <div class="card-body" style="padding: 1.25rem;">
+          <div style="font-weight: 700; font-size: 0.875rem; color: #991b1b; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.04em;">Reason for suspension</div>
+          <p style="color: #7f1d1d; font-size: 0.9375rem; line-height: 1.6;"><%= reason %></p>
+        </div>
+      </div>
+    <% } %>
+
+    <div class="card mb-3">
+      <div class="card-body" style="padding: 1.5rem;">
+        <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;">What can you do?</h2>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="flex-center gap-2">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--teal-100); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.875rem; font-weight: 700;">1</div>
+            <div>
+              <div style="font-weight: 600; font-size: 0.9375rem;">Contact support</div>
+              <p class="text-sm text-light">If you believe this is a mistake, please contact our support team at: <a href="mailto:support@swapmart.ch" style="font-weight: 600;">support@swapmart.ch</a></p>
+            </div>
+          </div>
+
+          <div class="flex-center gap-2">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--teal-100); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.875rem; font-weight: 700;">2</div>
+            <div>
+              <div style="font-weight: 600; font-size: 0.9375rem;">Review our policies</div>
+              <p class="text-sm text-light">Read our <a href="/faq" style="font-weight: 600;">FAQ and Community Guidelines</a> to understand our policies.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center">
+      <a href="/faq" class="btn btn--outline" style="margin-right: 0.5rem;">Read FAQ</a>
+      <a href="/" class="btn btn--primary">Back to Home</a>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
