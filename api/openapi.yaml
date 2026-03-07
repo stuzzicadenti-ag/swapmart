@@ -15,6 +15,7 @@ tags:
   - name: Listings
   - name: Swaps
   - name: Messages
+  - name: Payments
 
 paths:
   /auth/register:
@@ -369,6 +370,147 @@ paths:
               schema:
                 $ref: '#/components/schemas/Message'
 
+  /payments:
+    post:
+      tags: [Payments]
+      summary: Create escrow payment
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [swapId]
+              properties:
+                swapId: { type: string, format: uuid }
+                method: { type: string, enum: [stripe, twint], default: stripe }
+      responses:
+        '201':
+          description: Payment created in escrow
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string, format: uuid }
+                  swapId: { type: string, format: uuid }
+                  amountCHF: { type: number }
+                  commissionCHF: { type: number }
+                  sellerReceivesCHF: { type: number }
+                  method: { type: string }
+                  status: { type: string }
+                  escrowTimeoutDays: { type: integer }
+                  paymentIntent:
+                    type: object
+                    properties:
+                      provider: { type: string }
+                      clientSecret: { type: string, nullable: true }
+                      twintUrl: { type: string, nullable: true }
+
+  /payments/{id}:
+    get:
+      tags: [Payments]
+      summary: Get payment status
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Payment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+
+  /payments/{id}/confirm:
+    post:
+      tags: [Payments]
+      summary: Confirm payment (funds enter escrow)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Payment confirmed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string, format: uuid }
+                  status: { type: string, example: processing }
+                  message: { type: string }
+
+  /payments/{id}/release:
+    post:
+      tags: [Payments]
+      summary: Release escrow (buyer confirms receipt)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Funds released to seller
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string, format: uuid }
+                  status: { type: string, example: completed }
+                  sellerReceivedCHF: { type: number }
+                  commissionCHF: { type: number }
+                  message: { type: string }
+
+  /payments/{id}/refund:
+    post:
+      tags: [Payments]
+      summary: Refund payment
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Payment refunded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string, format: uuid }
+                  status: { type: string, example: refunded }
+                  refundedCHF: { type: number }
+                  message: { type: string }
+
+  /payments/check-timeouts:
+    post:
+      tags: [Payments]
+      summary: Auto-refund expired escrows (cron)
+      responses:
+        '200':
+          description: Timeout check results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  processed: { type: integer }
+                  escrowTimeoutDays: { type: integer }
+                  message: { type: string }
+
 components:
   securitySchemes:
     bearerAuth:
@@ -472,4 +614,18 @@ components:
         swapId: { type: string, format: uuid }
         senderId: { type: string, format: uuid }
         body: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    Payment:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        swapId: { type: string, format: uuid }
+        buyerId: { type: string, format: uuid }
+        sellerId: { type: string, format: uuid }
+        amountCHF: { type: number }
+        commissionCHF: { type: number }
+        sellerReceivesCHF: { type: number }
+        method: { type: string, enum: [stripe, twint] }
+        status: { type: string, enum: [pending, processing, completed, refunded, failed] }
         createdAt: { type: string, format: date-time }

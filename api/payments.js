@@ -163,6 +163,24 @@ function createPaymentRoutes(db, authenticate) {
     });
   });
 
+  // ─── Check Expired Escrows (cron endpoint) ────────────
+  router.post('/payments/check-timeouts', function(req, res) {
+    var expired = db.prepare(
+      "SELECT * FROM transactions WHERE payment_status = 'processing' AND created_at < datetime('now', '-' || ? || ' days')"
+    ).all(ESCROW_TIMEOUT_DAYS);
+
+    for (var i = 0; i < expired.length; i++) {
+      db.prepare("UPDATE transactions SET payment_status = 'refunded' WHERE id = ?").run(expired[i].id);
+      db.prepare("UPDATE swaps SET status = 'cancelled', updated_at = datetime('now') WHERE id = ?").run(expired[i].swap_id);
+    }
+
+    res.json({
+      processed: expired.length,
+      escrowTimeoutDays: ESCROW_TIMEOUT_DAYS,
+      message: expired.length > 0 ? expired.length + ' expired escrow(s) auto-refunded.' : 'No expired escrows found.'
+    });
+  });
+
   return router;
 }
 
