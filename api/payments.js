@@ -87,8 +87,7 @@ function createPaymentRoutes(db, authenticate) {
     // In production: verify with Stripe/TWINT that payment succeeded
     db.prepare("UPDATE transactions SET payment_status = 'processing' WHERE id = ?").run(req.params.id);
 
-    // Update swap status
-    db.prepare("UPDATE swaps SET status = 'completed', updated_at = datetime('now') WHERE id = ?").run(tx.swap_id);
+    // Swap stays 'accepted' — moves to 'completed' only on /release (buyer confirms receipt)
 
     res.json({
       id: tx.id,
@@ -107,7 +106,8 @@ function createPaymentRoutes(db, authenticate) {
     // In production: trigger Stripe Transfer to seller's connected account
     db.prepare("UPDATE transactions SET payment_status = 'completed' WHERE id = ?").run(req.params.id);
 
-    // Update seller trade count and listing status
+    // Now mark swap as completed and update trade counts
+    db.prepare("UPDATE swaps SET status = 'completed', updated_at = datetime('now') WHERE id = ?").run(tx.swap_id);
     db.prepare('UPDATE users SET trade_count = trade_count + 1 WHERE id = ?').run(tx.seller_id);
     db.prepare('UPDATE users SET trade_count = trade_count + 1 WHERE id = ?').run(tx.buyer_id);
 
