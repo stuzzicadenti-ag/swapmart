@@ -84,6 +84,10 @@ app.setErrorHandler((error, request, reply) => {
   reply.code(statusCode).send({ error: message });
 });
 
+// Plugins (must be registered before hooks that depend on them)
+await app.register(fastifyCookie, { secret: COOKIE_SECRET });
+await app.register(fastifyFormbody);
+
 // Decorators
 app.decorate('db', pool);
 app.decorate('redis', redis);
@@ -103,10 +107,6 @@ app.addHook('onRequest', async (request) => {
     }
   }
 });
-
-// Plugins
-await app.register(fastifyCookie, { secret: COOKIE_SECRET });
-await app.register(fastifyFormbody);
 await app.register(fastifyMultipart, { limits: { fileSize: 10 * 1024 * 1024 } });
 await app.register(fastifyWebsocket);
 
