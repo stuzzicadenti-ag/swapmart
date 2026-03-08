@@ -363,7 +363,7 @@
         <h2 class="section-heading--sm" style="margin-bottom: 1rem;">Similar Listings</h2>
         <div class="grid grid-4">
           <% similar.forEach(s => { %>
-            <a href="/listings/<%= s.id %>" class="card" style="text-decoration: none;">
+            <a href="/listings/<%= s.slug || s.id %>" class="card" style="text-decoration: none;">
               <% if (s.image) { %>
                 <img src="/uploads/<%= s.image %>" alt="<%= s.title %>" class="listing-img" loading="lazy">
               <% } else { %>

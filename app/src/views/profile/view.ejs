@@ -46,7 +46,7 @@
     <% } else { %>
       <div class="grid grid-4 mb-3">
         <% listings.forEach(listing => { %>
-          <a href="/listings/<%= listing.id %>" class="card" style="text-decoration: none;">
+          <a href="/listings/<%= listing.slug || listing.id %>" class="card" style="text-decoration: none;">
             <% if (listing.image) { %>
               <img src="/uploads/<%= listing.image %>" alt="<%= listing.title %>" class="listing-img" loading="lazy">
             <% } else { %>

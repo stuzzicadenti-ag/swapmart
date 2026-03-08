@@ -328,7 +328,7 @@
       <% if (featured.length > 0) { %>
         <div class="listings__grid">
           <% featured.forEach(function(listing) { %>
-            <a href="/listings/<%= listing.id %>" style="text-decoration:none; color:inherit;">
+            <a href="/listings/<%= listing.slug || listing.id %>" style="text-decoration:none; color:inherit;">
               <article class="listing-card">
                 <% if (listing.image) { %>
                   <div class="listing-card__img" style="position: relative;">

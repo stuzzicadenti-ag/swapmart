@@ -99,7 +99,7 @@
           </div>
           <div style="font-weight: 600; margin-bottom: 0.35rem;">
             <% if (f.listing_id) { %>
-              <a href="/listings/<%= f.listing_id %>"><%= f.listing_title || 'Listing #' + f.listing_id %></a>
+              <a href="/listings/<%= f.listing_slug || f.listing_id %>"><%= f.listing_title || 'Listing #' + f.listing_id %></a>
             <% } else { %>
               No listing
             <% } %>
@@ -116,7 +116,7 @@
         <div class="flag-actions">
           <% if (f.status === 'pending') { %>
             <% if (f.listing_id) { %>
-              <a href="/listings/<%= f.listing_id %>" class="btn btn--outline btn--sm" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">View</a>
+              <a href="/listings/<%= f.listing_slug || f.listing_id %>" class="btn btn--outline btn--sm" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">View</a>
             <% } %>
             <form action="/admin/flags/<%= f.id %>/dismiss" method="POST" style="display: inline;">
               <button type="submit" class="btn btn--outline btn--sm" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Dismiss</button>

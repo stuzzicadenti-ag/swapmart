@@ -470,7 +470,7 @@ export default async function adminRoutes(fastify) {
       const totalPages = Math.ceil(total / limit);
 
       const flagsResult = await db.query(
-        `SELECT f.*, l.title as listing_title, l.status as listing_status,
+        `SELECT f.*, l.title as listing_title, l.status as listing_status, l.slug as listing_slug,
          u.username as reporter_name, r.username as reviewer_name
          FROM flags f
          LEFT JOIN listings l ON f.listing_id = l.id

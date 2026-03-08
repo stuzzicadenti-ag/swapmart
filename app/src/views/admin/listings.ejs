@@ -97,7 +97,7 @@
                   <% } %>
                 </td>
                 <td>
-                  <a href="/listings/<%= l.id %>" style="font-weight: 600; max-width: 200px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <a href="/listings/<%= l.slug || l.id %>" style="font-weight: 600; max-width: 200px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     <%= l.title %>
                   </a>
                 </td>

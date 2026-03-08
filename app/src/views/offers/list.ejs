@@ -109,7 +109,7 @@
                     <div style="width: 60px; height: 45px; background: var(--border); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: var(--text-light);">&#128230;</div>
                   <% } %>
                   <div>
-                    <a href="/listings/<%= offer.listing_id %>" style="font-weight: 600;"><%= offer.listing_title %></a>
+                    <a href="/listings/<%= offer.listing_slug || offer.listing_id %>" style="font-weight: 600;"><%= offer.listing_title %></a>
                     <div class="text-sm text-light">
                       To <strong><%= offer.seller_name %></strong> &middot;
                       <%= new Date(offer.created_at).toLocaleDateString('en-CH') %>

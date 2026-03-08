@@ -12,7 +12,7 @@ export default async function invoicesRoutes(fastify) {
     try {
       const result = await db.query(
         `SELECT i.*, t.amount as transaction_amount, t.offer_id,
-         l.title as listing_title, l.id as listing_id
+         l.title as listing_title, l.id as listing_id, l.slug as listing_slug
          FROM invoices i
          JOIN transactions t ON i.transaction_id = t.id
          JOIN offers o ON t.offer_id = o.id

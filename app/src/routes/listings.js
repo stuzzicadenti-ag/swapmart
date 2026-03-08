@@ -3,9 +3,20 @@ import { randomUUID } from 'crypto';
 import fs from 'fs/promises';
 import { scanContent } from '../utils/moderation.js';
 import { calculateCommission } from '../utils/commission.js';
+import { generateSlug } from '../utils/slug.js';
 
 export default async function listingsRoutes(fastify) {
   const { db, config } = fastify;
+
+  // Migration: add slug column
+  await db.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS slug VARCHAR(255)`);
+  await db.query(`CREATE UNIQUE INDEX IF NOT EXISTS idx_listings_slug ON listings(slug) WHERE slug IS NOT NULL`);
+  // Backfill slugs for existing listings without one
+  const noSlug = await db.query('SELECT id, title FROM listings WHERE slug IS NULL');
+  for (const row of noSlug.rows) {
+    const slug = generateSlug(row.title);
+    await db.query('UPDATE listings SET slug = $1 WHERE id = $2', [slug, row.id]);
+  }
 
   // Helper: require auth
   const requireAuth = async (request, reply) => {
@@ -294,10 +305,12 @@ export default async function listingsRoutes(fastify) {
         auctionEnd.setDate(auctionEnd.getDate() + parseInt(auction_duration));
       }
 
+      const slug = generateSlug(title);
+
       const result = await db.query(
         `INSERT INTO listings (seller_id, title, description, price, category_id, condition, location, type, status,
-         listing_mode, starting_price, buy_now_price, auction_end, min_bid_increment)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id`,
+         listing_mode, starting_price, buy_now_price, auction_end, min_bid_increment, slug)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id, slug`,
         [
           request.user.id, title, description || null,
           isAuction ? null : (price ? parseFloat(price) : null),
@@ -307,6 +320,7 @@ export default async function listingsRoutes(fastify) {
           (isAuction && buy_now_price) ? parseFloat(buy_now_price) : null,
           auctionEnd,
           (isAuction && min_bid_increment) ? parseFloat(min_bid_increment) : 1.00,
+          slug,
         ]
       );
 
@@ -345,7 +359,7 @@ export default async function listingsRoutes(fastify) {
         });
       }
 
-      return reply.redirect(`/listings/${listingId}`);
+      return reply.redirect(`/listings/${result.rows[0].slug}`);
     } catch (err) {
       fastify.log.error(err);
       const catResult = await db.query('SELECT * FROM categories ORDER BY name');
@@ -357,20 +371,27 @@ export default async function listingsRoutes(fastify) {
     }
   });
 
-  // GET /listings/:id - Detail
-  fastify.get('/:id', async (request, reply) => {
-    const { id } = request.params;
+  // GET /listings/:slug - Detail (lookup by slug or legacy numeric ID)
+  fastify.get('/:slug', async (request, reply) => {
+    const { slug } = request.params;
 
     try {
+      // Support both slug and legacy numeric ID lookups
+      const isNumericId = /^\d+$/.test(slug);
       const listingResult = await db.query(
         `SELECT l.*, u.username as seller_name, u.id as seller_user_id, u.reputation_score, u.avatar_path, u.location as seller_location,
          c.name as category_name, c.slug as category_slug
          FROM listings l
          JOIN users u ON l.seller_id = u.id
          JOIN categories c ON l.category_id = c.id
-         WHERE l.id = $1`,
-        [parseInt(id)]
+         WHERE ${isNumericId ? 'l.id = $1' : 'l.slug = $1'}`,
+        [isNumericId ? parseInt(slug) : slug]
       );
+
+      // If accessed by numeric ID and listing has a slug, redirect to slug URL
+      if (isNumericId && listingResult.rows.length > 0 && listingResult.rows[0].slug) {
+        return reply.redirect(`/listings/${listingResult.rows[0].slug}`, 301);
+      }
 
       if (listingResult.rows.length === 0) {
         return reply.code(404).view('index.ejs', { user: request.user, categories: [], featured: [] });
@@ -464,36 +485,35 @@ export default async function listingsRoutes(fastify) {
     const { bid_amount } = request.body;
 
     try {
-      // Check KYC
-      const kycOk = await isKycVerified(request.user.id);
-      if (!kycOk) {
-        return reply.redirect(`/listings/${id}?offer=kyc_required`);
-      }
-
-      // Get listing
+      // Get listing with slug for redirects
       const listingResult = await db.query(
         "SELECT * FROM listings WHERE id = $1 AND listing_mode = 'auction' AND status = 'active'",
         [parseInt(id)]
       );
+      const slug = listingResult.rows[0]?.slug || id;
+
+      // Check KYC
+      const kycOk = await isKycVerified(request.user.id);
+      if (!kycOk) {
+        return reply.redirect(`/listings/${slug}?offer=kyc_required`);
+      }
+
       if (listingResult.rows.length === 0) {
-        return reply.redirect(`/listings/${id}?offer=auction_ended`);
+        return reply.redirect(`/listings/${slug}?offer=auction_ended`);
       }
 
       const listing = listingResult.rows[0];
 
-      // Check auction hasn't ended
       if (new Date(listing.auction_end) <= new Date()) {
-        return reply.redirect(`/listings/${id}?offer=auction_ended`);
+        return reply.redirect(`/listings/${slug}?offer=auction_ended`);
       }
 
-      // Can't bid on own listing
       if (listing.seller_id === request.user.id) {
-        return reply.redirect(`/listings/${id}`);
+        return reply.redirect(`/listings/${slug}`);
       }
 
       const amount = parseFloat(bid_amount);
 
-      // Get current highest bid
       const topBid = await db.query(
         'SELECT MAX(amount) as max_bid FROM bids WHERE listing_id = $1',
         [parseInt(id)]
@@ -504,7 +524,7 @@ export default async function listingsRoutes(fastify) {
         : parseFloat(listing.starting_price);
 
       if (amount < minRequired) {
-        return reply.redirect(`/listings/${id}?offer=bid_too_low`);
+        return reply.redirect(`/listings/${slug}?offer=bid_too_low`);
       }
 
       await db.query(
@@ -512,7 +532,7 @@ export default async function listingsRoutes(fastify) {
         [parseInt(id), request.user.id, amount]
       );
 
-      return reply.redirect(`/listings/${id}?offer=bid_placed`);
+      return reply.redirect(`/listings/${slug}?offer=bid_placed`);
     } catch (err) {
       fastify.log.error(err);
       return reply.redirect(`/listings/${id}?offer=error`);
@@ -524,44 +544,40 @@ export default async function listingsRoutes(fastify) {
     const { id } = request.params;
 
     try {
-      // Check KYC
-      const kycOk = await isKycVerified(request.user.id);
-      if (!kycOk) {
-        return reply.redirect(`/listings/${id}?offer=kyc_required`);
-      }
-
-      // Get listing
       const listingResult = await db.query(
         "SELECT * FROM listings WHERE id = $1 AND listing_mode = 'auction' AND status = 'active' AND buy_now_price IS NOT NULL",
         [parseInt(id)]
       );
+      const slug = listingResult.rows[0]?.slug || id;
+
+      const kycOk = await isKycVerified(request.user.id);
+      if (!kycOk) {
+        return reply.redirect(`/listings/${slug}?offer=kyc_required`);
+      }
+
       if (listingResult.rows.length === 0) {
-        return reply.redirect(`/listings/${id}?offer=error`);
+        return reply.redirect(`/listings/${slug}?offer=error`);
       }
 
       const listing = listingResult.rows[0];
 
-      // Check auction hasn't ended
       if (new Date(listing.auction_end) <= new Date()) {
-        return reply.redirect(`/listings/${id}?offer=auction_ended`);
+        return reply.redirect(`/listings/${slug}?offer=auction_ended`);
       }
 
-      // Can't buy own listing
       if (listing.seller_id === request.user.id) {
-        return reply.redirect(`/listings/${id}`);
+        return reply.redirect(`/listings/${slug}`);
       }
 
-      // Create offer at buy_now_price and mark as accepted
       await db.query(
         `INSERT INTO offers (listing_id, buyer_id, type, cash_amount, message, status)
          VALUES ($1, $2, 'cash', $3, 'Buy Now purchase', 'accepted')`,
         [parseInt(id), request.user.id, listing.buy_now_price]
       );
 
-      // Mark listing as sold and end auction
       await db.query("UPDATE listings SET status = 'sold', updated_at = NOW() WHERE id = $1", [parseInt(id)]);
 
-      return reply.redirect(`/listings/${id}?offer=buy_now`);
+      return reply.redirect(`/listings/${slug}?offer=buy_now`);
     } catch (err) {
       fastify.log.error(err);
       return reply.redirect(`/listings/${id}?offer=error`);
@@ -574,25 +590,25 @@ export default async function listingsRoutes(fastify) {
     const { reason } = request.body;
 
     try {
-      // Verify listing exists and user is not the seller
       const listingResult = await db.query('SELECT * FROM listings WHERE id = $1', [parseInt(id)]);
       if (listingResult.rows.length === 0) {
         return reply.redirect('/listings');
       }
 
       const listing = listingResult.rows[0];
+      const slug = listing.slug || id;
+
       if (listing.seller_id === request.user.id) {
-        return reply.redirect(`/listings/${id}`);
+        return reply.redirect(`/listings/${slug}`);
       }
 
-      // Check if user already reported this listing
       const existingFlag = await db.query(
         "SELECT id FROM flags WHERE listing_id = $1 AND user_id = $2 AND type = 'user_report' AND status = 'pending'",
         [parseInt(id), request.user.id]
       );
 
       if (existingFlag.rows.length > 0) {
-        return reply.redirect(`/listings/${id}?offer=already_reported`);
+        return reply.redirect(`/listings/${slug}?offer=already_reported`);
       }
 
       await db.query(
@@ -600,7 +616,7 @@ export default async function listingsRoutes(fastify) {
         [parseInt(id), request.user.id, reason || 'No reason provided']
       );
 
-      return reply.redirect(`/listings/${id}?offer=reported`);
+      return reply.redirect(`/listings/${slug}?offer=reported`);
     } catch (err) {
       fastify.log.error(err);
       return reply.redirect(`/listings/${id}`);
@@ -613,23 +629,23 @@ export default async function listingsRoutes(fastify) {
     const { offer_type, cash_amount, swap_listing_id, message } = request.body;
 
     try {
-      // Verify listing exists and user is not the seller
       const listingResult = await db.query('SELECT * FROM listings WHERE id = $1', [parseInt(id)]);
       if (listingResult.rows.length === 0) {
         return reply.redirect('/listings');
       }
 
       const listing = listingResult.rows[0];
+      const slug = listing.slug || id;
+
       if (listing.seller_id === request.user.id) {
-        return reply.redirect(`/listings/${id}`);
+        return reply.redirect(`/listings/${slug}`);
       }
 
-      // KYC restriction: offers above CHF 50 require KYC
       const offerAmount = cash_amount ? parseFloat(cash_amount) : 0;
       if (offerAmount > 50) {
         const kycOk = await isKycVerified(request.user.id);
         if (!kycOk) {
-          return reply.redirect(`/listings/${id}?offer=kyc_required`);
+          return reply.redirect(`/listings/${slug}?offer=kyc_required`);
         }
       }
 
@@ -644,7 +660,7 @@ export default async function listingsRoutes(fastify) {
         ]
       );
 
-      return reply.redirect(`/listings/${id}?offer=sent`);
+      return reply.redirect(`/listings/${slug}?offer=sent`);
     } catch (err) {
       fastify.log.error(err);
       return reply.redirect(`/listings/${id}?offer=error`);

@@ -61,7 +61,7 @@
                 </td>
                 <td style="padding: 0.875rem 1rem;">
                   <% if (inv.listing_title) { %>
-                    <a href="/listings/<%= inv.listing_id %>"><%= inv.listing_title %></a>
+                    <a href="/listings/<%= inv.listing_slug || inv.listing_id %>"><%= inv.listing_title %></a>
                   <% } else { %>
                     <span class="text-light">-</span>
                   <% } %>

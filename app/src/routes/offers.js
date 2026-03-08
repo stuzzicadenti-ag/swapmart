@@ -27,7 +27,7 @@ export default async function offersRoutes(fastify) {
     try {
       // Received offers (on user's listings)
       const receivedResult = await db.query(
-        `SELECT o.*, l.title as listing_title, l.price as listing_price, u.username as buyer_name,
+        `SELECT o.*, l.title as listing_title, l.price as listing_price, l.slug as listing_slug, u.username as buyer_name,
          (SELECT file_path FROM listing_images WHERE listing_id = l.id ORDER BY position LIMIT 1) as listing_image
          FROM offers o
          JOIN listings l ON o.listing_id = l.id
@@ -40,7 +40,7 @@ export default async function offersRoutes(fastify) {
 
       // Sent offers
       const sentResult = await db.query(
-        `SELECT o.*, l.title as listing_title, l.price as listing_price, u.username as seller_name,
+        `SELECT o.*, l.title as listing_title, l.price as listing_price, l.slug as listing_slug, u.username as seller_name,
          (SELECT file_path FROM listing_images WHERE listing_id = l.id ORDER BY position LIMIT 1) as listing_image
          FROM offers o
          JOIN listings l ON o.listing_id = l.id
