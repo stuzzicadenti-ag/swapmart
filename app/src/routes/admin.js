@@ -78,6 +78,22 @@ export default async function adminRoutes(fastify) {
   await db.query('CREATE INDEX IF NOT EXISTS idx_listings_mode ON listings(listing_mode)');
   await db.query('CREATE INDEX IF NOT EXISTS idx_listings_auction_end ON listings(auction_end)');
 
+  // --- Warning system ---
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS user_warnings (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id),
+      admin_id INTEGER NOT NULL REFERENCES users(id),
+      reason VARCHAR(50) NOT NULL,
+      details TEXT,
+      evidence_url TEXT,
+      expired BOOLEAN DEFAULT false,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    )
+  `);
+  await db.query('CREATE INDEX IF NOT EXISTS idx_user_warnings_user_id ON user_warnings(user_id)');
+  await db.query('CREATE INDEX IF NOT EXISTS idx_user_warnings_created ON user_warnings(created_at)');
+
   // Ensure at least one owner exists; if not, promote the first registered user
   const ownerCheck = await db.query("SELECT id FROM users WHERE role = 'owner' LIMIT 1");
   if (ownerCheck.rows.length === 0) {
@@ -586,6 +602,98 @@ export default async function adminRoutes(fastify) {
     } catch (err) {
       fastify.log.error(err);
       return reply.redirect('/admin/kyc');
+    }
+  });
+
+  // --- Warning System ---
+  const WARNING_REASONS = ['spam', 'fraud', 'harassment', 'counterfeit', 'policy_violation', 'misleading_listing', 'shill_bidding', 'other'];
+
+  // POST /admin/users/:id/warn - Issue a warning
+  fastify.post('/users/:id/warn', { preHandler: requireAdmin }, async (request, reply) => {
+    const targetId = parseInt(request.params.id);
+    const { reason, details, evidence_url } = request.body;
+
+    if (!WARNING_REASONS.includes(reason)) {
+      return reply.code(400).send('Invalid warning reason');
+    }
+
+    if (targetId === request.user.id) {
+      return reply.code(400).send('Cannot warn yourself');
+    }
+
+    try {
+      const target = await db.query('SELECT id, role, banned FROM users WHERE id = $1', [targetId]);
+      if (target.rows.length === 0) return reply.code(404).send('User not found');
+      if (target.rows[0].role === 'owner') return reply.code(403).send('Cannot warn an owner');
+
+      await db.query(
+        `INSERT INTO user_warnings (user_id, admin_id, reason, details, evidence_url)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [targetId, request.user.id, reason, details || null, evidence_url || null]
+      );
+
+      // Expire old warnings (6+ months with good conduct)
+      await db.query(
+        `UPDATE user_warnings SET expired = true
+         WHERE user_id = $1 AND expired = false
+           AND created_at < NOW() - INTERVAL '6 months'`,
+        [targetId]
+      );
+
+      // Count active (non-expired) warnings
+      const warnCount = await db.query(
+        'SELECT COUNT(*) as count FROM user_warnings WHERE user_id = $1 AND expired = false',
+        [targetId]
+      );
+
+      if (parseInt(warnCount.rows[0].count) >= 3 && !target.rows[0].banned) {
+        await db.query(
+          `UPDATE users SET banned = true, banned_reason = $1, banned_at = NOW() WHERE id = $2`,
+          ['Account suspended: 3 active warnings for misconduct', targetId]
+        );
+        // Deactivate listings
+        await db.query(
+          "UPDATE listings SET status = 'removed' WHERE seller_id = $1 AND status = 'active'",
+          [targetId]
+        );
+        await logAction(request.user.id, 'auto_ban_warnings', 'user', targetId, '3 active warnings reached');
+      }
+
+      await logAction(request.user.id, 'warn_user', 'user', targetId, `Reason: ${reason}. ${details || ''}`);
+      return reply.redirect('/admin/users');
+    } catch (err) {
+      fastify.log.error(err);
+      return reply.redirect('/admin/users');
+    }
+  });
+
+  // GET /admin/users/:id/warnings - View user's warning history
+  fastify.get('/users/:id/warnings', { preHandler: requireAdmin }, async (request, reply) => {
+    const targetId = parseInt(request.params.id);
+
+    try {
+      const [userResult, warnings] = await Promise.all([
+        db.query('SELECT id, username, name, email, banned FROM users WHERE id = $1', [targetId]),
+        db.query(
+          `SELECT w.*, a.username as admin_name
+           FROM user_warnings w
+           JOIN users a ON w.admin_id = a.id
+           WHERE w.user_id = $1
+           ORDER BY w.created_at DESC`,
+          [targetId]
+        ),
+      ]);
+
+      if (userResult.rows.length === 0) return reply.code(404).send('User not found');
+
+      return reply.view('admin/warnings.ejs', {
+        user: request.user,
+        targetUser: userResult.rows[0],
+        warnings: warnings.rows,
+      });
+    } catch (err) {
+      fastify.log.error(err);
+      return reply.redirect('/admin/users');
     }
   });
 
