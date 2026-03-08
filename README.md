@@ -28,17 +28,34 @@ npm start
 
 See [DOCS.md](DOCS.md) for full technical documentation, architecture, database schema, API routes, legal compliance, and deployment details.
 
+## Features
+
+- **Listing modes**: Fixed-price, auction (3/5/7/10 days), swap/barter
+- **SEO-friendly slug URLs**: Ricardo-style `/listings/{title-slug}-{random-hex}` (prevents enumeration)
+- **Tiered seller plans**: Starter (free, 4%), Plus (CHF 9.90/mo, 2.5%), Pro (CHF 24.90/mo, 1%)
+- **KYC verification**: Required for auctions and offers > CHF 50
+- **Real-time messaging**: WebSocket-based chat between buyer/seller
+- **Content moderation**: Auto-scan for phone numbers, emails, URLs at listing creation
+- **Commission system**: Tiered rates based on seller plan
+- **Invoice generation**: Automatic invoices for completed transactions
+- **Review system**: 1-5 stars + comments after transactions
+- **Warning system**: 3 active warnings = auto-ban, 6-month expiry
+- **Admin panel**: Dashboard, user/listing/flag/KYC/warning management, audit logs
+- **i18n**: English, Italian, German, French with language dropdown
+- **Responsive nav**: Profile dropdown, language dropdown, logged-in vs logged-out states
+
 ## Tech Stack
 
 - **Runtime**: Node.js (ESM)
 - **Framework**: Fastify 5
 - **Template Engine**: EJS
-- **Database**: PostgreSQL (raw pg Pool)
+- **Database**: PostgreSQL (raw pg Pool, parameterized queries)
 - **Cache**: Redis (ioredis)
 - **Auth**: JWT cookies + bcryptjs (10 rounds)
 - **Image Processing**: sharp
 - **File Uploads**: @fastify/multipart
 - **WebSocket**: @fastify/websocket
+- **i18n**: Flat JSON locale files (en, it, de, fr)
 
 ## License
 
