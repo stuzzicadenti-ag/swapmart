@@ -18,6 +18,10 @@
   "nav.categories": "Categorie",
   "nav.how_it_works": "Come funziona",
   "nav.pricing": "Prezzi",
+  "nav.community": "Comunità",
+  "nav.favorites": "Preferiti",
+  "nav.my_listings": "I miei annunci",
+  "nav.language": "Lingua",
 
   "btn.login": "Accedi",
   "btn.logout": "Esci",

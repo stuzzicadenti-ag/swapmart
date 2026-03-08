@@ -1,41 +1,37 @@
   </main>
-  <footer style="background: var(--gray-900); color: var(--gray-300); padding: 2.5rem 0; margin-top: auto;">
+  <footer class="site-footer">
     <div class="container">
-      <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-        <div>
-          <div style="font-size: 1.5rem; font-weight: 800; color: var(--white); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-            &#x1F501; Swap<span style="color: var(--amber-400);">Mart</span>
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="footer__logo">
+            &#x1F501; Swap<span>Mart</span>
           </div>
-          <p style="font-size: 0.9375rem; color: var(--gray-400); line-height: 1.6; margin-bottom: 1rem;">
+          <p class="footer__desc">
             <%= t('footer.tagline') %>
           </p>
-          <span style="display: inline-flex; align-items: center; gap: 6px; background: var(--gray-800); padding: 6px 14px; border-radius: 100px; font-size: 0.8125rem; font-weight: 600; color: var(--gray-300);">
+          <span class="footer__swiss">
             &#127464;&#127469; <%= t('footer.made_in_ch') %>
           </span>
         </div>
 
-        <div>
-          <div style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-200); margin-bottom: 1rem;"><%= t('footer.marketplace') %></div>
-          <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-            <a href="/listings" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.browse_listings') %></a>
-            <a href="/fees" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.fees_protection') %></a>
-            <a href="/faq" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.faq_guidelines') %></a>
-            <a href="/auth/register" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.create_account') %></a>
-            <a href="/health" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.status') %></a>
-          </div>
+        <div class="footer__col">
+          <div class="footer__col-title"><%= t('footer.marketplace') %></div>
+          <a href="/listings"><%= t('footer.browse_listings') %></a>
+          <a href="/fees"><%= t('footer.fees_protection') %></a>
+          <a href="/faq"><%= t('footer.faq_guidelines') %></a>
+          <a href="/auth/register"><%= t('footer.create_account') %></a>
+          <a href="/health"><%= t('footer.status') %></a>
         </div>
 
-        <div>
-          <div style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-200); margin-bottom: 1rem;"><%= t('footer.legal') %></div>
-          <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-            <a href="#" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.terms') %></a>
-            <a href="#" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.privacy') %></a>
-            <a href="#" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.contact') %></a>
-          </div>
+        <div class="footer__col">
+          <div class="footer__col-title"><%= t('footer.legal') %></div>
+          <a href="#"><%= t('footer.terms') %></a>
+          <a href="#"><%= t('footer.privacy') %></a>
+          <a href="#"><%= t('footer.contact') %></a>
         </div>
       </div>
 
-      <div style="border-top: 1px solid var(--gray-800); padding-top: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; font-size: 0.8125rem; color: var(--gray-500);">
+      <div class="footer__bottom">
         <span>&copy; <%= new Date().getFullYear() %> <%= t('footer.copyright') %></span>
         <span><%= t('footer.company') %></span>
       </div>

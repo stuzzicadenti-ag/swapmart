@@ -18,6 +18,10 @@
   "nav.categories": "Kategorien",
   "nav.how_it_works": "So funktioniert's",
   "nav.pricing": "Preise",
+  "nav.community": "Community",
+  "nav.favorites": "Favoriten",
+  "nav.my_listings": "Meine Inserate",
+  "nav.language": "Sprache",
 
   "btn.login": "Anmelden",
   "btn.logout": "Abmelden",

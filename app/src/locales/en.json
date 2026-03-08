@@ -18,6 +18,10 @@
   "nav.categories": "Categories",
   "nav.how_it_works": "How It Works",
   "nav.pricing": "Pricing",
+  "nav.community": "Community",
+  "nav.favorites": "Favorites",
+  "nav.my_listings": "My Listings",
+  "nav.language": "Language",
 
   "btn.login": "Login",
   "btn.logout": "Logout",

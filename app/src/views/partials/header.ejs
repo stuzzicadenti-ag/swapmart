@@ -98,6 +98,7 @@
     ul, ol { list-style: none; }
     button { cursor: pointer; font-family: inherit; border: none; background: none; }
 
+    main { flex: 1; }
     .container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; width: 100%; }
 
     /* ===== Navigation ===== */
@@ -120,7 +121,7 @@
       max-width: var(--max-w);
       margin: 0 auto;
       padding: 0 24px;
-      gap: 32px;
+      gap: 24px;
     }
     .nav__logo {
       display: flex;
@@ -153,29 +154,6 @@
       white-space: nowrap;
     }
     .nav__links a:hover { color: var(--primary); background: var(--teal-50); }
-    .nav__links .nav-divider {
-      width: 1px;
-      height: 20px;
-      background: var(--gray-200);
-      margin: 0 6px;
-      flex-shrink: 0;
-    }
-    .nav__lang-switcher {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.75rem;
-      margin-left: 4px;
-    }
-    .nav__lang-switcher a {
-      font-size: 0.75rem;
-      padding: 2px 4px;
-      border-radius: 3px;
-    }
-    .nav__lang-switcher .lang-sep {
-      color: var(--gray-300);
-      font-size: 0.7rem;
-    }
 
     .nav__actions {
       display: flex;
@@ -184,7 +162,140 @@
       flex-shrink: 0;
     }
 
-    /* Hamburger */
+    /* ===== Dropdown (shared: profile + lang) ===== */
+    .dropdown {
+      position: relative;
+      display: inline-flex;
+    }
+    .dropdown__trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition);
+      border: 1.5px solid transparent;
+      background: none;
+      white-space: nowrap;
+    }
+    .dropdown__trigger:hover {
+      color: var(--primary);
+      background: var(--teal-50);
+    }
+    .dropdown__trigger--profile {
+      border-color: var(--border);
+      gap: 8px;
+    }
+    .dropdown__trigger--profile:hover {
+      border-color: var(--primary);
+    }
+    .dropdown__avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal-500), var(--teal-700));
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .dropdown__caret {
+      font-size: 0.625rem;
+      transition: transform 0.2s ease;
+    }
+    .dropdown.open .dropdown__caret {
+      transform: rotate(180deg);
+    }
+    .dropdown__menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      min-width: 200px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      z-index: 1001;
+      padding: 6px 0;
+      animation: dropdownFade 0.15s ease;
+    }
+    .dropdown.open .dropdown__menu {
+      display: block;
+    }
+    .dropdown__menu a,
+    .dropdown__menu button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 16px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+      transition: background var(--transition);
+      border: none;
+      background: none;
+      cursor: pointer;
+      text-align: left;
+    }
+    .dropdown__menu a:hover,
+    .dropdown__menu button:hover {
+      background: var(--gray-50);
+      color: var(--primary);
+    }
+    .dropdown__menu-header {
+      padding: 10px 16px 8px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+    }
+    .dropdown__menu-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0;
+    }
+    .dropdown__menu .dropdown__item--danger {
+      color: var(--red-500);
+    }
+    .dropdown__menu .dropdown__item--danger:hover {
+      background: #fef2f2;
+      color: var(--red-600);
+    }
+    .dropdown__menu .dropdown__item--admin {
+      color: var(--amber-600);
+      font-weight: 600;
+    }
+
+    /* Lang dropdown specific */
+    .dropdown--lang .dropdown__menu {
+      min-width: 100px;
+    }
+    .dropdown--lang .dropdown__menu a {
+      justify-content: space-between;
+    }
+    .dropdown--lang .dropdown__menu a.lang-active {
+      color: var(--primary);
+      font-weight: 700;
+      background: var(--teal-50);
+    }
+
+    @keyframes dropdownFade {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== Hamburger ===== */
     .nav__burger {
       display: none;
       flex-direction: column;
@@ -213,7 +324,7 @@
     .nav__burger.active span:nth-child(2) { opacity: 0; }
     .nav__burger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-    /* Mobile menu */
+    /* ===== Mobile menu ===== */
     .nav__mobile {
       display: none;
       position: fixed;
@@ -233,6 +344,7 @@
     .nav__mobile a {
       display: flex;
       align-items: center;
+      gap: 10px;
       padding: 12px 16px;
       font-size: 1rem;
       font-weight: 500;
@@ -241,11 +353,40 @@
       transition: background var(--transition);
     }
     .nav__mobile a:hover { background: var(--gray-50); color: var(--primary); }
-    .nav__mobile .mobile-divider {
+    .mobile-divider {
       height: 1px;
       background: var(--border);
       margin: 8px 0;
     }
+    .mobile-section-label {
+      padding: 8px 16px 4px;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-light);
+    }
+    .mobile-lang-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 4px 8px;
+    }
+    .mobile-lang-row a {
+      flex: 1;
+      justify-content: center;
+      padding: 10px 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+    }
+    .mobile-lang-row a.lang-active {
+      background: var(--teal-50);
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .nav__mobile .mobile-item--danger { color: var(--red-500); }
+    .nav__mobile .mobile-item--admin { color: var(--amber-600); font-weight: 600; }
 
     @keyframes slideDown {
       from { opacity: 0; transform: translateY(-8px); }
@@ -254,16 +395,13 @@
 
     @media (max-width: 900px) {
       .nav__links { display: none; }
-      .nav__actions > a, .nav__actions > .btn { display: none; }
+      .nav__actions .hide-mobile { display: none !important; }
       .nav__burger { display: flex; }
+      .dropdown--profile { display: none; }
+      .dropdown--lang.hide-mobile { display: none !important; }
     }
     @media (min-width: 901px) {
       .nav__mobile { display: none !important; }
-    }
-
-    .hide-mobile { }
-    @media (max-width: 900px) {
-      .hide-mobile { display: none !important; }
     }
 
     /* ===== Buttons ===== */
@@ -623,6 +761,90 @@
       color: var(--text-light);
       margin-top: 0.25rem;
     }
+
+    /* ===== Site Footer ===== */
+    .site-footer {
+      background: var(--gray-900);
+      color: var(--gray-300);
+      padding: 2.5rem 0;
+      margin-top: auto;
+      flex-shrink: 0;
+    }
+    .site-footer .footer__grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .site-footer .footer__logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .site-footer .footer__logo span {
+      color: var(--amber-400);
+    }
+    .site-footer .footer__desc {
+      font-size: 0.9375rem;
+      color: var(--gray-400);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    .site-footer .footer__swiss {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--gray-800);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--gray-300);
+    }
+    .site-footer .footer__col-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--gray-200);
+      margin-bottom: 1rem;
+    }
+    .site-footer .footer__col a {
+      display: block;
+      padding: 3px 0;
+      color: var(--gray-400);
+      font-size: 0.9375rem;
+      transition: color var(--transition);
+    }
+    .site-footer .footer__col a:hover {
+      color: var(--teal-400);
+    }
+    .site-footer .footer__bottom {
+      border-top: 1px solid var(--gray-800);
+      padding-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--gray-500);
+    }
+    @media (max-width: 768px) {
+      .site-footer .footer__grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .site-footer .footer__grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -632,41 +854,65 @@
         <span class="nav__logo-icon">&#x1F501;</span>
         Swap<span>Mart</span>
       </a>
+
+      <!-- Desktop nav links -->
       <div class="nav__links">
-        <a href="/"><%= t('nav.home') %></a>
         <a href="/listings"><%= t('nav.browse') %></a>
-        <a href="/fees"><%= t('nav.fees') %></a>
-        <a href="/faq"><%= t('nav.faq') %></a>
         <% if (user) { %>
-          <span class="nav-divider"></span>
           <a href="/listings/new"><%= t('nav.sell_swap') %></a>
-          <a href="/offers"><%= t('nav.offers') %></a>
-          <a href="/messages"><%= t('nav.messages') %></a>
-          <a href="/invoices" class="hide-mobile"><%= t('nav.invoices') %></a>
-          <a href="/profile/<%= user.id %>" class="hide-mobile"><%= user.username %></a>
-          <% if (user.role === 'admin' || user.role === 'owner') { %>
-            <span class="nav-divider"></span>
-            <a href="/admin" style="color: var(--amber-600); font-weight: 700;"><%= t('nav.admin') %></a>
-          <% } %>
         <% } %>
+        <a href="/fees"><%= t('nav.pricing') %></a>
+        <a href="/faq"><%= t('nav.faq') %></a>
       </div>
+
       <div class="nav__actions">
         <% if (user) { %>
-          <a href="/profile/settings" class="btn btn--outline btn--sm hide-mobile"><%= t('nav.settings') %></a>
-          <a href="/auth/logout" class="btn btn--sm btn-ghost hide-mobile"><%= t('btn.logout') %></a>
+          <!-- Profile dropdown (desktop only) -->
+          <div class="dropdown dropdown--profile hide-mobile" id="profileDropdown">
+            <button type="button" class="dropdown__trigger dropdown__trigger--profile" aria-haspopup="true" aria-expanded="false">
+              <span class="dropdown__avatar"><%= user.username.charAt(0).toUpperCase() %></span>
+              <span><%= user.username %></span>
+              <span class="dropdown__caret">&#9660;</span>
+            </button>
+            <div class="dropdown__menu">
+              <div class="dropdown__menu-header"><%= user.username %></div>
+              <a href="/profile/<%= user.id %>"><%= t('nav.my_profile') %></a>
+              <a href="/listings?user=<%= user.id %>"><%= t('nav.my_listings') %></a>
+              <a href="/favorites"><%= t('nav.favorites') %></a>
+              <div class="dropdown__menu-divider"></div>
+              <a href="/messages"><%= t('nav.messages') %></a>
+              <a href="/offers"><%= t('nav.offers') %></a>
+              <a href="/invoices"><%= t('nav.invoices') %></a>
+              <div class="dropdown__menu-divider"></div>
+              <a href="/profile/settings"><%= t('nav.settings') %></a>
+              <% if (user.role === 'admin' || user.role === 'owner') { %>
+                <div class="dropdown__menu-divider"></div>
+                <a href="/admin" class="dropdown__item--admin"><%= t('nav.admin_panel') %></a>
+              <% } %>
+              <div class="dropdown__menu-divider"></div>
+              <a href="/auth/logout" class="dropdown__item--danger"><%= t('btn.logout') %></a>
+            </div>
+          </div>
         <% } else { %>
           <a href="/auth/login" class="btn btn--sm btn-ghost hide-mobile"><%= t('btn.login') %></a>
           <a href="/auth/register" class="btn btn--primary btn--sm hide-mobile"><%= t('btn.signup') %></a>
         <% } %>
-        <span class="nav__lang-switcher">
-          <a href="/lang/en" style="color: <%= lang === 'en' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'en' ? '700' : '400' %>;">EN</a>
-          <span class="lang-sep">|</span>
-          <a href="/lang/it" style="color: <%= lang === 'it' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'it' ? '700' : '400' %>;">IT</a>
-          <span class="lang-sep">|</span>
-          <a href="/lang/de" style="color: <%= lang === 'de' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'de' ? '700' : '400' %>;">DE</a>
-          <span class="lang-sep">|</span>
-          <a href="/lang/fr" style="color: <%= lang === 'fr' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'fr' ? '700' : '400' %>;">FR</a>
-        </span>
+
+        <!-- Language dropdown (desktop) -->
+        <div class="dropdown dropdown--lang hide-mobile" id="langDropdown">
+          <button type="button" class="dropdown__trigger" aria-haspopup="true" aria-expanded="false">
+            <%= lang.toUpperCase() %>
+            <span class="dropdown__caret">&#9660;</span>
+          </button>
+          <div class="dropdown__menu">
+            <a href="/lang/en" class="<%= lang === 'en' ? 'lang-active' : '' %>">English</a>
+            <a href="/lang/it" class="<%= lang === 'it' ? 'lang-active' : '' %>">Italiano</a>
+            <a href="/lang/de" class="<%= lang === 'de' ? 'lang-active' : '' %>">Deutsch</a>
+            <a href="/lang/fr" class="<%= lang === 'fr' ? 'lang-active' : '' %>">Fran&ccedil;ais</a>
+          </div>
+        </div>
+
+        <!-- Hamburger (mobile) -->
         <button type="button" class="nav__burger" id="burger" aria-label="Toggle menu" aria-expanded="false">
           <span></span>
           <span></span>
@@ -674,42 +920,49 @@
         </button>
       </div>
     </div>
+
+    <!-- Mobile menu -->
     <div class="nav__mobile" id="mobileMenu">
-      <a href="/"><%= t('nav.home') %></a>
-      <a href="/listings"><%= t('nav.browse_listings') %></a>
-      <a href="/fees"><%= t('nav.fees_protection') %></a>
+      <a href="/listings"><%= t('nav.browse') %></a>
+      <a href="/fees"><%= t('nav.pricing') %></a>
       <a href="/faq"><%= t('nav.faq') %></a>
       <% if (user) { %>
         <div class="mobile-divider"></div>
         <a href="/listings/new"><%= t('nav.sell_swap') %></a>
-        <a href="/offers"><%= t('nav.my_offers') %></a>
+        <div class="mobile-divider"></div>
+        <div class="mobile-section-label"><%= user.username %></div>
+        <a href="/profile/<%= user.id %>"><%= t('nav.my_profile') %></a>
+        <a href="/listings?user=<%= user.id %>"><%= t('nav.my_listings') %></a>
+        <a href="/favorites"><%= t('nav.favorites') %></a>
+        <div class="mobile-divider"></div>
         <a href="/messages"><%= t('nav.messages') %></a>
+        <a href="/offers"><%= t('nav.offers') %></a>
         <a href="/invoices"><%= t('nav.invoices') %></a>
         <div class="mobile-divider"></div>
-        <a href="/profile/<%= user.id %>"><%= t('nav.my_profile') %></a>
         <a href="/profile/settings"><%= t('nav.settings') %></a>
-        <a href="/profile/verify"><%= t('nav.kyc_verification') %></a>
         <% if (user.role === 'admin' || user.role === 'owner') { %>
-          <a href="/admin" style="color: var(--amber-600);"><%= t('nav.admin_panel') %></a>
+          <a href="/admin" class="mobile-item--admin"><%= t('nav.admin_panel') %></a>
         <% } %>
         <div class="mobile-divider"></div>
-        <a href="/auth/logout"><%= t('btn.logout') %></a>
+        <a href="/auth/logout" class="mobile-item--danger"><%= t('btn.logout') %></a>
       <% } else { %>
         <div class="mobile-divider"></div>
         <a href="/auth/login"><%= t('btn.login') %></a>
         <a href="/auth/register"><%= t('btn.signup') %></a>
       <% } %>
       <div class="mobile-divider"></div>
-      <div style="display: flex; align-items: center; gap: 12px; padding: 8px 16px; font-size: 0.875rem;">
-        <a href="/lang/en" style="color: <%= lang === 'en' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'en' ? '700' : '400' %>;">EN</a>
-        <a href="/lang/it" style="color: <%= lang === 'it' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'it' ? '700' : '400' %>;">IT</a>
-        <a href="/lang/de" style="color: <%= lang === 'de' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'de' ? '700' : '400' %>;">DE</a>
-        <a href="/lang/fr" style="color: <%= lang === 'fr' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'fr' ? '700' : '400' %>;">FR</a>
+      <div class="mobile-section-label"><%= t('nav.language') %></div>
+      <div class="mobile-lang-row">
+        <a href="/lang/en" class="<%= lang === 'en' ? 'lang-active' : '' %>">EN</a>
+        <a href="/lang/it" class="<%= lang === 'it' ? 'lang-active' : '' %>">IT</a>
+        <a href="/lang/de" class="<%= lang === 'de' ? 'lang-active' : '' %>">DE</a>
+        <a href="/lang/fr" class="<%= lang === 'fr' ? 'lang-active' : '' %>">FR</a>
       </div>
     </div>
   </nav>
   <script>
     (function() {
+      /* Mobile hamburger */
       var burger = document.getElementById('burger');
       var menu = document.getElementById('mobileMenu');
       if (burger && menu) {
@@ -728,6 +981,45 @@
           }
         });
       }
+
+      /* Dropdown toggle logic */
+      var dropdowns = document.querySelectorAll('.dropdown');
+      dropdowns.forEach(function(dd) {
+        var trigger = dd.querySelector('.dropdown__trigger');
+        if (!trigger) return;
+        trigger.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var wasOpen = dd.classList.contains('open');
+          /* Close all dropdowns first */
+          dropdowns.forEach(function(d) { d.classList.remove('open'); });
+          if (!wasOpen) {
+            dd.classList.add('open');
+            trigger.setAttribute('aria-expanded', 'true');
+          } else {
+            trigger.setAttribute('aria-expanded', 'false');
+          }
+        });
+      });
+
+      /* Close dropdowns on outside click */
+      document.addEventListener('click', function() {
+        dropdowns.forEach(function(d) {
+          d.classList.remove('open');
+          var t = d.querySelector('.dropdown__trigger');
+          if (t) t.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      /* Close dropdowns on Escape */
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          dropdowns.forEach(function(d) {
+            d.classList.remove('open');
+            var t = d.querySelector('.dropdown__trigger');
+            if (t) t.setAttribute('aria-expanded', 'false');
+          });
+        }
+      });
     })();
   </script>
   <main>
