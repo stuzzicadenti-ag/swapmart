@@ -1,10 +1,10 @@
-<%- include('../partials/header', { pageTitle: 'Sign Up', user }) %>
+<%- include('../partials/header', { pageTitle: t('btn.signup'), user }) %>
 
 <section class="py-4">
   <div class="container" style="max-width: 420px;">
     <div class="text-center mb-2">
-      <h1 style="font-size: 1.75rem;">Join SwapMart</h1>
-      <p class="text-light">Create your account and start trading</p>
+      <h1 style="font-size: 1.75rem;"><%= t('auth.join_title') %></h1>
+      <p class="text-light"><%= t('auth.join_subtitle') %></p>
     </div>
 
     <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
@@ -13,50 +13,50 @@
       <div class="card-body" style="padding: 1.5rem;">
         <form action="/auth/register" method="POST">
           <div class="form-group">
-            <label for="email">Email *</label>
+            <label for="email"><%= t('auth.email') %> *</label>
             <input type="email" id="email" name="email" class="form-control" required
-                   placeholder="you@example.com" autocomplete="email">
+                   placeholder="<%= t('auth.email_placeholder') %>" autocomplete="email">
           </div>
 
           <div class="form-group">
-            <label for="username">Username *</label>
+            <label for="username"><%= t('auth.username') %> *</label>
             <input type="text" id="username" name="username" class="form-control" required
-                   placeholder="Choose a username" autocomplete="username" maxlength="100"
+                   placeholder="<%= t('auth.username_placeholder') %>" autocomplete="username" maxlength="100"
                    pattern="[a-zA-Z0-9_-]+" title="Letters, numbers, underscores, and hyphens only">
           </div>
 
           <div class="form-group">
-            <label for="name">Display Name</label>
+            <label for="name"><%= t('auth.display_name') %></label>
             <input type="text" id="name" name="name" class="form-control"
-                   placeholder="Your name (optional)">
+                   placeholder="<%= t('auth.name_placeholder') %>">
           </div>
 
           <div class="form-group">
-            <label for="location">Location</label>
+            <label for="location"><%= t('auth.location') %></label>
             <input type="text" id="location" name="location" class="form-control"
-                   placeholder="e.g. Zurich, CH (optional)">
+                   placeholder="<%= t('auth.location_placeholder') %>">
           </div>
 
           <div class="form-group">
-            <label for="password">Password *</label>
+            <label for="password"><%= t('auth.password') %> *</label>
             <input type="password" id="password" name="password" class="form-control" required
-                   placeholder="At least 8 characters" autocomplete="new-password" minlength="8">
+                   placeholder="<%= t('auth.password_min') %>" autocomplete="new-password" minlength="8">
           </div>
 
           <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; font-size: 1rem;">
-            Create Account
+            <%= t('btn.create_account') %>
           </button>
         </form>
       </div>
     </div>
 
     <p class="text-center mt-2 text-sm text-light">
-      Already have an account? <a href="/auth/login">Sign in</a>
+      <%= t('auth.has_account') %> <a href="/auth/login"><%= t('auth.signin_link') %></a>
     </p>
 
     <div class="text-center mt-1">
       <p class="text-sm text-light">
-        Pure barter trades are <strong>FREE</strong>. Cash transactions have fair tiered commissions starting at 5%.
+        <%- t('auth.barter_free') %>
       </p>
     </div>
   </div>

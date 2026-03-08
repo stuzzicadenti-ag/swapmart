@@ -7,6 +7,7 @@ import fastifyMultipart from '@fastify/multipart';
 import fastifyWebsocket from '@fastify/websocket';
 import ejs from 'ejs';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
 import Redis from 'ioredis';
@@ -29,6 +30,14 @@ const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const JWT_SECRET = process.env.JWT_SECRET || 'change-me';
 const COOKIE_SECRET = process.env.COOKIE_SECRET || 'change-me';
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'data', 'uploads');
+
+// i18n: preload all locale files
+const SUPPORTED_LANGS = ['en', 'it', 'de', 'fr'];
+const locales = {};
+for (const lang of SUPPORTED_LANGS) {
+  const filePath = path.join(__dirname, 'locales', `${lang}.json`);
+  locales[lang] = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+}
 
 const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 10, idleTimeoutMillis: 30000 });
 const redis = new Redis(REDIS_URL, { lazyConnect: true, maxRetriesPerRequest: 3 });
@@ -141,9 +150,14 @@ await app.register(fastifyStatic, {
   maxAge: process.env.NODE_ENV === 'production' ? 604800000 : 0,
 });
 
-// Inject user into all view contexts
+// Inject user and i18n into all view contexts
 app.addHook('preHandler', async (request, reply) => {
-  reply.locals = { user: request.user };
+  const langCookie = request.cookies?.lang;
+  const lang = SUPPORTED_LANGS.includes(langCookie) ? langCookie : 'en';
+  const strings = locales[lang] || locales.en;
+  const fallback = locales.en;
+  const t = (key) => strings[key] || fallback[key] || key;
+  reply.locals = { user: request.user, t, lang };
 });
 
 // Health check
@@ -169,6 +183,16 @@ await app.register(messagesRoutes, { prefix: '/messages' });
 await app.register(profileRoutes, { prefix: '/profile' });
 await app.register(invoicesRoutes, { prefix: '/invoices' });
 await app.register(adminRoutes, { prefix: '/admin' });
+
+// Language switcher
+app.get('/lang/:code', async (request, reply) => {
+  const code = request.params.code;
+  if (SUPPORTED_LANGS.includes(code)) {
+    reply.setCookie('lang', code, { path: '/', httpOnly: false, sameSite: 'lax', maxAge: 365 * 24 * 60 * 60 });
+  }
+  const referer = request.headers.referer || '/';
+  return reply.redirect(referer);
+});
 
 // Fees page
 app.get('/fees', async (request, reply) => {

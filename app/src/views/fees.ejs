@@ -1,18 +1,18 @@
-<%- include('partials/header', { pageTitle: 'Fees & Protection', user }) %>
+<%- include('partials/header', { pageTitle: t('fees.title'), user }) %>
 
 <section class="py-3">
   <div class="container" style="max-width: 900px;">
     <div class="text-center mb-3">
-      <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">Fees & Buyer Protection</h1>
-      <p class="text-light" style="font-size: 1.05rem;">Transparent pricing. No hidden costs. The fairest marketplace in Switzerland.</p>
+      <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;"><%= t('fees.title') %></h1>
+      <p class="text-light" style="font-size: 1.05rem;"><%= t('fees.subtitle') %></p>
     </div>
 
     <!-- Pure Swap Banner -->
     <div class="card mb-3" style="border: 2px solid var(--amber-400); background: var(--amber-50);">
       <div class="card-body text-center" style="padding: 1.5rem;">
         <div style="font-size: 2rem; margin-bottom: 0.5rem;">&#9889;</div>
-        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Pure Swaps are FREE</h2>
-        <p class="text-light">Swapping items without any cash component? Zero fees. Always. On every plan.</p>
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;"><%= t('fees.pure_swaps_free') %></h2>
+        <p class="text-light"><%= t('fees.pure_swaps_desc') %></p>
       </div>
     </div>
 
@@ -22,18 +22,18 @@
         <table style="width: 100%; border-collapse: collapse; font-size: 0.9375rem;">
           <thead>
             <tr style="background: var(--gray-50); border-bottom: 2px solid var(--border);">
-              <th style="padding: 1rem 1.25rem; text-align: left; font-weight: 700; color: var(--text-dark);">Transaction Amount (CHF)</th>
+              <th style="padding: 1rem 1.25rem; text-align: left; font-weight: 700; color: var(--text-dark);"><%= t('fees.transaction_amount') %></th>
               <th style="padding: 1rem 1.25rem; text-align: center; font-weight: 700; color: var(--text-dark);">
-                <div>Free</div>
-                <div class="text-sm text-light" style="font-weight: 400;">Default</div>
+                <div><%= t('fees.free_plan') %></div>
+                <div class="text-sm text-light" style="font-weight: 400;"><%= t('fees.default') %></div>
               </th>
               <th style="padding: 1rem 1.25rem; text-align: center; font-weight: 700; color: var(--primary);">
-                <div>Seller Pro</div>
-                <div class="text-sm text-light" style="font-weight: 400;">For regulars</div>
+                <div><%= t('fees.seller_pro') %></div>
+                <div class="text-sm text-light" style="font-weight: 400;"><%= t('fees.for_regulars') %></div>
               </th>
               <th style="padding: 1rem 1.25rem; text-align: center; font-weight: 700; color: var(--amber-600);">
-                <div>Business</div>
-                <div class="text-sm text-light" style="font-weight: 400;">For shops</div>
+                <div><%= t('fees.business') %></div>
+                <div class="text-sm text-light" style="font-weight: 400;"><%= t('fees.for_shops') %></div>
               </th>
             </tr>
           </thead>
@@ -70,20 +70,20 @@
     <!-- Example -->
     <div class="card mb-3">
       <div class="card-body" style="padding: 1.5rem;">
-        <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem;">Example: Selling a CHF 200 item</h3>
+        <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem;"><%= t('fees.example_title') %></h3>
         <div class="grid grid-3" style="gap: 1rem;">
           <div style="padding: 1rem; background: var(--gray-50); border-radius: var(--radius); text-align: center;">
-            <div class="text-sm text-light mb-1">Free Plan</div>
+            <div class="text-sm text-light mb-1"><%= t('fees.free_plan') %></div>
             <div style="font-size: 1.25rem; font-weight: 700;">CHF 16.00</div>
             <div class="text-sm text-light">8% fee</div>
           </div>
           <div style="padding: 1rem; background: var(--teal-50); border-radius: var(--radius); text-align: center; border: 1px solid var(--teal-200);">
-            <div class="text-sm" style="color: var(--primary); font-weight: 600;">Seller Pro</div>
+            <div class="text-sm" style="color: var(--primary); font-weight: 600;"><%= t('fees.seller_pro') %></div>
             <div style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-top: 0.25rem;">CHF 12.00</div>
             <div class="text-sm text-light">6% fee</div>
           </div>
           <div style="padding: 1rem; background: var(--amber-50); border-radius: var(--radius); text-align: center; border: 1px solid var(--amber-200);">
-            <div class="text-sm" style="color: var(--amber-600); font-weight: 600;">Business</div>
+            <div class="text-sm" style="color: var(--amber-600); font-weight: 600;"><%= t('fees.business') %></div>
             <div style="font-size: 1.25rem; font-weight: 700; color: var(--amber-600); margin-top: 0.25rem;">CHF 8.00</div>
             <div class="text-sm text-light">4% fee</div>
           </div>
@@ -94,23 +94,23 @@
     <!-- Buyer Protection -->
     <div class="card mb-3">
       <div class="card-body" style="padding: 1.5rem;">
-        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">&#128737; Buyer Protection</h2>
-        <p class="text-light mb-2">Every transaction on SwapMart is covered by our buyer protection program:</p>
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">&#128737; <%= t('fees.buyer_protection') %></h2>
+        <p class="text-light mb-2"><%= t('fees.buyer_protection_desc') %></p>
         <div class="grid grid-3" style="gap: 1.25rem;">
           <div>
             <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">&#128274;</div>
-            <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem;">Secure Escrow</h3>
-            <p class="text-sm text-light">Payments are held securely until both parties confirm the transaction is complete. Funds are never released prematurely.</p>
+            <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem;"><%= t('fees.secure_escrow') %></h3>
+            <p class="text-sm text-light"><%= t('fees.secure_escrow_desc') %></p>
           </div>
           <div>
             <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">&#128269;</div>
-            <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem;">Dispute Resolution</h3>
-            <p class="text-sm text-light">If something goes wrong, our team reviews evidence from both parties and mediates a fair resolution within 48 hours.</p>
+            <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem;"><%= t('fees.dispute_resolution') %></h3>
+            <p class="text-sm text-light"><%= t('fees.dispute_resolution_desc') %></p>
           </div>
           <div>
             <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">&#128176;</div>
-            <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem;">Money-Back Guarantee</h3>
-            <p class="text-sm text-light">If an item is not as described or never arrives, you get a full refund. No questions asked within the protection window.</p>
+            <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem;"><%= t('fees.money_back') %></h3>
+            <p class="text-sm text-light"><%= t('fees.money_back_desc') %></p>
           </div>
         </div>
       </div>
@@ -119,34 +119,34 @@
     <!-- How It Works -->
     <div class="card">
       <div class="card-body" style="padding: 1.5rem;">
-        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">How It Works</h2>
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;"><%= t('fees.how_it_works') %></h2>
         <div style="display: flex; flex-direction: column; gap: 1rem;">
           <div class="flex-center gap-2">
             <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
             <div>
-              <div style="font-weight: 600;">Buyer sends an offer</div>
-              <div class="text-sm text-light">Cash, swap, or a combination. The seller reviews it.</div>
+              <div style="font-weight: 600;"><%= t('fees.step1') %></div>
+              <div class="text-sm text-light"><%= t('fees.step1_desc') %></div>
             </div>
           </div>
           <div class="flex-center gap-2">
             <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
             <div>
-              <div style="font-weight: 600;">Seller accepts</div>
-              <div class="text-sm text-light">Chat unlocks so both parties can coordinate the exchange.</div>
+              <div style="font-weight: 600;"><%= t('fees.step2') %></div>
+              <div class="text-sm text-light"><%= t('fees.step2_desc') %></div>
             </div>
           </div>
           <div class="flex-center gap-2">
             <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
             <div>
-              <div style="font-weight: 600;">Transaction completes</div>
-              <div class="text-sm text-light">The seller marks the deal as completed. Commission is calculated and invoiced.</div>
+              <div style="font-weight: 600;"><%= t('fees.step3') %></div>
+              <div class="text-sm text-light"><%= t('fees.step3_desc') %></div>
             </div>
           </div>
           <div class="flex-center gap-2">
             <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: var(--gray-900); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">&#10003;</div>
             <div>
-              <div style="font-weight: 600;">Everyone is happy</div>
-              <div class="text-sm text-light">Leave a review and build your reputation on the platform.</div>
+              <div style="font-weight: 600;"><%= t('fees.step4') %></div>
+              <div class="text-sm text-light"><%= t('fees.step4_desc') %></div>
             </div>
           </div>
         </div>

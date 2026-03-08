@@ -1,10 +1,10 @@
-<%- include('../partials/header', { pageTitle: 'Login', user }) %>
+<%- include('../partials/header', { pageTitle: t('btn.login'), user }) %>
 
 <section class="py-4">
   <div class="container" style="max-width: 420px;">
     <div class="text-center mb-2">
-      <h1 style="font-size: 1.75rem;">Welcome Back</h1>
-      <p class="text-light">Sign in to your SwapMart account</p>
+      <h1 style="font-size: 1.75rem;"><%= t('auth.welcome_back') %></h1>
+      <p class="text-light"><%= t('auth.signin_subtitle') %></p>
     </div>
 
     <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
@@ -13,26 +13,26 @@
       <div class="card-body" style="padding: 1.5rem;">
         <form action="/auth/login" method="POST">
           <div class="form-group">
-            <label for="email">Email</label>
+            <label for="email"><%= t('auth.email') %></label>
             <input type="email" id="email" name="email" class="form-control" required
-                   placeholder="you@example.com" autocomplete="email">
+                   placeholder="<%= t('auth.email_placeholder') %>" autocomplete="email">
           </div>
 
           <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password"><%= t('auth.password') %></label>
             <input type="password" id="password" name="password" class="form-control" required
-                   placeholder="Your password" autocomplete="current-password">
+                   placeholder="<%= t('auth.password_placeholder') %>" autocomplete="current-password">
           </div>
 
           <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; font-size: 1rem;">
-            Sign In
+            <%= t('btn.signin') %>
           </button>
         </form>
       </div>
     </div>
 
     <p class="text-center mt-2 text-sm text-light">
-      Don't have an account? <a href="/auth/register">Create one</a>
+      <%= t('auth.no_account') %> <a href="/auth/register"><%= t('auth.create_one') %></a>
     </p>
   </div>
 </section>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= typeof lang !== 'undefined' ? lang : 'en' %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -610,29 +610,38 @@
         Swap<span>Mart</span>
       </a>
       <div class="nav__links">
-        <a href="/">Home</a>
-        <a href="/listings">Browse</a>
-        <a href="/fees">Fees</a>
-        <a href="/faq">FAQ</a>
+        <a href="/"><%= t('nav.home') %></a>
+        <a href="/listings"><%= t('nav.browse') %></a>
+        <a href="/fees"><%= t('nav.fees') %></a>
+        <a href="/faq"><%= t('nav.faq') %></a>
         <% if (user) { %>
-          <a href="/listings/new">Sell / Swap</a>
-          <a href="/offers">Offers</a>
-          <a href="/messages">Messages</a>
-          <a href="/invoices" class="hide-mobile">Invoices</a>
+          <a href="/listings/new"><%= t('nav.sell_swap') %></a>
+          <a href="/offers"><%= t('nav.offers') %></a>
+          <a href="/messages"><%= t('nav.messages') %></a>
+          <a href="/invoices" class="hide-mobile"><%= t('nav.invoices') %></a>
           <a href="/profile/<%= user.id %>" class="hide-mobile"><%= user.username %></a>
           <% if (user.role === 'admin' || user.role === 'owner') { %>
-            <a href="/admin" style="color: var(--amber-600); font-weight: 700;">Admin</a>
+            <a href="/admin" style="color: var(--amber-600); font-weight: 700;"><%= t('nav.admin') %></a>
           <% } %>
         <% } %>
       </div>
       <div class="nav__actions">
         <% if (user) { %>
-          <a href="/profile/settings" class="btn btn--outline btn--sm hide-mobile">Settings</a>
-          <a href="/auth/logout" class="btn btn--sm btn-ghost hide-mobile">Logout</a>
+          <a href="/profile/settings" class="btn btn--outline btn--sm hide-mobile"><%= t('nav.settings') %></a>
+          <a href="/auth/logout" class="btn btn--sm btn-ghost hide-mobile"><%= t('btn.logout') %></a>
         <% } else { %>
-          <a href="/auth/login" class="btn btn--sm btn-ghost hide-mobile">Login</a>
-          <a href="/auth/register" class="btn btn--primary btn--sm hide-mobile">Sign Up</a>
+          <a href="/auth/login" class="btn btn--sm btn-ghost hide-mobile"><%= t('btn.login') %></a>
+          <a href="/auth/register" class="btn btn--primary btn--sm hide-mobile"><%= t('btn.signup') %></a>
         <% } %>
+        <span class="hide-mobile" style="font-size: 0.75rem; color: var(--gray-400); display: inline-flex; align-items: center; gap: 4px;">
+          <a href="/lang/en" style="color: <%= lang === 'en' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'en' ? '700' : '400' %>; font-size: 0.75rem;">EN</a>
+          <span style="color: var(--gray-300);">|</span>
+          <a href="/lang/it" style="color: <%= lang === 'it' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'it' ? '700' : '400' %>; font-size: 0.75rem;">IT</a>
+          <span style="color: var(--gray-300);">|</span>
+          <a href="/lang/de" style="color: <%= lang === 'de' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'de' ? '700' : '400' %>; font-size: 0.75rem;">DE</a>
+          <span style="color: var(--gray-300);">|</span>
+          <a href="/lang/fr" style="color: <%= lang === 'fr' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'fr' ? '700' : '400' %>; font-size: 0.75rem;">FR</a>
+        </span>
         <button type="button" class="nav__burger" id="burger" aria-label="Toggle menu" aria-expanded="false">
           <span></span>
           <span></span>
@@ -641,30 +650,37 @@
       </div>
     </div>
     <div class="nav__mobile" id="mobileMenu">
-      <a href="/">Home</a>
-      <a href="/listings">Browse Listings</a>
-      <a href="/fees">Fees & Protection</a>
-      <a href="/faq">FAQ</a>
+      <a href="/"><%= t('nav.home') %></a>
+      <a href="/listings"><%= t('nav.browse_listings') %></a>
+      <a href="/fees"><%= t('nav.fees_protection') %></a>
+      <a href="/faq"><%= t('nav.faq') %></a>
       <% if (user) { %>
         <div class="mobile-divider"></div>
-        <a href="/listings/new">Sell / Swap</a>
-        <a href="/offers">My Offers</a>
-        <a href="/messages">Messages</a>
-        <a href="/invoices">Invoices</a>
+        <a href="/listings/new"><%= t('nav.sell_swap') %></a>
+        <a href="/offers"><%= t('nav.my_offers') %></a>
+        <a href="/messages"><%= t('nav.messages') %></a>
+        <a href="/invoices"><%= t('nav.invoices') %></a>
         <div class="mobile-divider"></div>
-        <a href="/profile/<%= user.id %>">My Profile</a>
-        <a href="/profile/settings">Settings</a>
-        <a href="/profile/verify">KYC Verification</a>
+        <a href="/profile/<%= user.id %>"><%= t('nav.my_profile') %></a>
+        <a href="/profile/settings"><%= t('nav.settings') %></a>
+        <a href="/profile/verify"><%= t('nav.kyc_verification') %></a>
         <% if (user.role === 'admin' || user.role === 'owner') { %>
-          <a href="/admin" style="color: var(--amber-600);">Admin Panel</a>
+          <a href="/admin" style="color: var(--amber-600);"><%= t('nav.admin_panel') %></a>
         <% } %>
         <div class="mobile-divider"></div>
-        <a href="/auth/logout">Logout</a>
+        <a href="/auth/logout"><%= t('btn.logout') %></a>
       <% } else { %>
         <div class="mobile-divider"></div>
-        <a href="/auth/login">Login</a>
-        <a href="/auth/register">Sign Up</a>
+        <a href="/auth/login"><%= t('btn.login') %></a>
+        <a href="/auth/register"><%= t('btn.signup') %></a>
       <% } %>
+      <div class="mobile-divider"></div>
+      <div style="display: flex; align-items: center; gap: 12px; padding: 8px 16px; font-size: 0.875rem;">
+        <a href="/lang/en" style="color: <%= lang === 'en' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'en' ? '700' : '400' %>;">EN</a>
+        <a href="/lang/it" style="color: <%= lang === 'it' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'it' ? '700' : '400' %>;">IT</a>
+        <a href="/lang/de" style="color: <%= lang === 'de' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'de' ? '700' : '400' %>;">DE</a>
+        <a href="/lang/fr" style="color: <%= lang === 'fr' ? 'var(--primary)' : 'var(--gray-500)' %>; font-weight: <%= lang === 'fr' ? '700' : '400' %>;">FR</a>
+      </div>
     </div>
   </nav>
   <script>

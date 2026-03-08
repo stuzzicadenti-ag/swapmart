@@ -1,4 +1,4 @@
-<%- include('partials/header', { pageTitle: 'FAQ & Community Guidelines', user }) %>
+<%- include('partials/header', { pageTitle: t('faq.title'), user }) %>
 
 <style>
   .faq-section { margin-bottom: 1.5rem; }
@@ -111,13 +111,13 @@
 <section class="py-3">
   <div class="container" style="max-width: 860px;">
     <div class="text-center mb-3">
-      <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">FAQ & Community Guidelines</h1>
-      <p class="text-light" style="font-size: 1.05rem;">Everything you need to know about trading on SwapMart.</p>
+      <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;"><%= t('faq.title') %></h1>
+      <p class="text-light" style="font-size: 1.05rem;"><%= t('faq.subtitle') %></p>
     </div>
 
     <!-- 1. How SwapMart Works -->
     <details class="faq-section" open>
-      <summary>How SwapMart Works</summary>
+      <summary><%= t('faq.how_it_works') %></summary>
       <div class="faq-content">
         <p>SwapMart is Switzerland's community-driven marketplace where you can <strong>buy, sell, and swap</strong> items with other users. Unlike traditional marketplaces, SwapMart was built around the idea that trading should be fair, transparent, and accessible to everyone.</p>
         <p>Our platform supports three types of transactions:</p>
@@ -132,7 +132,7 @@
 
     <!-- 2. Buying & Selling -->
     <details class="faq-section">
-      <summary>Buying & Selling</summary>
+      <summary><%= t('faq.buying_selling') %></summary>
       <div class="faq-content">
         <h3>How to list an item</h3>
         <ol>
@@ -172,7 +172,7 @@
 
     <!-- 3. Fees & Commissions -->
     <details class="faq-section">
-      <summary>Fees & Commissions</summary>
+      <summary><%= t('faq.fees_commissions') %></summary>
       <div class="faq-content">
         <div class="highlight">Pure swaps (item for item with no cash component) are always <strong>100% FREE</strong> on every plan.</div>
 
@@ -226,7 +226,7 @@
 
     <!-- 4. Buyer Protection -->
     <details class="faq-section">
-      <summary>Buyer Protection</summary>
+      <summary><%= t('faq.buyer_protection') %></summary>
       <div class="faq-content">
         <h3>How escrow works</h3>
         <p>When a cash offer is accepted, the buyer's payment is held securely by SwapMart until the transaction is confirmed as complete by both parties. Funds are never released to the seller until the buyer confirms receipt of the item.</p>
@@ -252,7 +252,7 @@
 
     <!-- 5. Seller Guidelines -->
     <details class="faq-section">
-      <summary>Seller Guidelines</summary>
+      <summary><%= t('faq.seller_guidelines') %></summary>
       <div class="faq-content">
         <h3>Photo requirements</h3>
         <ul>
@@ -277,7 +277,7 @@
 
     <!-- 6. Account Rules -->
     <details class="faq-section">
-      <summary>Account Rules</summary>
+      <summary><%= t('faq.account_rules') %></summary>
       <div class="faq-content">
         <h3>Eligibility</h3>
         <ul>
@@ -305,7 +305,7 @@
 
     <!-- 7. Swiss Regulations -->
     <details class="faq-section">
-      <summary>Swiss Regulations</summary>
+      <summary><%= t('faq.swiss_regulations') %></summary>
       <div class="faq-content">
         <h3>Governing law</h3>
         <p>SwapMart operates under <strong>Swiss law</strong>, specifically the Swiss Code of Obligations (OR/CO). All disputes are subject to the jurisdiction of the courts of Zurich, Switzerland.</p>
@@ -326,7 +326,7 @@
 
     <!-- 8. New User Limits -->
     <details class="faq-section">
-      <summary>New User Limits</summary>
+      <summary><%= t('faq.new_user_limits') %></summary>
       <div class="faq-content">
         <p>To maintain a safe marketplace, new accounts have the following restrictions during the first 30 days:</p>
         <ul>
@@ -340,7 +340,7 @@
 
     <!-- 9. Contact & Support -->
     <details class="faq-section">
-      <summary>Contact & Support</summary>
+      <summary><%= t('faq.contact_support') %></summary>
       <div class="faq-content">
         <p>Need help? Our support team is here for you.</p>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem;">

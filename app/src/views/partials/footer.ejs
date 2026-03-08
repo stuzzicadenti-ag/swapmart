@@ -7,37 +7,37 @@
             &#x1F501; Swap<span style="color: var(--amber-400);">Mart</span>
           </div>
           <p style="font-size: 0.9375rem; color: var(--gray-400); line-height: 1.6; margin-bottom: 1rem;">
-            Switzerland's fairest marketplace. Trade, swap and sell with lower fees and a community-first approach.
+            <%= t('footer.tagline') %>
           </p>
           <span style="display: inline-flex; align-items: center; gap: 6px; background: var(--gray-800); padding: 6px 14px; border-radius: 100px; font-size: 0.8125rem; font-weight: 600; color: var(--gray-300);">
-            &#127464;&#127469; Made in Switzerland
+            &#127464;&#127469; <%= t('footer.made_in_ch') %>
           </span>
         </div>
 
         <div>
-          <div style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-200); margin-bottom: 1rem;">Marketplace</div>
+          <div style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-200); margin-bottom: 1rem;"><%= t('footer.marketplace') %></div>
           <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-            <a href="/listings" style="color: var(--gray-400); font-size: 0.9375rem;">Browse Listings</a>
-            <a href="/fees" style="color: var(--gray-400); font-size: 0.9375rem;">Fees & Protection</a>
-            <a href="/faq" style="color: var(--gray-400); font-size: 0.9375rem;">FAQ & Guidelines</a>
-            <a href="/auth/register" style="color: var(--gray-400); font-size: 0.9375rem;">Create Account</a>
-            <a href="/health" style="color: var(--gray-400); font-size: 0.9375rem;">Status</a>
+            <a href="/listings" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.browse_listings') %></a>
+            <a href="/fees" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.fees_protection') %></a>
+            <a href="/faq" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.faq_guidelines') %></a>
+            <a href="/auth/register" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.create_account') %></a>
+            <a href="/health" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.status') %></a>
           </div>
         </div>
 
         <div>
-          <div style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-200); margin-bottom: 1rem;">Legal</div>
+          <div style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-200); margin-bottom: 1rem;"><%= t('footer.legal') %></div>
           <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-            <a href="#" style="color: var(--gray-400); font-size: 0.9375rem;">Terms of Service</a>
-            <a href="#" style="color: var(--gray-400); font-size: 0.9375rem;">Privacy Policy</a>
-            <a href="#" style="color: var(--gray-400); font-size: 0.9375rem;">Contact Us</a>
+            <a href="#" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.terms') %></a>
+            <a href="#" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.privacy') %></a>
+            <a href="#" style="color: var(--gray-400); font-size: 0.9375rem;"><%= t('footer.contact') %></a>
           </div>
         </div>
       </div>
 
       <div style="border-top: 1px solid var(--gray-800); padding-top: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; font-size: 0.8125rem; color: var(--gray-500);">
-        <span>&copy; <%= new Date().getFullYear() %> SwapMart. All rights reserved.</span>
-        <span>Part of Stuzzicadenti AG</span>
+        <span>&copy; <%= new Date().getFullYear() %> <%= t('footer.copyright') %></span>
+        <span><%= t('footer.company') %></span>
       </div>
     </div>
   </footer>

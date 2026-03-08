@@ -16,25 +16,26 @@ export default async function authRoutes(fastify) {
   fastify.post('/register', async (request, reply) => {
     if (fastify.checkAuthRateLimit && !fastify.checkAuthRateLimit(request, reply)) return;
     const { email, username, password, name, location } = request.body;
+    const t = reply.locals.t;
 
     if (!email || !username || !password) {
-      return reply.view('auth/register.ejs', { user: request.user, error: 'Email, username, and password are required.' });
+      return reply.view('auth/register.ejs', { user: request.user, error: t('auth.err_required') });
     }
 
     if (!EMAIL_RE.test(email)) {
-      return reply.view('auth/register.ejs', { user: request.user, error: 'Invalid email format.' });
+      return reply.view('auth/register.ejs', { user: request.user, error: t('auth.err_email_format') });
     }
 
     if (username.length < 3 || username.length > 50) {
-      return reply.view('auth/register.ejs', { user: request.user, error: 'Username must be 3-50 characters.' });
+      return reply.view('auth/register.ejs', { user: request.user, error: t('auth.err_username_length') });
     }
 
     if (password.length < 8 || password.length > 1000) {
-      return reply.view('auth/register.ejs', { user: request.user, error: 'Password must be 8-1000 characters.' });
+      return reply.view('auth/register.ejs', { user: request.user, error: t('auth.err_password_length') });
     }
 
     if (email.length > 255 || (name && name.length > 255) || (location && location.length > 255)) {
-      return reply.view('auth/register.ejs', { user: request.user, error: 'Input too long.' });
+      return reply.view('auth/register.ejs', { user: request.user, error: t('auth.err_input_long') });
     }
 
     try {
@@ -44,7 +45,7 @@ export default async function authRoutes(fastify) {
         [email.toLowerCase(), username]
       );
       if (existing.rows.length > 0) {
-        return reply.view('auth/register.ejs', { user: request.user, error: 'Email or username already taken.' });
+        return reply.view('auth/register.ejs', { user: request.user, error: t('auth.err_taken') });
       }
 
       const passwordHash = await bcrypt.hash(password, 10);
@@ -72,7 +73,7 @@ export default async function authRoutes(fastify) {
       return reply.redirect('/');
     } catch (err) {
       fastify.log.error(err);
-      return reply.view('auth/register.ejs', { user: request.user, error: 'Registration failed. Please try again.' });
+      return reply.view('auth/register.ejs', { user: request.user, error: t('auth.err_register_fail') });
     }
   });
 
@@ -85,9 +86,10 @@ export default async function authRoutes(fastify) {
   fastify.post('/login', async (request, reply) => {
     if (fastify.checkAuthRateLimit && !fastify.checkAuthRateLimit(request, reply)) return;
     const { email, password } = request.body;
+    const t = reply.locals.t;
 
     if (!email || !password) {
-      return reply.view('auth/login.ejs', { user: request.user, error: 'Email and password are required.' });
+      return reply.view('auth/login.ejs', { user: request.user, error: t('auth.err_login_required') });
     }
 
     try {
@@ -97,7 +99,7 @@ export default async function authRoutes(fastify) {
       );
 
       if (result.rows.length === 0) {
-        return reply.view('auth/login.ejs', { user: request.user, error: 'Invalid email or password.' });
+        return reply.view('auth/login.ejs', { user: request.user, error: t('auth.err_invalid_credentials') });
       }
 
       const user = result.rows[0];
@@ -109,7 +111,7 @@ export default async function authRoutes(fastify) {
       const valid = await bcrypt.compare(password, user.password_hash);
 
       if (!valid) {
-        return reply.view('auth/login.ejs', { user: request.user, error: 'Invalid email or password.' });
+        return reply.view('auth/login.ejs', { user: request.user, error: t('auth.err_invalid_credentials') });
       }
 
       const token = jwt.sign(
@@ -129,7 +131,7 @@ export default async function authRoutes(fastify) {
       return reply.redirect('/');
     } catch (err) {
       fastify.log.error(err);
-      return reply.view('auth/login.ejs', { user: request.user, error: 'Login failed. Please try again.' });
+      return reply.view('auth/login.ejs', { user: request.user, error: t('auth.err_login_fail') });
     }
   });
 
