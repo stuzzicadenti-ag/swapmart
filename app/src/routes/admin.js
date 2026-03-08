@@ -1,7 +1,7 @@
 export default async function adminRoutes(fastify) {
   const { db } = fastify;
 
-  // --- Database migrations for admin system ---
+  // Database migrations for admin system
   await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'user'`);
   await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50)`);
   await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS address_line1 VARCHAR(255)`);
@@ -47,7 +47,7 @@ export default async function adminRoutes(fastify) {
   await db.query('CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)');
   await db.query('CREATE INDEX IF NOT EXISTS idx_users_banned ON users(banned)');
 
-  // --- KYC Document Verification columns ---
+  // KYC Document Verification columns
   await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_document_type VARCHAR(50)`);
   await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_document_path TEXT`);
   await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_verified BOOLEAN DEFAULT false`);
@@ -55,7 +55,7 @@ export default async function adminRoutes(fastify) {
   await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_verified_at TIMESTAMP`);
   await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_rejected_reason TEXT`);
 
-  // --- Auction/Bidding system ---
+  // Auction/Bidding system
   await db.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS listing_mode VARCHAR(20) DEFAULT 'fixed'`);
   await db.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS starting_price NUMERIC(12,2)`);
   await db.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS buy_now_price NUMERIC(12,2)`);
@@ -78,7 +78,7 @@ export default async function adminRoutes(fastify) {
   await db.query('CREATE INDEX IF NOT EXISTS idx_listings_mode ON listings(listing_mode)');
   await db.query('CREATE INDEX IF NOT EXISTS idx_listings_auction_end ON listings(auction_end)');
 
-  // --- Warning system ---
+  // Warning system
   await db.query(`
     CREATE TABLE IF NOT EXISTS user_warnings (
       id SERIAL PRIMARY KEY,
@@ -106,7 +106,7 @@ export default async function adminRoutes(fastify) {
     }
   }
 
-  // --- Middleware ---
+  // Middleware
   const requireAdmin = async (request, reply) => {
     if (!request.user) {
       return reply.redirect('/auth/login');
@@ -130,7 +130,7 @@ export default async function adminRoutes(fastify) {
     );
   };
 
-  // --- GET /admin - Dashboard ---
+  // GET /admin - Dashboard
   fastify.get('/', { preHandler: requireAdmin }, async (request, reply) => {
     try {
       const [usersCount, listingsCount, revenueResult, flagsCount, kycPendingCount, recentFlags, recentTx] = await Promise.all([
@@ -181,7 +181,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- GET /admin/users ---
+  // GET /admin/users
   fastify.get('/users', { preHandler: requireAdmin }, async (request, reply) => {
     const { q, role, banned, page = 1 } = request.query;
     const limit = 25;
@@ -241,7 +241,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- POST /admin/users/:id/role ---
+  // POST /admin/users/:id/role
   fastify.post('/users/:id/role', { preHandler: requireAdmin }, async (request, reply) => {
     const { id } = request.params;
     const { role } = request.body;
@@ -285,7 +285,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- POST /admin/users/:id/ban ---
+  // POST /admin/users/:id/ban
   fastify.post('/users/:id/ban', { preHandler: requireAdmin }, async (request, reply) => {
     const { id } = request.params;
     const { reason } = request.body;
@@ -321,7 +321,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- POST /admin/users/:id/unban ---
+  // POST /admin/users/:id/unban
   fastify.post('/users/:id/unban', { preHandler: requireAdmin }, async (request, reply) => {
     const { id } = request.params;
 
@@ -340,7 +340,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- GET /admin/listings ---
+  // GET /admin/listings
   fastify.get('/listings', { preHandler: requireAdmin }, async (request, reply) => {
     const { status, flagged, q, page = 1 } = request.query;
     const limit = 25;
@@ -413,7 +413,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- POST /admin/listings/:id/remove ---
+  // POST /admin/listings/:id/remove
   fastify.post('/listings/:id/remove', { preHandler: requireAdmin }, async (request, reply) => {
     const { id } = request.params;
 
@@ -427,7 +427,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- POST /admin/listings/:id/approve ---
+  // POST /admin/listings/:id/approve
   fastify.post('/listings/:id/approve', { preHandler: requireAdmin }, async (request, reply) => {
     const { id } = request.params;
 
@@ -446,7 +446,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- GET /admin/flags ---
+  // GET /admin/flags
   fastify.get('/flags', { preHandler: requireAdmin }, async (request, reply) => {
     const { status: filterStatus, page = 1 } = request.query;
     const limit = 25;
@@ -501,7 +501,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- POST /admin/flags/:id/dismiss ---
+  // POST /admin/flags/:id/dismiss
   fastify.post('/flags/:id/dismiss', { preHandler: requireAdmin }, async (request, reply) => {
     const { id } = request.params;
 
@@ -518,7 +518,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- POST /admin/flags/:id/action (remove listing) ---
+  // POST /admin/flags/:id/action (remove listing)
   fastify.post('/flags/:id/action', { preHandler: requireAdmin }, async (request, reply) => {
     const { id } = request.params;
 
@@ -549,7 +549,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- GET /admin/kyc - Pending KYC submissions ---
+  // GET /admin/kyc - Pending KYC submissions
   fastify.get('/kyc', { preHandler: requireAdmin }, async (request, reply) => {
     try {
       const pendingResult = await db.query(
@@ -572,7 +572,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- POST /admin/kyc/:userId/approve ---
+  // POST /admin/kyc/:userId/approve
   fastify.post('/kyc/:userId/approve', { preHandler: requireAdmin }, async (request, reply) => {
     const { userId } = request.params;
     try {
@@ -588,7 +588,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- POST /admin/kyc/:userId/reject ---
+  // POST /admin/kyc/:userId/reject
   fastify.post('/kyc/:userId/reject', { preHandler: requireAdmin }, async (request, reply) => {
     const { userId } = request.params;
     const { reason } = request.body;
@@ -605,7 +605,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- Warning System ---
+  // Warning System
   const WARNING_REASONS = ['spam', 'fraud', 'harassment', 'counterfeit', 'policy_violation', 'misleading_listing', 'shill_bidding', 'other'];
 
   // POST /admin/users/:id/warn - Issue a warning
@@ -697,7 +697,7 @@ export default async function adminRoutes(fastify) {
     }
   });
 
-  // --- GET /admin/logs ---
+  // GET /admin/logs
   fastify.get('/logs', { preHandler: requireAdmin }, async (request, reply) => {
     const { page = 1 } = request.query;
     const limit = 50;

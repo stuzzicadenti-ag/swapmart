@@ -137,7 +137,7 @@ const migrate = async () => {
     await client.query('CREATE INDEX IF NOT EXISTS idx_reviews_transaction ON reviews(transaction_id);');
     await client.query('CREATE INDEX IF NOT EXISTS idx_reviews_reviewee ON reviews(reviewee_id);');
 
-    // --- Admin system columns ---
+    // Admin system columns
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'user'`);
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50)`);
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS address_line1 VARCHAR(255)`);
@@ -185,7 +185,7 @@ const migrate = async () => {
     await client.query('CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)');
     await client.query('CREATE INDEX IF NOT EXISTS idx_users_banned ON users(banned)');
 
-    // --- KYC Document Verification columns ---
+    // KYC Document Verification columns
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_document_type VARCHAR(50)`);
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_document_path TEXT`);
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_verified BOOLEAN DEFAULT false`);
@@ -193,7 +193,7 @@ const migrate = async () => {
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_verified_at TIMESTAMP`);
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_rejected_reason TEXT`);
 
-    // --- Auction/Bidding system columns ---
+    // Auction/Bidding system columns
     await client.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS listing_mode VARCHAR(20) DEFAULT 'fixed'`);
     await client.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS starting_price NUMERIC(12,2)`);
     await client.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS buy_now_price NUMERIC(12,2)`);
