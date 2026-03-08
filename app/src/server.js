@@ -50,11 +50,14 @@ const app = Fastify({ logger: true, trustProxy: true, bodyLimit: 1048576 });
 
 // Security headers
 app.addHook('onSend', async (request, reply) => {
+  reply.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   reply.header('X-Content-Type-Options', 'nosniff');
   reply.header('X-Frame-Options', 'DENY');
   reply.header('X-XSS-Protection', '0');
   reply.header('Referrer-Policy', 'strict-origin-when-cross-origin');
   reply.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  reply.header('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'");
+  reply.removeHeader('X-Powered-By');
 });
 
 // Rate limiting for auth routes (in-memory, per IP)
@@ -62,10 +65,19 @@ const authAttempts = new Map();
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
 const RATE_LIMIT_MAX = 10;
 
+// Rate limiting for listing creation and message sending (per user, in-memory)
+const actionAttempts = new Map();
+const ACTION_RATE_WINDOW = 60 * 60 * 1000; // 1 hour
+const LISTING_RATE_MAX = 20; // max 20 listings per hour
+const MESSAGE_RATE_MAX = 60; // max 60 messages per hour
+
 setInterval(() => {
   const now = Date.now();
   for (const [key, entry] of authAttempts) {
     if (now - entry.windowStart > RATE_LIMIT_WINDOW) authAttempts.delete(key);
+  }
+  for (const [key, entry] of actionAttempts) {
+    if (now - entry.windowStart > ACTION_RATE_WINDOW) actionAttempts.delete(key);
   }
 }, 60 * 1000);
 
@@ -80,6 +92,25 @@ app.decorate('checkAuthRateLimit', (request, reply) => {
   entry.count++;
   if (entry.count > RATE_LIMIT_MAX) {
     reply.code(429).send('Too many attempts. Please try again later.');
+    return false;
+  }
+  return true;
+});
+
+app.decorate('checkActionRateLimit', (request, reply, action) => {
+  const userId = request.user?.id;
+  if (!userId) return true; // auth check happens elsewhere
+  const key = `${action}:${userId}`;
+  const now = Date.now();
+  const max = action === 'listing' ? LISTING_RATE_MAX : MESSAGE_RATE_MAX;
+  let entry = actionAttempts.get(key);
+  if (!entry || now - entry.windowStart > ACTION_RATE_WINDOW) {
+    entry = { count: 0, windowStart: now };
+    actionAttempts.set(key, entry);
+  }
+  entry.count++;
+  if (entry.count > max) {
+    reply.code(429).send('Rate limit exceeded. Please try again later.');
     return false;
   }
   return true;
@@ -190,8 +221,10 @@ app.get('/lang/:code', async (request, reply) => {
   if (SUPPORTED_LANGS.includes(code)) {
     reply.setCookie('lang', code, { path: '/', httpOnly: false, sameSite: 'lax', maxAge: 365 * 24 * 60 * 60 });
   }
-  const referer = request.headers.referer || '/';
-  return reply.redirect(referer);
+  const redirect = request.query.redirect || request.headers.referer || '/';
+  // Prevent open redirect: only allow relative paths, block protocol:// and //
+  const safeRedirect = (typeof redirect === 'string' && redirect.startsWith('/') && !redirect.startsWith('//') && !redirect.includes('://')) ? redirect : '/';
+  return reply.redirect(safeRedirect);
 });
 
 // Fees page

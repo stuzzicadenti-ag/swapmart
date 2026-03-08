@@ -29,6 +29,46 @@ var app = express();
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
 
+// Security headers
+app.disable('x-powered-by');
+app.use(function(req, res, next) {
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '0');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'");
+  next();
+});
+
+// ─── Rate Limiting (in-memory, per user) ────────────────
+var rateLimits = new Map();
+var RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
+
+setInterval(function() {
+  var now = Date.now();
+  for (var entry of rateLimits) {
+    if (now - entry[1].windowStart > RATE_LIMIT_WINDOW) rateLimits.delete(entry[0]);
+  }
+}, 60 * 1000);
+
+function rateLimit(action, max) {
+  return function(req, res, next) {
+    var key = action + ':' + (req.userId || req.ip);
+    var now = Date.now();
+    var entry = rateLimits.get(key);
+    if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW) {
+      entry = { count: 0, windowStart: now };
+      rateLimits.set(key, entry);
+    }
+    entry.count++;
+    if (entry.count > max) {
+      return res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
+    }
+    next();
+  };
+}
+
 // ─── Auth Middleware ────────────────────────────────────
 function authenticate(req, res, next) {
   var header = req.headers.authorization;
@@ -56,7 +96,7 @@ function generateTokens(userId) {
 }
 
 // ─── Auth Routes ───────────────────────────────────────
-app.post('/api/v1/auth/register', function(req, res) {
+app.post('/api/v1/auth/register', rateLimit('auth', 10), function(req, res) {
   var body = req.body || {};
   if (!body.email || !body.password || !body.displayName) {
     return res.status(400).json({ error: 'email, password, and displayName are required' });
@@ -80,7 +120,7 @@ app.post('/api/v1/auth/register', function(req, res) {
   res.status(201).json({ ...tokens, user: formatUser(user) });
 });
 
-app.post('/api/v1/auth/login', function(req, res) {
+app.post('/api/v1/auth/login', rateLimit('auth', 10), function(req, res) {
   var body = req.body || {};
   if (!body.email || !body.password) {
     return res.status(400).json({ error: 'email and password are required' });
@@ -184,10 +224,16 @@ app.get('/api/v1/listings', function(req, res) {
   });
 });
 
-app.post('/api/v1/listings', authenticate, function(req, res) {
+app.post('/api/v1/listings', authenticate, rateLimit('listing', 20), function(req, res) {
   var body = req.body || {};
   if (!body.title || !body.category || !body.type) {
     return res.status(400).json({ error: 'title, category, and type are required' });
+  }
+  if (body.title.length > 255) {
+    return res.status(400).json({ error: 'Title must be 255 characters or less' });
+  }
+  if (body.description && body.description.length > 10000) {
+    return res.status(400).json({ error: 'Description must be 10,000 characters or less' });
   }
 
   var id = uuidv4();
@@ -331,7 +377,7 @@ app.get('/api/v1/messages/:swapId', authenticate, function(req, res) {
   res.json(messages.map(formatMessage));
 });
 
-app.post('/api/v1/messages/:swapId', authenticate, function(req, res) {
+app.post('/api/v1/messages/:swapId', authenticate, rateLimit('message', 60), function(req, res) {
   var swap = db.prepare('SELECT * FROM swaps WHERE id = ?').get(req.params.swapId);
   if (!swap) return res.status(404).json({ error: 'Swap not found' });
   if (swap.proposer_id !== req.userId && swap.receiver_id !== req.userId) {

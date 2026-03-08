@@ -181,6 +181,7 @@ export default async function listingsRoutes(fastify) {
 
   // POST /listings/new - Create listing
   fastify.post('/new', { preHandler: requireAuth }, async (request, reply) => {
+    if (fastify.checkActionRateLimit && !fastify.checkActionRateLimit(request, reply, 'listing')) return;
     try {
       const parts = request.parts();
       const fields = {};
@@ -639,6 +640,11 @@ export default async function listingsRoutes(fastify) {
 
       if (listing.seller_id === request.user.id) {
         return reply.redirect(`/listings/${slug}`);
+      }
+
+      // Input length validation for offer message
+      if (message && message.length > 2000) {
+        return reply.redirect(`/listings/${slug}?offer=error`);
       }
 
       const offerAmount = cash_amount ? parseFloat(cash_amount) : 0;

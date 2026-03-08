@@ -21,18 +21,28 @@ export default async function messagesRoutes(fastify) {
              WHEN l.seller_id = $1 THEN bu.username
              ELSE su.username
            END as other_username,
-           (SELECT content FROM messages WHERE offer_id = o.id ORDER BY created_at DESC LIMIT 1) as last_message,
-           (SELECT sender_id FROM messages WHERE offer_id = o.id ORDER BY created_at DESC LIMIT 1) as last_sender_id,
-           (SELECT created_at FROM messages WHERE offer_id = o.id ORDER BY created_at DESC LIMIT 1) as last_message_at,
-           (SELECT COUNT(*) FROM messages WHERE offer_id = o.id AND sender_id != $1 AND read_at IS NULL) as unread_count
+           lm.content as last_message,
+           lm.sender_id as last_sender_id,
+           lm.created_at as last_message_at,
+           COALESCE(uc.unread_count, 0) as unread_count
          FROM offers o
          JOIN listings l ON o.listing_id = l.id
          JOIN users bu ON o.buyer_id = bu.id
          JOIN users su ON l.seller_id = su.id
+         LEFT JOIN LATERAL (
+           SELECT content, sender_id, created_at
+           FROM messages
+           WHERE offer_id = o.id
+           ORDER BY created_at DESC
+           LIMIT 1
+         ) lm ON true
+         LEFT JOIN LATERAL (
+           SELECT COUNT(*) as unread_count
+           FROM messages
+           WHERE offer_id = o.id AND sender_id != $1 AND read_at IS NULL
+         ) uc ON true
          WHERE (l.seller_id = $1 OR o.buyer_id = $1)
-         ORDER BY
-           (SELECT created_at FROM messages WHERE offer_id = o.id ORDER BY created_at DESC LIMIT 1) DESC NULLS LAST,
-           o.created_at DESC
+         ORDER BY lm.created_at DESC NULLS LAST, o.created_at DESC
          LIMIT 100`,
         [request.user.id]
       );
@@ -126,6 +136,7 @@ export default async function messagesRoutes(fastify) {
 
   // POST /messages/:offerId - Send message
   fastify.post('/:offerId', { preHandler: requireAuth }, async (request, reply) => {
+    if (fastify.checkActionRateLimit && !fastify.checkActionRateLimit(request, reply, 'message')) return;
     const { offerId } = request.params;
     const { content } = request.body;
 
