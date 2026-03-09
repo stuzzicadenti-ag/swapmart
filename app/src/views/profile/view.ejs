@@ -49,6 +49,26 @@
             </div>
           </div>
         </div>
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <div class="profile-stat__value"><%= listings.length %></div>
+            <div class="profile-stat__label">Listings</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat__value"><%= reviews.length %></div>
+            <div class="profile-stat__label">Reviews</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat__value">
+              <% if (typeof sellerRating !== 'undefined' && sellerRating.count > 0) { %>
+                <%= sellerRating.avg.toFixed(1) %>
+              <% } else { %>
+                <%= profile.reputation_score %>
+              <% } %>
+            </div>
+            <div class="profile-stat__label">Rating</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -61,7 +81,7 @@
         </div>
       </div>
     <% } else { %>
-      <div class="grid grid-4 mb-3">
+      <div class="grid grid-4 mb-3 stagger-children">
         <% listings.forEach(listing => { %>
           <a href="/listings/<%= listing.slug || listing.id %>" class="card" style="text-decoration: none;">
             <% if (listing.image) { %>

@@ -103,7 +103,7 @@
             </div>
           </div>
         <% } else { %>
-          <div class="grid grid-3">
+          <div class="grid grid-3 stagger-children">
             <% listings.forEach(listing => { %>
               <a href="/listings/<%= listing.slug || listing.id %>" class="listing-card-link">
                 <div class="card card--interactive">

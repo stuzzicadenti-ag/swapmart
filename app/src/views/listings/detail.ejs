@@ -22,7 +22,7 @@
       </div>
     <% } %>
 
-    <div class="detail-grid">
+    <div class="detail-grid animate-fadeInUp">
       <!-- Left: Images -->
       <div>
         <% if (images.length > 0) { %>
@@ -407,7 +407,7 @@
     <% if (similar.length > 0) { %>
       <div class="mt-3">
         <h2 class="section-heading--sm" style="margin-bottom: 1rem;">Similar Listings</h2>
-        <div class="grid grid-4">
+        <div class="grid grid-4 stagger-children">
           <% similar.forEach(s => { %>
             <a href="/listings/<%= s.slug || s.id %>" class="listing-card-link">
               <div class="card card--interactive">
