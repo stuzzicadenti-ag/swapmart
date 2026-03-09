@@ -587,6 +587,7 @@ export default async function listingsRoutes(fastify) {
 
   // POST /listings/:id/report - Report a listing
   fastify.post('/:id/report', { preHandler: requireAuth }, async (request, reply) => {
+    if (fastify.checkActionRateLimit && !fastify.checkActionRateLimit(request, reply, 'listing')) return;
     const { id } = request.params;
     const { reason } = request.body;
 
@@ -626,6 +627,7 @@ export default async function listingsRoutes(fastify) {
 
   // POST /listings/:id/offer - Make an offer
   fastify.post('/:id/offer', { preHandler: requireAuth }, async (request, reply) => {
+    if (fastify.checkActionRateLimit && !fastify.checkActionRateLimit(request, reply, 'listing')) return;
     const { id } = request.params;
     const { offer_type, cash_amount, swap_listing_id, message } = request.body;
 

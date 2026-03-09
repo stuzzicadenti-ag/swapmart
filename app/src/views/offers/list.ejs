@@ -5,8 +5,8 @@
     <h1 style="font-size: 1.75rem; margin-bottom: 1.5rem;">My Offers</h1>
 
     <div class="tabs">
-      <div class="tab active" onclick="showTab('received')" id="tab-received">Received (<%= received.length %>)</div>
-      <div class="tab" onclick="showTab('sent')" id="tab-sent">Sent (<%= sent.length %>)</div>
+      <button type="button" class="tab active" onclick="showTab('received')" id="tab-received">Received (<%= received.length %>)</button>
+      <button type="button" class="tab" onclick="showTab('sent')" id="tab-sent">Sent (<%= sent.length %>)</button>
     </div>
 
     <!-- Received Offers -->

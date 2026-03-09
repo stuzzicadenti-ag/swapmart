@@ -399,21 +399,21 @@
   background: rgba(0,0,0,0.92); z-index: 9999; align-items: center; justify-content: center;
   flex-direction: column;
 ">
-  <button onclick="closeGallery()" style="
+  <button type="button" onclick="closeGallery()" style="
     position: absolute; top: 16px; right: 20px; background: none; border: none;
     color: #fff; font-size: 2rem; cursor: pointer; z-index: 10001; padding: 8px;
     line-height: 1;
   " aria-label="Close gallery">&times;</button>
 
   <% if (images.length > 1) { %>
-    <button onclick="galleryNav(-1)" style="
+    <button type="button" onclick="galleryNav(-1)" style="
       position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
       background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 2rem;
       width: 48px; height: 48px; border-radius: 50%; cursor: pointer; z-index: 10001;
       display: flex; align-items: center; justify-content: center;
     " aria-label="Previous image">&#10094;</button>
 
-    <button onclick="galleryNav(1)" style="
+    <button type="button" onclick="galleryNav(1)" style="
       position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
       background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 2rem;
       width: 48px; height: 48px; border-radius: 50%; cursor: pointer; z-index: 10001;

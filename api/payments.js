@@ -164,7 +164,7 @@ function createPaymentRoutes(db, authenticate) {
   });
 
   // ─── Check Expired Escrows (cron endpoint) ────────────
-  router.post('/payments/check-timeouts', function(req, res) {
+  router.post('/payments/check-timeouts', authenticate, function(req, res) {
     var expired = db.prepare(
       "SELECT * FROM transactions WHERE payment_status = 'processing' AND created_at < datetime('now', '-' || ? || ' days')"
     ).all(ESCROW_TIMEOUT_DAYS);

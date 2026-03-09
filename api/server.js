@@ -37,6 +37,7 @@ app.use(function(req, res, next) {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '0');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'");
   next();
 });
@@ -135,7 +136,7 @@ app.post('/api/v1/auth/login', rateLimit('auth', 10), function(req, res) {
   res.json({ ...tokens, user: formatUser(user) });
 });
 
-app.post('/api/v1/auth/refresh', function(req, res) {
+app.post('/api/v1/auth/refresh', rateLimit('auth', 10), function(req, res) {
   var body = req.body || {};
   if (!body.refreshToken) return res.status(400).json({ error: 'refreshToken is required' });
 
