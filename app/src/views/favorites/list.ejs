@@ -1,0 +1,83 @@
+<%- include('../partials/header', { pageTitle: t('favorites.title'), user }) %>
+
+<section class="py-3">
+  <div class="container">
+    <h1 class="section-heading mb-2"><%= t('favorites.title') %></h1>
+    <p class="section-subheading mb-2"><%= t('favorites.subtitle') %></p>
+
+    <% if (favorites.length === 0) { %>
+      <div class="card">
+        <div class="empty-state">
+          <div class="empty-state__icon">&#10084;</div>
+          <div class="empty-state__title"><%= t('favorites.empty_title') %></div>
+          <div class="empty-state__text"><%= t('favorites.empty_text') %></div>
+          <a href="/listings" class="btn btn--primary btn--sm"><%= t('nav.browse') %></a>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="grid grid-4">
+        <% favorites.forEach(listing => { %>
+          <div class="card" style="position: relative;">
+            <a href="/listings/<%= listing.slug || listing.id %>" style="text-decoration: none;">
+              <% if (listing.image) { %>
+                <img src="/uploads/<%= listing.image %>" alt="<%= listing.title %>" class="listing-img" loading="lazy">
+              <% } else { %>
+                <div class="listing-img-placeholder">&#128230;</div>
+              <% } %>
+              <div class="card-body">
+                <div class="flex-between mb-1">
+                  <span class="badge badge-primary"><%= listing.category_name %></span>
+                  <% if (listing.type === 'swap') { %>
+                    <span class="badge badge-amber">Swap</span>
+                  <% } else if (listing.type === 'both') { %>
+                    <span class="badge badge-amber">Sell / Swap</span>
+                  <% } %>
+                </div>
+                <h3 style="font-size: 0.9rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  <%= listing.title %>
+                </h3>
+                <div class="flex-between mt-1">
+                  <% if (listing.price) { %>
+                    <span style="font-weight: 700; color: var(--primary);">
+                      CHF <%= parseFloat(listing.price).toLocaleString('de-CH') %>
+                    </span>
+                  <% } else { %>
+                    <span class="badge badge-amber">Swap Only</span>
+                  <% } %>
+                  <span class="text-sm text-light"><%= listing.seller_name %></span>
+                </div>
+                <div class="text-xs text-light mt-1">
+                  <% if (listing.status !== 'active') { %>
+                    <span class="badge badge-danger"><%= listing.status %></span>
+                  <% } %>
+                </div>
+              </div>
+            </a>
+            <button type="button" class="favorite-btn favorite-btn--active"
+                    onclick="toggleFavorite(<%= listing.id %>, this)" title="<%= t('favorites.remove') %>"
+                    style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; box-shadow: var(--shadow); z-index: 2;">
+              &#10084;&#65039;
+            </button>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<script>
+function toggleFavorite(listingId, btn) {
+  fetch('/favorites/' + listingId + '/toggle', { method: 'POST', headers: { 'Accept': 'application/json' } })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data.favorited) {
+        btn.closest('.card').style.transition = 'opacity 0.3s';
+        btn.closest('.card').style.opacity = '0';
+        setTimeout(function() { btn.closest('.card').remove(); }, 300);
+      }
+    })
+    .catch(function() { /* ignore */ });
+}
+</script>
+
+<%- include('../partials/footer') %>

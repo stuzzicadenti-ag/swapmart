@@ -1,0 +1,156 @@
+<%- include('../partials/header', { pageTitle: seller.username + ' - ' + t('reviews.title'), user }) %>
+
+<section class="py-3">
+  <div class="container">
+    <a href="/profile/<%= seller.id %>" class="text-sm text-light" style="display: inline-block; margin-bottom: 1rem;">&larr; <%= t('reviews.back_to_profile') %></a>
+
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+    <% if (success) { %><div class="alert alert-success"><%= success %></div><% } %>
+
+    <!-- Seller Header with Rating -->
+    <div class="card mb-2">
+      <div class="card-body" style="padding: 2rem;">
+        <div class="flex-center gap-2">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: #fff; flex-shrink: 0;">
+            <%= seller.username.charAt(0).toUpperCase() %>
+          </div>
+          <div>
+            <h1 style="font-size: 1.5rem; font-weight: 700;"><%= seller.name || seller.username %></h1>
+            <div class="flex gap-1 mt-1" style="flex-wrap: wrap; align-items: center;">
+              <!-- Star Rating -->
+              <div style="color: var(--amber-500); font-size: 1.25rem; letter-spacing: 2px;">
+                <% for (let i = 1; i <= 5; i++) { %>
+                  <% if (i <= Math.round(avgRating)) { %>&#9733;<% } else { %>&#9734;<% } %>
+                <% } %>
+              </div>
+              <span style="font-weight: 700; font-size: 1.1rem;"><%= avgRating.toFixed(1) %></span>
+              <span class="text-light text-sm">(<%= reviewCount %> <%= t('reviews.reviews') %>)</span>
+
+              <% if (trustBadge === 'gold') { %>
+                <span class="badge" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #78350f; font-weight: 700;">&#127942; <%= t('reviews.gold_seller') %></span>
+              <% } else if (trustBadge === 'silver') { %>
+                <span class="badge" style="background: linear-gradient(135deg, #e5e7eb, #d1d5db); color: #374151; font-weight: 700;">&#129351; <%= t('reviews.silver_seller') %></span>
+              <% } else if (trustBadge === 'bronze') { %>
+                <span class="badge" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700;">&#129352; <%= t('reviews.bronze_seller') %></span>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leave a Review (if eligible) -->
+    <% if (reviewableTransactions && reviewableTransactions.length > 0) { %>
+      <div class="card mb-2">
+        <div class="card-body" style="padding: 1.5rem;">
+          <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;"><%= t('reviews.leave_review') %></h2>
+          <form action="/reviews/seller/<%= seller.id %>" method="POST">
+            <div class="form-group">
+              <label for="transaction_id"><%= t('reviews.select_transaction') %></label>
+              <select id="transaction_id" name="transaction_id" class="form-control" required>
+                <% reviewableTransactions.forEach(tx => { %>
+                  <option value="<%= tx.transaction_id %>"><%= tx.listing_title %> (<%= new Date(tx.completed_at).toLocaleDateString('en-CH') %>)</option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label><%= t('reviews.rating') %></label>
+              <div class="star-rating" id="starRating" style="font-size: 2rem; cursor: pointer; letter-spacing: 4px; color: var(--gray-300);">
+                <span data-value="1">&#9733;</span>
+                <span data-value="2">&#9733;</span>
+                <span data-value="3">&#9733;</span>
+                <span data-value="4">&#9733;</span>
+                <span data-value="5">&#9733;</span>
+              </div>
+              <input type="hidden" name="rating" id="ratingInput" value="" required>
+            </div>
+
+            <div class="form-group">
+              <label for="comment"><%= t('reviews.comment') %></label>
+              <textarea id="comment" name="comment" class="form-control" rows="3" maxlength="2000"
+                        placeholder="<%= t('reviews.comment_placeholder') %>"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn--primary"><%= t('reviews.submit_review') %></button>
+          </form>
+        </div>
+      </div>
+
+      <script>
+      (function() {
+        var stars = document.querySelectorAll('#starRating span');
+        var input = document.getElementById('ratingInput');
+        var selected = 0;
+
+        stars.forEach(function(star) {
+          star.addEventListener('click', function() {
+            selected = parseInt(this.getAttribute('data-value'));
+            input.value = selected;
+            updateStars(selected);
+          });
+          star.addEventListener('mouseenter', function() {
+            updateStars(parseInt(this.getAttribute('data-value')));
+          });
+        });
+
+        document.getElementById('starRating').addEventListener('mouseleave', function() {
+          updateStars(selected);
+        });
+
+        function updateStars(value) {
+          stars.forEach(function(s) {
+            var v = parseInt(s.getAttribute('data-value'));
+            s.style.color = v <= value ? 'var(--amber-500)' : 'var(--gray-300)';
+          });
+        }
+      })();
+      </script>
+    <% } %>
+
+    <!-- Reviews List -->
+    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">
+      <%= t('reviews.all_reviews') %> (<%= reviewCount %>)
+    </h2>
+
+    <% if (reviews.length === 0) { %>
+      <div class="card">
+        <div class="empty-state">
+          <div class="empty-state__icon">&#11088;</div>
+          <div class="empty-state__title"><%= t('reviews.no_reviews_title') %></div>
+          <div class="empty-state__text"><%= t('reviews.no_reviews_text') %></div>
+        </div>
+      </div>
+    <% } else { %>
+      <% reviews.forEach(review => { %>
+        <div class="card mb-1">
+          <div class="card-body">
+            <div class="flex-between">
+              <div class="flex-center gap-1">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--teal-200), var(--teal-400)); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; font-size: 0.8rem; flex-shrink: 0;">
+                  <%= review.reviewer_name.charAt(0).toUpperCase() %>
+                </div>
+                <div>
+                  <strong><%= review.reviewer_name %></strong>
+                  <span class="text-light text-sm">
+                    &middot; <%= new Date(review.created_at).toLocaleDateString('en-CH', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                  </span>
+                </div>
+              </div>
+              <div style="color: var(--amber-500); letter-spacing: 2px;">
+                <% for (let i = 1; i <= 5; i++) { %>
+                  <% if (i <= review.rating) { %>&#9733;<% } else { %>&#9734;<% } %>
+                <% } %>
+              </div>
+            </div>
+            <% if (review.comment) { %>
+              <p class="mt-1 text-sm" style="color: var(--text);"><%= review.comment %></p>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

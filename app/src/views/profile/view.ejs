@@ -12,8 +12,25 @@
           <div>
             <h1 style="font-size: 1.5rem; font-weight: 700;"><%= profile.name || profile.username %></h1>
             <div class="text-light">@<%= profile.username %></div>
-            <div class="flex gap-1 mt-1" style="flex-wrap: wrap;">
-              <span class="badge badge-primary">Rep: <%= profile.reputation_score %></span>
+            <div class="flex gap-1 mt-1" style="flex-wrap: wrap; align-items: center;">
+              <% if (typeof sellerRating !== 'undefined' && sellerRating.count > 0) { %>
+                <span style="color: var(--amber-500); font-size: 1rem;">
+                  <% for (let i = 1; i <= 5; i++) { %>
+                    <% if (i <= Math.round(sellerRating.avg)) { %>&#9733;<% } else { %>&#9734;<% } %>
+                  <% } %>
+                </span>
+                <span style="font-weight: 700;"><%= sellerRating.avg.toFixed(1) %></span>
+                <a href="/seller/<%= profile.id %>/reviews" class="text-sm text-light">(<%= sellerRating.count %> reviews)</a>
+              <% } else { %>
+                <span class="badge badge-primary">Rep: <%= profile.reputation_score %></span>
+              <% } %>
+              <% if (typeof sellerRating !== 'undefined' && sellerRating.trustBadge === 'gold') { %>
+                <span class="badge" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #78350f; font-weight: 700;">&#127942; Gold Seller</span>
+              <% } else if (typeof sellerRating !== 'undefined' && sellerRating.trustBadge === 'silver') { %>
+                <span class="badge" style="background: linear-gradient(135deg, #e5e7eb, #d1d5db); color: #374151; font-weight: 700;">&#129351; Silver Seller</span>
+              <% } else if (typeof sellerRating !== 'undefined' && sellerRating.trustBadge === 'bronze') { %>
+                <span class="badge" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700;">&#129352; Bronze Seller</span>
+              <% } %>
               <% if (profile.plan !== 'free') { %>
                 <span class="badge badge-amber"><%= profile.plan.replace('_', ' ') %></span>
               <% } %>

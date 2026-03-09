@@ -69,6 +69,14 @@
 
             <button type="submit" class="btn btn-primary btn-block">Apply Filters</button>
             <a href="/listings" class="btn btn-outline btn-block mt-1" style="text-align: center;">Clear</a>
+
+            <% if (user) { %>
+              <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+                <button type="button" id="saveSearchBtn" class="btn btn-ghost btn-block btn--sm" style="color: var(--primary);" onclick="saveCurrentSearch()">
+                  &#128278; <%= t('saved_searches.save_this_search') %>
+                </button>
+              </div>
+            <% } %>
           </div>
         </form>
       </aside>
@@ -218,6 +226,50 @@
   tick();
   setInterval(tick, 1000);
 })();
+</script>
+
+<script>
+function saveCurrentSearch() {
+  var btn = document.getElementById('saveSearchBtn');
+  var name = prompt('<%= t("saved_searches.name_prompt") %>');
+  if (name === null) return;
+  if (!name) name = 'Search';
+
+  var data = new URLSearchParams();
+  data.append('name', name);
+  <% if (filters.q) { %>data.append('query', '<%= filters.q %>');<% } %>
+  <% if (filters.category) { %>data.append('category', '<%= filters.category %>');<% } %>
+  <% if (filters.type) { %>data.append('type', '<%= filters.type %>');<% } %>
+  <% if (filters.mode) { %>data.append('mode', '<%= filters.mode %>');<% } %>
+  <% if (filters.min_price) { %>data.append('min_price', '<%= filters.min_price %>');<% } %>
+  <% if (filters.max_price) { %>data.append('max_price', '<%= filters.max_price %>');<% } %>
+
+  fetch('/search/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+    body: data.toString()
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(result) {
+    if (result.error) {
+      btn.textContent = result.error;
+      btn.style.color = 'var(--red-500)';
+    } else {
+      btn.innerHTML = '&#10003; <%= t("saved_searches.saved") %>';
+      btn.style.color = 'var(--green-500)';
+      btn.disabled = true;
+    }
+    setTimeout(function() {
+      btn.innerHTML = '&#128278; <%= t("saved_searches.save_this_search") %>';
+      btn.style.color = 'var(--primary)';
+      btn.disabled = false;
+    }, 3000);
+  })
+  .catch(function() {
+    btn.textContent = 'Error';
+    btn.style.color = 'var(--red-500)';
+  });
+}
 </script>
 
 <%- include('../partials/footer') %>

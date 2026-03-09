@@ -878,7 +878,14 @@
               <div class="dropdown__menu-header"><%= user.username %></div>
               <a href="/profile/<%= user.id %>"><%= t('nav.my_profile') %></a>
               <a href="/listings?user=<%= user.id %>"><%= t('nav.my_listings') %></a>
-              <a href="/favorites"><%= t('nav.favorites') %></a>
+              <a href="/favorites" style="display: flex; justify-content: space-between; align-items: center;">
+                <span><%= t('nav.favorites') %></span>
+                <% if (typeof favCount !== 'undefined' && favCount > 0) { %>
+                  <span class="badge badge-primary" style="font-size: 0.7rem; padding: 1px 6px; min-width: 18px; text-align: center;"><%= favCount %></span>
+                <% } %>
+              </a>
+              <a href="/recently-viewed"><%= t('nav.recently_viewed') %></a>
+              <a href="/search/saved"><%= t('nav.saved_searches') %></a>
               <div class="dropdown__menu-divider"></div>
               <a href="/messages"><%= t('nav.messages') %></a>
               <a href="/offers"><%= t('nav.offers') %></a>
@@ -933,7 +940,14 @@
         <div class="mobile-section-label"><%= user.username %></div>
         <a href="/profile/<%= user.id %>"><%= t('nav.my_profile') %></a>
         <a href="/listings?user=<%= user.id %>"><%= t('nav.my_listings') %></a>
-        <a href="/favorites"><%= t('nav.favorites') %></a>
+        <a href="/favorites" style="display: flex; justify-content: space-between; align-items: center;">
+          <span><%= t('nav.favorites') %></span>
+          <% if (typeof favCount !== 'undefined' && favCount > 0) { %>
+            <span class="badge badge-primary" style="font-size: 0.7rem; padding: 1px 6px;"><%= favCount %></span>
+          <% } %>
+        </a>
+        <a href="/recently-viewed"><%= t('nav.recently_viewed') %></a>
+        <a href="/search/saved"><%= t('nav.saved_searches') %></a>
         <div class="mobile-divider"></div>
         <a href="/messages"><%= t('nav.messages') %></a>
         <a href="/offers"><%= t('nav.offers') %></a>

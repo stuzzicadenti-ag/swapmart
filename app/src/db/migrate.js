@@ -218,6 +218,79 @@ const migrate = async () => {
     await client.query('CREATE INDEX IF NOT EXISTS idx_listings_mode ON listings(listing_mode)');
     await client.query('CREATE INDEX IF NOT EXISTS idx_listings_auction_end ON listings(auction_end)');
 
+    // User Favorites table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS user_favorites (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        listing_id INTEGER NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        UNIQUE(user_id, listing_id)
+      )
+    `);
+    await client.query('CREATE INDEX IF NOT EXISTS idx_user_favorites_user ON user_favorites(user_id)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_user_favorites_listing ON user_favorites(listing_id)');
+
+    // Listing Views table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS listing_views (
+        id SERIAL PRIMARY KEY,
+        listing_id INTEGER NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+        viewer_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        ip_address VARCHAR(45),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+    await client.query('CREATE INDEX IF NOT EXISTS idx_listing_views_listing ON listing_views(listing_id)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_listing_views_created ON listing_views(created_at)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_listing_views_listing_date ON listing_views(listing_id, created_at)');
+
+    // Saved Searches table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS saved_searches (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        name VARCHAR(255),
+        query TEXT,
+        category VARCHAR(100),
+        min_price NUMERIC(12,2),
+        max_price NUMERIC(12,2),
+        condition VARCHAR(20),
+        type VARCHAR(20),
+        mode VARCHAR(20),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+    await client.query('CREATE INDEX IF NOT EXISTS idx_saved_searches_user ON saved_searches(user_id)');
+
+    // Seller Reviews table (separate from existing transaction reviews for direct seller ratings)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS seller_reviews (
+        id SERIAL PRIMARY KEY,
+        transaction_id INTEGER NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
+        reviewer_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        seller_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+        comment TEXT,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        UNIQUE(transaction_id, reviewer_id)
+      )
+    `);
+    await client.query('CREATE INDEX IF NOT EXISTS idx_seller_reviews_seller ON seller_reviews(seller_id)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_seller_reviews_reviewer ON seller_reviews(reviewer_id)');
+
+    // Recently Viewed table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS recently_viewed (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        listing_id INTEGER NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+        viewed_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+    await client.query('CREATE INDEX IF NOT EXISTS idx_recently_viewed_user ON recently_viewed(user_id, viewed_at DESC)');
+    await client.query('CREATE UNIQUE INDEX IF NOT EXISTS idx_recently_viewed_unique ON recently_viewed(user_id, listing_id)');
+
     await client.query('COMMIT');
     console.log('Migration completed successfully.');
   } catch (err) {

@@ -64,7 +64,21 @@
               <% } %>
             </div>
 
-            <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; letter-spacing: -0.01em;"><%= listing.title %></h1>
+            <div class="flex-between" style="align-items: flex-start;">
+              <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; letter-spacing: -0.01em; flex: 1;"><%= listing.title %></h1>
+              <% if (user) { %>
+                <button type="button" id="favBtn" onclick="toggleFavorite(<%= listing.id %>)"
+                        title="<%= typeof isFavorited !== 'undefined' && isFavorited ? t('favorites.remove') : t('favorites.add') %>"
+                        style="background: none; border: none; cursor: pointer; font-size: 1.5rem; padding: 4px 8px; flex-shrink: 0; transition: transform 0.15s;">
+                  <% if (typeof isFavorited !== 'undefined' && isFavorited) { %>&#10084;&#65039;<% } else { %>&#9825;<% } %>
+                </button>
+              <% } %>
+            </div>
+            <% if (typeof favoriteCount !== 'undefined' && favoriteCount > 0) { %>
+              <div class="text-xs text-light" style="margin-top: -0.5rem; margin-bottom: 0.5rem;">
+                <span id="favCount"><%= favoriteCount %></span> <%= t('favorites.people_favorited') %>
+              </div>
+            <% } %>
 
             <% if (listing.listing_mode === 'auction') { %>
               <!-- Auction info -->
@@ -142,13 +156,39 @@
                 <%= listing.seller_name.charAt(0).toUpperCase() %>
               </div>
               <div>
-                <a href="/profile/<%= listing.seller_user_id %>" style="font-weight: 600;"><%= listing.seller_name %></a>
+                <div class="flex-center gap-1">
+                  <a href="/profile/<%= listing.seller_user_id %>" style="font-weight: 600;"><%= listing.seller_name %></a>
+                  <% if (typeof sellerRating !== 'undefined' && sellerRating.trustBadge === 'gold') { %>
+                    <span class="badge" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #78350f; font-weight: 700; font-size: 0.65rem;">&#127942; Gold</span>
+                  <% } else if (typeof sellerRating !== 'undefined' && sellerRating.trustBadge === 'silver') { %>
+                    <span class="badge" style="background: linear-gradient(135deg, #e5e7eb, #d1d5db); color: #374151; font-weight: 700; font-size: 0.65rem;">&#129351; Silver</span>
+                  <% } else if (typeof sellerRating !== 'undefined' && sellerRating.trustBadge === 'bronze') { %>
+                    <span class="badge" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700; font-size: 0.65rem;">&#129352; Bronze</span>
+                  <% } %>
+                </div>
                 <div class="text-sm text-light">
-                  Rep: <%= listing.reputation_score %>
+                  <% if (typeof sellerRating !== 'undefined' && sellerRating.count > 0) { %>
+                    <span style="color: var(--amber-500);">
+                      <% for (let i = 1; i <= 5; i++) { %>
+                        <% if (i <= Math.round(sellerRating.avg)) { %>&#9733;<% } else { %>&#9734;<% } %>
+                      <% } %>
+                    </span>
+                    <span><%= sellerRating.avg.toFixed(1) %></span>
+                    <a href="/seller/<%= listing.seller_user_id %>/reviews" style="color: var(--text-light);">(<%= sellerRating.count %> reviews)</a>
+                  <% } else { %>
+                    Rep: <%= listing.reputation_score %>
+                  <% } %>
                   <% if (listing.seller_location) { %> &middot; <%= listing.seller_location %><% } %>
                 </div>
               </div>
             </div>
+            <% if (user && user.id === listing.seller_user_id) { %>
+              <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+                <a href="/analytics/listings/<%= listing.id %>" class="btn btn--outline btn--sm" style="width: 100%; text-align: center;">
+                  &#128202; <%= t('analytics.view_analytics') %>
+                </a>
+              </div>
+            <% } %>
           </div>
         </div>
 
@@ -494,6 +534,21 @@
       if (e.target === overlay) closeGallery();
     });
   }
+
+  // Favorite toggle
+  window.toggleFavorite = function(listingId) {
+    var btn = document.getElementById('favBtn');
+    fetch('/favorites/' + listingId + '/toggle', { method: 'POST', headers: { 'Accept': 'application/json' } })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        btn.innerHTML = data.favorited ? '&#10084;&#65039;' : '&#9825;';
+        btn.style.transform = 'scale(1.3)';
+        setTimeout(function() { btn.style.transform = 'scale(1)'; }, 200);
+        var countEl = document.getElementById('favCount');
+        if (countEl) countEl.textContent = data.count;
+      })
+      .catch(function() { /* ignore */ });
+  };
 
   // Auction countdown timer
   var countdownEl = document.getElementById('auctionCountdown');

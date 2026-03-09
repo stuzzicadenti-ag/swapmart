@@ -400,6 +400,35 @@ export default async function listingsRoutes(fastify) {
 
       let listing = listingResult.rows[0];
 
+      // Track view
+      try {
+        const viewerId = request.user ? request.user.id : null;
+        const ip = request.ip;
+        await db.query(
+          'INSERT INTO listing_views (listing_id, viewer_id, ip_address) VALUES ($1, $2, $3)',
+          [listing.id, viewerId, ip]
+        );
+      } catch { /* table may not exist yet, or insert fails - non-critical */ }
+
+      // Track recently viewed for logged-in users
+      if (request.user) {
+        try {
+          await db.query(
+            `INSERT INTO recently_viewed (user_id, listing_id, viewed_at)
+             VALUES ($1, $2, NOW())
+             ON CONFLICT (user_id, listing_id) DO UPDATE SET viewed_at = NOW()`,
+            [request.user.id, listing.id]
+          );
+          // Keep only last 20 per user
+          await db.query(
+            `DELETE FROM recently_viewed WHERE user_id = $1 AND id NOT IN (
+              SELECT id FROM recently_viewed WHERE user_id = $1 ORDER BY viewed_at DESC LIMIT 20
+            )`,
+            [request.user.id]
+          );
+        } catch { /* non-critical */ }
+      }
+
       // Lazy-finalize ended auctions
       listing = await finalizeAuction(listing);
 
@@ -449,6 +478,38 @@ export default async function listingsRoutes(fastify) {
         kycVerified = await isKycVerified(request.user.id);
       }
 
+      // Check if user has favorited this listing
+      let isFavorited = false;
+      let favoriteCount = 0;
+      try {
+        const favCountResult = await db.query('SELECT COUNT(*) FROM user_favorites WHERE listing_id = $1', [listing.id]);
+        favoriteCount = parseInt(favCountResult.rows[0].count);
+        if (request.user) {
+          const favCheck = await db.query(
+            'SELECT id FROM user_favorites WHERE user_id = $1 AND listing_id = $2',
+            [request.user.id, listing.id]
+          );
+          isFavorited = favCheck.rows.length > 0;
+        }
+      } catch { /* table may not exist */ }
+
+      // Get seller rating info
+      let sellerRating = { avg: 0, count: 0, trustBadge: null };
+      try {
+        const ratingResult = await db.query(
+          `SELECT AVG(rating)::numeric(3,2) as avg_rating, COUNT(*) as review_count
+           FROM seller_reviews WHERE seller_id = $1`,
+          [listing.seller_user_id]
+        );
+        const avg = parseFloat(ratingResult.rows[0].avg_rating) || 0;
+        const count = parseInt(ratingResult.rows[0].review_count);
+        let trustBadge = null;
+        if (count >= 50 && avg >= 4.5) trustBadge = 'gold';
+        else if (count >= 20 && avg >= 4.0) trustBadge = 'silver';
+        else if (count >= 5) trustBadge = 'bronze';
+        sellerRating = { avg, count, trustBadge };
+      } catch { /* table may not exist */ }
+
       // Check for offer feedback from query params
       const offerStatus = request.query.offer;
       let success = null;
@@ -471,6 +532,9 @@ export default async function listingsRoutes(fastify) {
         bids: bidsResult.rows,
         userListings,
         kycVerified,
+        isFavorited,
+        favoriteCount,
+        sellerRating,
         error,
         success,
       });

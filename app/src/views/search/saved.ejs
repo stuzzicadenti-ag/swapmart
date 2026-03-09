@@ -1,0 +1,75 @@
+<%- include('../partials/header', { pageTitle: t('saved_searches.title'), user }) %>
+
+<section class="py-3">
+  <div class="container">
+    <h1 class="section-heading mb-1"><%= t('saved_searches.title') %></h1>
+    <p class="section-subheading mb-2"><%= t('saved_searches.subtitle') %></p>
+
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+
+    <% if (searches.length === 0) { %>
+      <div class="card">
+        <div class="empty-state">
+          <div class="empty-state__icon">&#128269;</div>
+          <div class="empty-state__title"><%= t('saved_searches.empty_title') %></div>
+          <div class="empty-state__text"><%= t('saved_searches.empty_text') %></div>
+          <a href="/listings" class="btn btn--primary btn--sm"><%= t('nav.browse') %></a>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="text-sm text-light mb-2"><%= searches.length %> / 10 <%= t('saved_searches.limit_label') %></div>
+      <div class="grid grid-2">
+        <% searches.forEach(search => { %>
+          <div class="card">
+            <div class="card-body">
+              <div class="flex-between mb-1">
+                <h3 style="font-size: 1rem; font-weight: 600;"><%= search.name || t('saved_searches.unnamed') %></h3>
+                <form action="/search/saved/<%= search.id %>/delete" method="POST" style="display: inline;">
+                  <button type="submit" class="btn btn-ghost btn--xs" style="color: var(--red-500);" title="<%= t('btn.delete') %>">&#10005;</button>
+                </form>
+              </div>
+              <div class="flex gap-1 flex-wrap mb-1">
+                <% if (search.query) { %>
+                  <span class="badge badge-primary"><%= t('saved_searches.query') %>: <%= search.query %></span>
+                <% } %>
+                <% if (search.category) { %>
+                  <span class="badge badge-gray"><%= t('saved_searches.category') %>: <%= search.category %></span>
+                <% } %>
+                <% if (search.type) { %>
+                  <span class="badge badge-amber"><%= search.type %></span>
+                <% } %>
+                <% if (search.mode) { %>
+                  <span class="badge badge-blue"><%= search.mode %></span>
+                <% } %>
+                <% if (search.min_price || search.max_price) { %>
+                  <span class="badge badge-gray">
+                    CHF <%= search.min_price || '0' %> - <%= search.max_price || '...' %>
+                  </span>
+                <% } %>
+                <% if (search.condition) { %>
+                  <span class="badge badge-gray"><%= search.condition %></span>
+                <% } %>
+              </div>
+              <%
+                var params = [];
+                if (search.query) params.push('q=' + encodeURIComponent(search.query));
+                if (search.category) params.push('category=' + encodeURIComponent(search.category));
+                if (search.type) params.push('type=' + encodeURIComponent(search.type));
+                if (search.mode) params.push('mode=' + encodeURIComponent(search.mode));
+                if (search.min_price) params.push('min_price=' + search.min_price);
+                if (search.max_price) params.push('max_price=' + search.max_price);
+                var searchUrl = '/listings' + (params.length ? '?' + params.join('&') : '');
+              %>
+              <a href="<%= searchUrl %>" class="btn btn--outline btn--sm"><%= t('saved_searches.run_search') %></a>
+              <span class="text-xs text-light" style="margin-left: 0.5rem;">
+                <%= new Date(search.created_at).toLocaleDateString('en-CH', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+              </span>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

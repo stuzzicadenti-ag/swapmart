@@ -216,6 +216,23 @@ export default async function profileRoutes(fastify) {
 
       const profile = userResult.rows[0];
 
+      // Get seller rating stats
+      let sellerRating = { avg: 0, count: 0, trustBadge: null };
+      try {
+        const ratingResult = await db.query(
+          `SELECT AVG(rating)::numeric(3,2) as avg_rating, COUNT(*) as review_count
+           FROM seller_reviews WHERE seller_id = $1`,
+          [parseInt(id)]
+        );
+        const avg = parseFloat(ratingResult.rows[0].avg_rating) || 0;
+        const count = parseInt(ratingResult.rows[0].review_count);
+        let trustBadge = null;
+        if (count >= 50 && avg >= 4.5) trustBadge = 'gold';
+        else if (count >= 20 && avg >= 4.0) trustBadge = 'silver';
+        else if (count >= 5) trustBadge = 'bronze';
+        sellerRating = { avg, count, trustBadge };
+      } catch { /* table may not exist */ }
+
       // Parallel queries for listings and reviews
       const [listingsResult, reviewsResult] = await Promise.all([
         db.query(
@@ -242,6 +259,7 @@ export default async function profileRoutes(fastify) {
         profile,
         listings: listingsResult.rows,
         reviews: reviewsResult.rows,
+        sellerRating,
       });
     } catch (err) {
       fastify.log.error(err);

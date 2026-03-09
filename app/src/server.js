@@ -20,6 +20,11 @@ import messagesRoutes from './routes/messages.js';
 import profileRoutes from './routes/profile.js';
 import invoicesRoutes from './routes/invoices.js';
 import adminRoutes from './routes/admin.js';
+import favoritesRoutes from './routes/favorites.js';
+import analyticsRoutes from './routes/analytics.js';
+import searchRoutes from './routes/search.js';
+import reviewsRoutes from './routes/reviews.js';
+import recentRoutes from './routes/recent.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,7 +61,7 @@ app.addHook('onSend', async (request, reply) => {
   reply.header('X-XSS-Protection', '0');
   reply.header('Referrer-Policy', 'strict-origin-when-cross-origin');
   reply.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  reply.header('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'");
+  reply.header('Content-Security-Policy', "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'");
   reply.removeHeader('X-Powered-By');
 });
 
@@ -181,14 +186,21 @@ await app.register(fastifyStatic, {
   maxAge: process.env.NODE_ENV === 'production' ? 604800000 : 0,
 });
 
-// Inject user and i18n into all view contexts
+// Inject user and i18n into all view contexts, plus favorites count
 app.addHook('preHandler', async (request, reply) => {
   const langCookie = request.cookies?.lang;
   const lang = SUPPORTED_LANGS.includes(langCookie) ? langCookie : 'en';
   const strings = locales[lang] || locales.en;
   const fallback = locales.en;
   const t = (key) => strings[key] || fallback[key] || key;
-  reply.locals = { user: request.user, t, lang };
+  let favCount = 0;
+  if (request.user) {
+    try {
+      const res = await pool.query('SELECT COUNT(*) FROM user_favorites WHERE user_id = $1', [request.user.id]);
+      favCount = parseInt(res.rows[0].count);
+    } catch { /* table may not exist yet */ }
+  }
+  reply.locals = { user: request.user, t, lang, favCount };
 });
 
 // Health check
@@ -214,6 +226,11 @@ await app.register(messagesRoutes, { prefix: '/messages' });
 await app.register(profileRoutes, { prefix: '/profile' });
 await app.register(invoicesRoutes, { prefix: '/invoices' });
 await app.register(adminRoutes, { prefix: '/admin' });
+await app.register(favoritesRoutes, { prefix: '/favorites' });
+await app.register(analyticsRoutes, { prefix: '/analytics' });
+await app.register(searchRoutes, { prefix: '/search' });
+await app.register(reviewsRoutes);
+await app.register(recentRoutes, { prefix: '/recently-viewed' });
 
 // Language switcher
 app.get('/lang/:code', async (request, reply) => {
@@ -282,8 +299,27 @@ app.get('/', async (request, reply) => {
   } catch (err) {
     app.log.error(err);
   }
+  // Get recently viewed for logged-in users
+  let recentlyViewed = [];
+  if (request.user) {
+    try {
+      const rvResult = await pool.query(
+        `SELECT l.*, u.username as seller_name,
+         (SELECT file_path FROM listing_images WHERE listing_id = l.id ORDER BY position LIMIT 1) as image
+         FROM recently_viewed rv
+         JOIN listings l ON rv.listing_id = l.id
+         JOIN users u ON l.seller_id = u.id
+         WHERE rv.user_id = $1 AND l.status = 'active'
+         ORDER BY rv.viewed_at DESC
+         LIMIT 4`,
+        [request.user.id]
+      );
+      recentlyViewed = rvResult.rows;
+    } catch { /* table may not exist yet */ }
+  }
+
   return reply.view('index.ejs', {
-    user: request.user, categories, featured,
+    user: request.user, categories, featured, recentlyViewed,
     activeFilter: mode || '', activeType: filterType || '',
   });
 });

@@ -117,3 +117,49 @@ export const reviews = pgTable('reviews', {
   comment: text('comment'),
   created_at: timestamp('created_at').defaultNow().notNull(),
 });
+
+export const userFavorites = pgTable('user_favorites', {
+  id: serial('id').primaryKey(),
+  user_id: integer('user_id').notNull(),
+  listing_id: integer('listing_id').notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const listingViews = pgTable('listing_views', {
+  id: serial('id').primaryKey(),
+  listing_id: integer('listing_id').notNull(),
+  viewer_id: integer('viewer_id'),
+  ip_address: varchar('ip_address', { length: 45 }),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const savedSearches = pgTable('saved_searches', {
+  id: serial('id').primaryKey(),
+  user_id: integer('user_id').notNull(),
+  name: varchar('name', { length: 255 }),
+  query: text('query'),
+  category: varchar('category', { length: 100 }),
+  min_price: decimal('min_price', { precision: 12, scale: 2 }),
+  max_price: decimal('max_price', { precision: 12, scale: 2 }),
+  condition: varchar('condition', { length: 20 }),
+  type: varchar('type', { length: 20 }),
+  mode: varchar('mode', { length: 20 }),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const sellerReviews = pgTable('seller_reviews', {
+  id: serial('id').primaryKey(),
+  transaction_id: integer('transaction_id').notNull(),
+  reviewer_id: integer('reviewer_id').notNull(),
+  seller_id: integer('seller_id').notNull(),
+  rating: integer('rating').notNull(),
+  comment: text('comment'),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const recentlyViewed = pgTable('recently_viewed', {
+  id: serial('id').primaryKey(),
+  user_id: integer('user_id').notNull(),
+  listing_id: integer('listing_id').notNull(),
+  viewed_at: timestamp('viewed_at').defaultNow().notNull(),
+});
