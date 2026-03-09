@@ -1,7 +1,7 @@
 {
   "name": "swapmart-api",
   "version": "1.0.0",
-  "description": "SwapMart REST API — Swiss marketplace backend",
+  "description": "SwapMart REST API - Swiss marketplace backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
