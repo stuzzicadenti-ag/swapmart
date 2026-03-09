@@ -12,9 +12,12 @@
     <!-- Received Offers -->
     <div id="panel-received">
       <% if (received.length === 0) { %>
-        <div class="card">
-          <div class="card-body text-center py-4">
-            <p class="text-light">No offers received yet. Share your listings to get offers!</p>
+        <div class="card card--no-hover">
+          <div class="empty-state">
+            <div class="empty-state__icon">&#128230;</div>
+            <div class="empty-state__title">No offers received yet</div>
+            <div class="empty-state__text">Share your listings to attract offers from buyers and swappers!</div>
+            <a href="/listings/new" class="btn btn--primary btn--sm">Create a Listing</a>
           </div>
         </div>
       <% } else { %>
@@ -91,9 +94,12 @@
     <!-- Sent Offers -->
     <div id="panel-sent" style="display: none;">
       <% if (sent.length === 0) { %>
-        <div class="card">
-          <div class="card-body text-center py-4">
-            <p class="text-light">You haven't sent any offers yet. <a href="/listings">Browse listings</a> to get started.</p>
+        <div class="card card--no-hover">
+          <div class="empty-state">
+            <div class="empty-state__icon">&#128073;</div>
+            <div class="empty-state__title">No offers sent yet</div>
+            <div class="empty-state__text">Browse listings and make offers on items you like!</div>
+            <a href="/listings" class="btn btn--primary btn--sm">Browse Listings</a>
           </div>
         </div>
       <% } else { %>

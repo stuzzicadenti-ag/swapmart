@@ -17,40 +17,42 @@
     <% } else { %>
       <div class="grid grid-4">
         <% favorites.forEach(listing => { %>
-          <div class="card" style="position: relative;">
+          <div class="card card--interactive" style="position: relative;">
             <a href="/listings/<%= listing.slug || listing.id %>" style="text-decoration: none;">
-              <% if (listing.image) { %>
-                <img src="/uploads/<%= listing.image %>" alt="<%= listing.title %>" class="listing-img" loading="lazy">
-              <% } else { %>
-                <div class="listing-img-placeholder">&#128230;</div>
-              <% } %>
-              <div class="card-body">
-                <div class="flex-between mb-1">
-                  <span class="badge badge-primary"><%= listing.category_name %></span>
-                  <% if (listing.type === 'swap') { %>
+              <div class="listing-img-wrap">
+                <% if (listing.image) { %>
+                  <img src="/uploads/<%= listing.image %>" alt="<%= listing.title %>" class="listing-img" loading="lazy">
+                <% } else { %>
+                  <div class="listing-img-placeholder">&#128230;</div>
+                <% } %>
+                <% if (listing.type === 'swap') { %>
+                  <div style="position: absolute; top: 8px; left: 8px;">
                     <span class="badge badge-amber">Swap</span>
-                  <% } else if (listing.type === 'both') { %>
+                  </div>
+                <% } else if (listing.type === 'both') { %>
+                  <div style="position: absolute; top: 8px; left: 8px;">
                     <span class="badge badge-amber">Sell / Swap</span>
-                  <% } %>
-                </div>
-                <h3 style="font-size: 0.9rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                  <%= listing.title %>
-                </h3>
+                  </div>
+                <% } %>
+              </div>
+              <div class="card-body">
+                <span class="badge badge-primary mb-1" style="align-self: flex-start;"><%= listing.category_name %></span>
+                <h3 class="listing-card__title"><%= listing.title %></h3>
                 <div class="flex-between mt-1">
                   <% if (listing.price) { %>
-                    <span style="font-weight: 700; color: var(--primary);">
+                    <span class="price-tag--sm">
                       CHF <%= parseFloat(listing.price).toLocaleString('de-CH') %>
                     </span>
                   <% } else { %>
                     <span class="badge badge-amber">Swap Only</span>
                   <% } %>
-                  <span class="text-sm text-light"><%= listing.seller_name %></span>
+                  <span class="text-xs text-light"><%= listing.seller_name %></span>
                 </div>
-                <div class="text-xs text-light mt-1">
-                  <% if (listing.status !== 'active') { %>
+                <% if (listing.status !== 'active') { %>
+                  <div class="mt-1">
                     <span class="badge badge-danger"><%= listing.status %></span>
-                  <% } %>
-                </div>
+                  </div>
+                <% } %>
               </div>
             </a>
             <button type="button" class="favorite-btn favorite-btn--active"

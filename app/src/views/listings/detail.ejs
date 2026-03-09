@@ -2,7 +2,13 @@
 
 <section class="py-3">
   <div class="container">
-    <a href="/listings" class="text-sm text-light" style="display: inline-block; margin-bottom: 1rem;">&larr; Back to listings</a>
+    <nav class="breadcrumb">
+      <a href="/">Home</a>
+      <span class="breadcrumb__sep">/</span>
+      <a href="/listings">Listings</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current"><%= listing.title.length > 40 ? listing.title.substring(0, 40) + '...' : listing.title %></span>
+    </nav>
 
     <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
     <% if (success) { %><div class="alert alert-success"><%= success %></div><% } %>
@@ -16,26 +22,26 @@
       </div>
     <% } %>
 
-    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem;">
+    <div class="detail-grid">
       <!-- Left: Images -->
       <div>
         <% if (images.length > 0) { %>
-          <div class="card mb-2" style="cursor: zoom-in; border-radius: var(--radius-lg);" id="mainImageWrap" onclick="openGallery(currentImageIndex)">
-            <img src="/uploads/<%= images[0].file_path %>" alt="<%= listing.title %>"
-                 style="width: 100%; max-height: 500px; object-fit: contain; background: #f8fafc;" id="mainImage">
+          <div class="detail-gallery__main card--no-hover mb-2" id="mainImageWrap" onclick="openGallery(currentImageIndex)">
+            <img src="/uploads/<%= images[0].file_path %>" alt="<%= listing.title %>" id="mainImage" loading="lazy">
           </div>
           <% if (images.length > 1) { %>
-            <div style="overflow-x: auto; white-space: nowrap; padding-bottom: 4px;" id="thumbStrip">
+            <div class="detail-gallery__thumbs" id="thumbStrip">
               <% images.forEach((img, i) => { %>
                 <img src="/uploads/<%= img.file_path %>" alt="Image <%= i + 1 %>"
-                     style="width: 80px; height: 60px; object-fit: cover; border-radius: var(--radius); cursor: pointer; border: 2px solid <%= i === 0 ? 'var(--primary)' : 'var(--border)' %>; display: inline-block; margin-right: 6px; vertical-align: top; transition: border-color 0.15s;"
+                     class="detail-gallery__thumb <%= i === 0 ? 'active' : '' %>"
                      onclick="selectThumb(<%= i %>)"
-                     data-thumb="<%= i %>">
+                     data-thumb="<%= i %>"
+                     loading="lazy">
               <% }) %>
             </div>
           <% } %>
         <% } else { %>
-          <div class="card" style="border-radius: var(--radius-lg);">
+          <div class="card card--no-hover" style="border-radius: var(--radius-lg);">
             <div class="listing-img-placeholder" style="aspect-ratio: 4/3; font-size: 4rem;">
               <% const catIcons = { 'Trading Cards': '&#127183;', 'Electronics': '&#128187;', 'Cars & Vehicles': '&#128663;', 'Apartments & Housing': '&#127968;', 'Fashion': '&#128085;', 'Furniture': '&#128715;', 'Sports': '&#127942;', 'Collectibles': '&#128142;' }; %>
               <%- catIcons[listing.category_name] || '&#128230;' %>
@@ -124,7 +130,7 @@
               </div>
             <% } else { %>
               <% if (listing.price) { %>
-                <div style="font-size: 1.75rem; font-weight: 800; color: var(--primary); margin-bottom: 1rem;">
+                <div class="price-tag" style="margin-bottom: 1rem;">
                   CHF <%= parseFloat(listing.price).toLocaleString('de-CH', { minimumFractionDigits: 2 }) %>
                 </div>
               <% } %>
@@ -152,7 +158,7 @@
           <div class="card-body">
             <h3 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.04em;">Seller</h3>
             <div class="flex-center gap-1">
-              <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--teal-200), var(--teal-400)); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--white); font-size: 1rem;">
+              <div class="seller-avatar">
                 <%= listing.seller_name.charAt(0).toUpperCase() %>
               </div>
               <div>
@@ -403,25 +409,27 @@
         <h2 class="section-heading--sm" style="margin-bottom: 1rem;">Similar Listings</h2>
         <div class="grid grid-4">
           <% similar.forEach(s => { %>
-            <a href="/listings/<%= s.slug || s.id %>" class="card" style="text-decoration: none;">
-              <% if (s.image) { %>
-                <img src="/uploads/<%= s.image %>" alt="<%= s.title %>" class="listing-img" loading="lazy">
-              <% } else { %>
-                <div class="listing-img-placeholder">&#128230;</div>
-              <% } %>
-              <div class="card-body">
-                <h3 style="font-size: 0.9rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                  <%= s.title %>
-                </h3>
-                <div class="flex-between mt-1">
-                  <% if (s.price) { %>
-                    <span style="font-weight: 700; color: var(--primary); font-size: 0.9rem;">
-                      CHF <%= parseFloat(s.price).toLocaleString('de-CH') %>
-                    </span>
+            <a href="/listings/<%= s.slug || s.id %>" class="listing-card-link">
+              <div class="card card--interactive">
+                <div class="listing-img-wrap">
+                  <% if (s.image) { %>
+                    <img src="/uploads/<%= s.image %>" alt="<%= s.title %>" class="listing-img" loading="lazy">
                   <% } else { %>
-                    <span class="badge badge-amber">Swap</span>
+                    <div class="listing-img-placeholder">&#128230;</div>
                   <% } %>
-                  <span class="text-sm text-light"><%= s.seller_name %></span>
+                </div>
+                <div class="card-body">
+                  <h3 class="listing-card__title"><%= s.title %></h3>
+                  <div class="flex-between mt-1">
+                    <% if (s.price) { %>
+                      <span class="price-tag--sm">
+                        CHF <%= parseFloat(s.price).toLocaleString('de-CH') %>
+                      </span>
+                    <% } else { %>
+                      <span class="badge badge-amber">Swap</span>
+                    <% } %>
+                    <span class="text-xs text-light"><%= s.seller_name %></span>
+                  </div>
                 </div>
               </div>
             </a>
@@ -434,51 +442,18 @@
 
 <!-- Fullscreen Gallery Overlay -->
 <% if (images.length > 0) { %>
-<div id="galleryOverlay" style="
-  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.92); z-index: 9999; align-items: center; justify-content: center;
-  flex-direction: column;
-">
-  <button type="button" onclick="closeGallery()" style="
-    position: absolute; top: 16px; right: 20px; background: none; border: none;
-    color: #fff; font-size: 2rem; cursor: pointer; z-index: 10001; padding: 8px;
-    line-height: 1;
-  " aria-label="Close gallery">&times;</button>
+<div id="galleryOverlay" class="gallery-overlay">
+  <button type="button" onclick="closeGallery()" class="gallery-overlay__close" aria-label="Close gallery">&times;</button>
 
   <% if (images.length > 1) { %>
-    <button type="button" onclick="galleryNav(-1)" style="
-      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-      background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 2rem;
-      width: 48px; height: 48px; border-radius: 50%; cursor: pointer; z-index: 10001;
-      display: flex; align-items: center; justify-content: center;
-    " aria-label="Previous image">&#10094;</button>
-
-    <button type="button" onclick="galleryNav(1)" style="
-      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
-      background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 2rem;
-      width: 48px; height: 48px; border-radius: 50%; cursor: pointer; z-index: 10001;
-      display: flex; align-items: center; justify-content: center;
-    " aria-label="Next image">&#10095;</button>
+    <button type="button" onclick="galleryNav(-1)" class="gallery-overlay__nav gallery-overlay__nav--prev" aria-label="Previous image">&#10094;</button>
+    <button type="button" onclick="galleryNav(1)" class="gallery-overlay__nav gallery-overlay__nav--next" aria-label="Next image">&#10095;</button>
   <% } %>
 
-  <img id="galleryImage" src="" alt="" style="
-    max-width: 90vw; max-height: 80vh; object-fit: contain; border-radius: 4px;
-  ">
-
-  <div id="galleryCounter" style="
-    color: rgba(255,255,255,0.7); margin-top: 12px; font-size: 0.875rem;
-  "></div>
+  <img id="galleryImage" src="" alt="" class="gallery-overlay__img">
+  <div id="galleryCounter" class="gallery-overlay__counter"></div>
 </div>
 <% } %>
-
-<style>
-  @media (max-width: 768px) {
-    section .container > div:first-of-type { grid-template-columns: 1fr !important; }
-  }
-  #galleryOverlay button:hover {
-    background: rgba(255,255,255,0.25) !important;
-  }
-</style>
 
 <script>
 (function() {
@@ -492,20 +467,20 @@
     var mainImg = document.getElementById('mainImage');
     mainImg.src = '/uploads/' + galleryImages[idx];
     var thumbs = document.querySelectorAll('[data-thumb]');
-    thumbs.forEach(function(t) { t.style.borderColor = 'var(--border)'; });
-    if (thumbs[idx]) thumbs[idx].style.borderColor = 'var(--primary)';
+    thumbs.forEach(function(t) { t.classList.remove('active'); });
+    if (thumbs[idx]) thumbs[idx].classList.add('active');
   };
 
   window.openGallery = function(startIdx) {
     if (galleryImages.length === 0) return;
     currentIndex = startIdx || 0;
-    document.getElementById('galleryOverlay').style.display = 'flex';
+    document.getElementById('galleryOverlay').classList.add('open');
     updateGalleryImage();
     document.body.style.overflow = 'hidden';
   };
 
   window.closeGallery = function() {
-    document.getElementById('galleryOverlay').style.display = 'none';
+    document.getElementById('galleryOverlay').classList.remove('open');
     document.body.style.overflow = '';
   };
 
@@ -522,7 +497,7 @@
 
   document.addEventListener('keydown', function(e) {
     var overlay = document.getElementById('galleryOverlay');
-    if (!overlay || overlay.style.display === 'none') return;
+    if (!overlay || !overlay.classList.contains('open')) return;
     if (e.key === 'Escape') closeGallery();
     if (e.key === 'ArrowLeft') galleryNav(-1);
     if (e.key === 'ArrowRight') galleryNav(1);

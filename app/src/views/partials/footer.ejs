@@ -1,4 +1,6 @@
   </main>
+  <!-- Scroll to top -->
+  <button type="button" class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
   <footer class="site-footer">
     <div class="container">
       <div class="footer__grid">
@@ -37,5 +39,19 @@
       </div>
     </div>
   </footer>
+  <script>
+    /* Scroll to top button visibility */
+    (function() {
+      var btn = document.getElementById('scrollTopBtn');
+      if (!btn) return;
+      var last = 0;
+      window.addEventListener('scroll', function() {
+        var now = Date.now();
+        if (now - last < 100) return;
+        last = now;
+        btn.classList.toggle('visible', window.scrollY > 400);
+      }, { passive: true });
+    })();
+  </script>
 </body>
 </html>

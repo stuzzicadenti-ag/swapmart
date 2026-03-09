@@ -644,10 +644,11 @@ button {
 }
 
 .category-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px);
   box-shadow: var(--shadow-lg);
   border-color: var(--teal-300);
   color: var(--text);
+  background: var(--teal-50);
 }
 
 .category-card__icon {
@@ -739,12 +740,13 @@ button {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: all var(--transition);
+  transition: all 0.25s ease;
 }
 
 .listing-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
+  border-color: var(--teal-200);
 }
 
 .listing-card__img {
@@ -755,6 +757,15 @@ button {
   justify-content: center;
   font-size: 4rem;
   position: relative;
+  overflow: hidden;
+}
+
+.listing-card__img img {
+  transition: transform 0.3s ease;
+}
+
+.listing-card:hover .listing-card__img img {
+  transform: scale(1.05);
 }
 
 .listing-card__badge {
@@ -791,6 +802,11 @@ button {
   font-weight: 700;
   color: var(--text-dark);
   margin-bottom: 6px;
+  transition: color var(--transition);
+}
+
+.listing-card:hover .listing-card__title {
+  color: var(--primary);
 }
 
 .listing-card__meta {
@@ -819,6 +835,11 @@ button {
   border-top: 1px solid var(--gray-100);
   font-size: 0.8125rem;
   color: var(--text-light);
+  transition: background var(--transition);
+}
+
+.listing-card:hover .listing-card__footer {
+  background: var(--teal-50);
 }
 
 /* --- Swap + Cash Explainer --- */
@@ -1327,6 +1348,10 @@ button {
 
   .container {
     padding: 0 32px;
+  }
+
+  .listings__grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
