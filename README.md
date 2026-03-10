@@ -57,6 +57,17 @@ See [DOCS.md](DOCS.md) for full technical documentation, architecture, database 
 - **WebSocket**: @fastify/websocket
 - **i18n**: Flat JSON locale files (en, it, de, fr)
 
+## Security & Performance
+
+- **CSRF protection**: Double Submit Cookie pattern on all state-changing forms
+- **Compression**: @fastify/compress with gzip and Brotli support
+- **OG meta tags**: Open Graph tags for rich social media previews
+- **Accessibility**: aria-labels on interactive elements, proper form labels, sr-only class for screen readers
+- **Lazy loading**: `loading="lazy"` on images for faster initial page loads
+- **Descriptive alt text**: Meaningful alt attributes on all images
+- **Input constraints**: maxlength attributes on all text inputs
+- **Validation tests**: 94 tests covering input validation, auth flows, and edge cases
+
 ## License
 
 Proprietary -- Stuzzicadenti AG

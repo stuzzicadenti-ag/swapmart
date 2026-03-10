@@ -5,10 +5,12 @@ import fastifyFormbody from '@fastify/formbody';
 import fastifyCookie from '@fastify/cookie';
 import fastifyMultipart from '@fastify/multipart';
 import fastifyWebsocket from '@fastify/websocket';
+import fastifyCompress from '@fastify/compress';
 import ejs from 'ejs';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { randomBytes } from 'crypto';
 import pg from 'pg';
 import Redis from 'ioredis';
 import jwt from 'jsonwebtoken';
@@ -35,6 +37,17 @@ const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const JWT_SECRET = process.env.JWT_SECRET || 'change-me';
 const COOKIE_SECRET = process.env.COOKIE_SECRET || 'change-me';
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'data', 'uploads');
+const IS_PROD = process.env.NODE_ENV === 'production';
+
+// Environment variable validation: fail fast in production if required vars are missing
+if (IS_PROD) {
+  const required = { DATABASE_URL: process.env.DATABASE_URL, JWT_SECRET: process.env.JWT_SECRET, COOKIE_SECRET: process.env.COOKIE_SECRET };
+  const missing = Object.entries(required).filter(([, v]) => !v || v === 'change-me').map(([k]) => k);
+  if (missing.length > 0) {
+    console.error(`FATAL: Missing required environment variables in production: ${missing.join(', ')}`);
+    process.exit(1);
+  }
+}
 
 // i18n: preload all locale files
 const SUPPORTED_LANGS = ['en', 'it', 'de', 'fr'];
@@ -52,6 +65,9 @@ redis.on('error', (err) => {
 });
 
 const app = Fastify({ logger: true, trustProxy: true, bodyLimit: 1048576 });
+
+// Compression (gzip/brotli)
+await app.register(fastifyCompress, { global: true });
 
 // Security headers
 app.addHook('onSend', async (request, reply) => {
@@ -135,6 +151,44 @@ app.setErrorHandler((error, request, reply) => {
 await app.register(fastifyCookie, { secret: COOKIE_SECRET });
 await app.register(fastifyFormbody);
 
+// CSRF Protection (Double Submit Cookie pattern)
+app.addHook('onRequest', async (request, reply) => {
+  if (!request.cookies._csrf) {
+    const token = randomBytes(32).toString('hex');
+    reply.setCookie('_csrf', token, {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: IS_PROD,
+    });
+  }
+});
+
+app.addHook('preHandler', async (request, reply) => {
+  const method = request.method.toUpperCase();
+  if (['GET', 'HEAD', 'OPTIONS'].includes(method)) return;
+  if (request.url.startsWith('/api/')) return;
+  if (request.url === '/health') return;
+  // Allow JSON API endpoints (favorites toggle, etc.)
+  const accept = request.headers.accept || '';
+  if (accept.includes('application/json')) return;
+  // Skip multipart forms; CSRF is validated inside the route handler for those
+  const contentType = request.headers['content-type'] || '';
+  if (contentType.includes('multipart/form-data')) return;
+
+  const cookieToken = request.cookies._csrf;
+  const bodyToken = request.body?._csrf;
+  if (!cookieToken || !bodyToken || cookieToken !== bodyToken) {
+    return reply.code(403).send('Invalid or missing CSRF token.');
+  }
+});
+
+// CSRF helper for multipart routes
+app.decorate('validateCsrf', (request, csrfFieldValue) => {
+  const cookieToken = request.cookies._csrf;
+  return cookieToken && csrfFieldValue && cookieToken === csrfFieldValue;
+});
+
 // Decorators
 app.decorate('db', pool);
 app.decorate('redis', redis);
@@ -200,7 +254,8 @@ app.addHook('preHandler', async (request, reply) => {
       favCount = parseInt(res.rows[0].count);
     } catch { /* table may not exist yet */ }
   }
-  reply.locals = { user: request.user, t, lang, favCount };
+  const csrfToken = request.cookies._csrf || '';
+  reply.locals = { user: request.user, t, lang, favCount, csrfToken };
 });
 
 // Health check

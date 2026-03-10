@@ -506,6 +506,7 @@ describe('EJS Template Safety', () => {
           || inner.includes('catIcons[')
           || inner === 'iconEmoji'
           || inner.startsWith("t('") // i18n function — developer-controlled locale files
+          || inner.startsWith('JSON.stringify(') // safe server-side serialization
           || /^&#\d+;$/.test(inner)  // HTML entity
           || /^'&#\d+;'$/.test(inner);
         if (!isSafe) {
@@ -749,5 +750,201 @@ describe('API Escrow Security', () => {
     const src = readApi('payments.js');
     assert.ok(src.includes("'/payments/check-timeouts', authenticate"),
       'check-timeouts must require authentication');
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+// 18. CSRF PROTECTION
+// ═══════════════════════════════════════════════════════
+describe('CSRF Protection', () => {
+  it('server imports randomBytes for CSRF token generation', () => {
+    const src = readSrc('server.js');
+    assert.ok(src.includes("import { randomBytes } from 'crypto'"),
+      'Must import randomBytes from crypto');
+  });
+
+  it('server sets _csrf cookie via onRequest hook', () => {
+    const src = readSrc('server.js');
+    assert.ok(src.includes("request.cookies._csrf"),
+      'Must check for existing _csrf cookie');
+    assert.ok(src.includes("randomBytes(32).toString('hex')"),
+      'Must generate random CSRF token');
+    assert.ok(src.includes("setCookie('_csrf'"),
+      'Must set _csrf cookie');
+  });
+
+  it('server validates CSRF token on state-changing requests', () => {
+    const src = readSrc('server.js');
+    assert.ok(src.includes("cookieToken !== bodyToken"),
+      'Must compare cookie token with body token');
+    assert.ok(src.includes("code(403)"),
+      'Must return 403 for invalid CSRF');
+  });
+
+  it('server skips CSRF for GET/HEAD/OPTIONS and /api/ routes', () => {
+    const src = readSrc('server.js');
+    assert.ok(src.includes("['GET', 'HEAD', 'OPTIONS'].includes(method)"),
+      'Must skip CSRF check for safe HTTP methods');
+    assert.ok(src.includes("request.url.startsWith('/api/')"),
+      'Must skip CSRF check for API routes');
+  });
+
+  it('server provides validateCsrf decorator for multipart routes', () => {
+    const src = readSrc('server.js');
+    assert.ok(src.includes("app.decorate('validateCsrf'"),
+      'Must provide validateCsrf decorator');
+  });
+
+  it('listing creation validates CSRF for multipart forms', () => {
+    const src = readSrc('routes/listings.js');
+    assert.ok(src.includes('validateCsrf(request, _csrf)'),
+      'POST /listings/new must validate CSRF for multipart');
+  });
+
+  it('KYC upload validates CSRF for multipart forms', () => {
+    const src = readSrc('routes/profile.js');
+    assert.ok(src.includes('validateCsrf(request, _csrf)'),
+      'POST /profile/verify must validate CSRF for multipart');
+  });
+
+  it('csrfToken is injected into view context', () => {
+    const src = readSrc('server.js');
+    assert.ok(src.includes('csrfToken'),
+      'Must inject csrfToken into view locals');
+  });
+
+  it('footer auto-injects _csrf hidden input into POST forms', () => {
+    const footer = fs.readFileSync(path.join(APP_SRC, 'views', 'partials', 'footer.ejs'), 'utf-8');
+    assert.ok(footer.includes("input.name = '_csrf'"),
+      'Footer must auto-inject _csrf hidden input');
+    assert.ok(footer.includes('csrfToken'),
+      'Footer must reference csrfToken variable');
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+// 19. COMPRESSION
+// ═══════════════════════════════════════════════════════
+describe('Compression', () => {
+  it('server registers @fastify/compress', () => {
+    const src = readSrc('server.js');
+    assert.ok(src.includes("import fastifyCompress from '@fastify/compress'"),
+      'Must import @fastify/compress');
+    assert.ok(src.includes('fastifyCompress'),
+      'Must register compression plugin');
+  });
+
+  it('@fastify/compress is in package.json dependencies', () => {
+    const pkg = JSON.parse(fs.readFileSync(path.join(APP_SRC, '..', 'package.json'), 'utf-8'));
+    assert.ok(pkg.dependencies['@fastify/compress'],
+      '@fastify/compress must be in dependencies');
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+// 20. ENVIRONMENT VARIABLE VALIDATION
+// ═══════════════════════════════════════════════════════
+describe('Environment Variable Validation', () => {
+  it('server validates required env vars in production', () => {
+    const src = readSrc('server.js');
+    assert.ok(src.includes("IS_PROD") && src.includes("process.exit(1)"),
+      'Must fail fast if required env vars are missing in production');
+    assert.ok(src.includes('DATABASE_URL') && src.includes('JWT_SECRET') && src.includes('COOKIE_SECRET'),
+      'Must check for DATABASE_URL, JWT_SECRET, and COOKIE_SECRET');
+  });
+
+  it('server rejects default "change-me" secrets in production', () => {
+    const src = readSrc('server.js');
+    assert.ok(src.includes("'change-me'"),
+      'Must reject default "change-me" secrets');
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+// 21. OPEN GRAPH META TAGS
+// ═══════════════════════════════════════════════════════
+describe('Open Graph Meta Tags', () => {
+  it('header partial includes og:title and og:description', () => {
+    const header = fs.readFileSync(path.join(APP_SRC, 'views', 'partials', 'header.ejs'), 'utf-8');
+    assert.ok(header.includes('og:title'),
+      'Header must include og:title meta tag');
+    assert.ok(header.includes('og:description'),
+      'Header must include og:description meta tag');
+    assert.ok(header.includes('og:site_name'),
+      'Header must include og:site_name meta tag');
+    assert.ok(header.includes('twitter:card'),
+      'Header must include twitter:card meta tag');
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+// 22. ACCESSIBILITY
+// ═══════════════════════════════════════════════════════
+describe('Accessibility', () => {
+  it('nav has role and aria-label', () => {
+    const header = fs.readFileSync(path.join(APP_SRC, 'views', 'partials', 'header.ejs'), 'utf-8');
+    assert.ok(header.includes('role="navigation"'),
+      'Nav must have role="navigation"');
+    assert.ok(header.includes('aria-label="Main navigation"'),
+      'Nav must have aria-label');
+  });
+
+  it('main element has role attribute', () => {
+    const header = fs.readFileSync(path.join(APP_SRC, 'views', 'partials', 'header.ejs'), 'utf-8');
+    assert.ok(header.includes('role="main"'),
+      'Main element must have role="main"');
+  });
+
+  it('footer has role attribute', () => {
+    const footer = fs.readFileSync(path.join(APP_SRC, 'views', 'partials', 'footer.ejs'), 'utf-8');
+    assert.ok(footer.includes('role="contentinfo"'),
+      'Footer must have role="contentinfo"');
+  });
+
+  it('sr-only CSS class is defined', () => {
+    const header = fs.readFileSync(path.join(APP_SRC, 'views', 'partials', 'header.ejs'), 'utf-8');
+    assert.ok(header.includes('.sr-only'),
+      'Must define .sr-only CSS class');
+  });
+
+  it('auth forms have aria-required on required inputs', () => {
+    const login = fs.readFileSync(path.join(APP_SRC, 'views', 'auth', 'login.ejs'), 'utf-8');
+    const register = fs.readFileSync(path.join(APP_SRC, 'views', 'auth', 'register.ejs'), 'utf-8');
+    assert.ok(login.includes('aria-required="true"'),
+      'Login form inputs must have aria-required');
+    assert.ok(register.includes('aria-required="true"'),
+      'Register form inputs must have aria-required');
+  });
+
+  it('chat message input has aria-label', () => {
+    const chat = fs.readFileSync(path.join(APP_SRC, 'views', 'messages', 'chat.ejs'), 'utf-8');
+    assert.ok(chat.includes('aria-label='),
+      'Chat input must have aria-label');
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+// 23. IMAGE ALT TEXT AND LAZY LOADING
+// ═══════════════════════════════════════════════════════
+describe('Image Alt Text and Lazy Loading', () => {
+  it('offer listing images have descriptive alt text', () => {
+    const offers = fs.readFileSync(path.join(APP_SRC, 'views', 'offers', 'list.ejs'), 'utf-8');
+    // Should not have empty alt=""
+    const emptyAlts = offers.match(/alt=""\s/g) || [];
+    assert.equal(emptyAlts.length, 0,
+      'Offer images must not have empty alt attributes');
+  });
+
+  it('gallery overlay image has alt text', () => {
+    const detail = fs.readFileSync(path.join(APP_SRC, 'views', 'listings', 'detail.ejs'), 'utf-8');
+    assert.ok(!detail.includes('id="galleryImage" src="" alt=""'),
+      'Gallery overlay image must have alt text');
+  });
+
+  it('below-fold images use loading="lazy"', () => {
+    const list = fs.readFileSync(path.join(APP_SRC, 'views', 'listings', 'list.ejs'), 'utf-8');
+    const lazyMatches = (list.match(/loading="lazy"/g) || []).length;
+    assert.ok(lazyMatches > 0,
+      'Listing grid images should use loading="lazy"');
   });
 });

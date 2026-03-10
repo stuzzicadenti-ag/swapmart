@@ -27,7 +27,7 @@
       <div>
         <% if (images.length > 0) { %>
           <div class="detail-gallery__main card--no-hover mb-2" id="mainImageWrap" onclick="openGallery(currentImageIndex)">
-            <img src="/uploads/<%= images[0].file_path %>" alt="<%= listing.title %>" id="mainImage" loading="lazy">
+            <img src="/uploads/<%= images[0].file_path %>" alt="<%= listing.title %>" id="mainImage">
           </div>
           <% if (images.length > 1) { %>
             <div class="detail-gallery__thumbs" id="thumbStrip">
@@ -366,7 +366,7 @@
 
                   <div class="form-group">
                     <label for="message">Message (optional)</label>
-                    <textarea id="message" name="message" class="form-control" rows="3" placeholder="Add a message to the seller..."></textarea>
+                    <textarea id="message" name="message" class="form-control" rows="3" placeholder="Add a message to the seller..." maxlength="2000"></textarea>
                   </div>
 
                   <button type="submit" class="btn btn-primary btn-block">Send Offer</button>
@@ -450,7 +450,7 @@
     <button type="button" onclick="galleryNav(1)" class="gallery-overlay__nav gallery-overlay__nav--next" aria-label="Next image">&#10095;</button>
   <% } %>
 
-  <img id="galleryImage" src="" alt="" class="gallery-overlay__img">
+  <img id="galleryImage" src="" alt="<%= listing.title %>" class="gallery-overlay__img">
   <div id="galleryCounter" class="gallery-overlay__counter"></div>
 </div>
 <% } %>

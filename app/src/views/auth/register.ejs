@@ -15,14 +15,14 @@
           <div class="form-group">
             <label for="email"><%= t('auth.email') %> *</label>
             <input type="email" id="email" name="email" class="form-control" required
-                   placeholder="<%= t('auth.email_placeholder') %>" autocomplete="email">
+                   placeholder="<%= t('auth.email_placeholder') %>" autocomplete="email" aria-required="true" maxlength="255">
           </div>
 
           <div class="form-group">
             <label for="username"><%= t('auth.username') %> *</label>
             <input type="text" id="username" name="username" class="form-control" required
                    placeholder="<%= t('auth.username_placeholder') %>" autocomplete="username" maxlength="100"
-                   pattern="[a-zA-Z0-9_-]+" title="Letters, numbers, underscores, and hyphens only">
+                   pattern="[a-zA-Z0-9_-]+" title="Letters, numbers, underscores, and hyphens only" aria-required="true">
           </div>
 
           <div class="form-group">
@@ -40,7 +40,7 @@
           <div class="form-group">
             <label for="password"><%= t('auth.password') %> *</label>
             <input type="password" id="password" name="password" class="form-control" required
-                   placeholder="<%= t('auth.password_min') %>" autocomplete="new-password" minlength="8">
+                   placeholder="<%= t('auth.password_min') %>" autocomplete="new-password" minlength="8" aria-required="true">
           </div>
 
           <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; font-size: 1rem;">

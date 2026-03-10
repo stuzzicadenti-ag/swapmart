@@ -138,7 +138,13 @@ export default async function profileRoutes(fastify) {
         }
       }
 
-      const { document_type } = fields;
+      const { document_type, _csrf } = fields;
+
+      // CSRF validation for multipart form
+      if (!fastify.validateCsrf(request, _csrf)) {
+        return reply.code(403).send('Invalid or missing CSRF token.');
+      }
+
       const validTypes = ['passport', 'id_card', 'drivers_license', 'cie'];
 
       if (!document_type || !validTypes.includes(document_type)) {

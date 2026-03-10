@@ -1,7 +1,7 @@
   </main>
   <!-- Scroll to top -->
   <button type="button" class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
-  <footer class="site-footer">
+  <footer class="site-footer" role="contentinfo">
     <div class="container">
       <div class="footer__grid">
         <div class="footer__brand">
@@ -39,6 +39,21 @@
       </div>
     </div>
   </footer>
+  <script>
+    /* CSRF: auto-inject hidden _csrf field into all POST forms */
+    (function() {
+      var token = '<%= typeof csrfToken !== "undefined" ? csrfToken : "" %>';
+      if (!token) return;
+      document.querySelectorAll('form[method="POST"], form[method="post"]').forEach(function(form) {
+        if (form.querySelector('input[name="_csrf"]')) return;
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = '_csrf';
+        input.value = token;
+        form.appendChild(input);
+      });
+    })();
+  </script>
   <script>
     /* Scroll to top button visibility */
     (function() {

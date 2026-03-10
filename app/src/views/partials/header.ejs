@@ -4,8 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' | SwapMart' : 'SwapMart' %></title>
+  <meta name="description" content="SwapMart is Switzerland's fairest marketplace. Buy, sell, and swap with low commission fees.">
   <meta name="theme-color" content="#0d9488">
   <link rel="icon" type="image/svg+xml" href="/public/favicon.svg">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle + ' | SwapMart' : 'SwapMart' %>">
+  <meta property="og:description" content="SwapMart is Switzerland's fairest marketplace. Buy, sell, and swap with low commission fees.">
+  <meta property="og:site_name" content="SwapMart">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/public/favicon.svg">
+  <meta property="og:locale" content="<%= typeof lang !== 'undefined' ? lang : 'en' %>_CH">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle + ' | SwapMart' : 'SwapMart' %>">
+  <meta name="twitter:description" content="SwapMart is Switzerland's fairest marketplace. Buy, sell, and swap with low commission fees.">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1455,10 +1469,23 @@
       flex-direction: column;
       backdrop-filter: blur(8px);
     }
+
+    /* Screen-reader only (accessibility) */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
   </style>
 </head>
 <body>
-  <nav class="nav">
+  <nav class="nav" role="navigation" aria-label="Main navigation">
     <div class="nav__inner">
       <a href="/" class="nav__logo" aria-label="SwapMart home">
         <span class="nav__logo-icon">&#x1F501;</span>
@@ -1646,4 +1673,4 @@
       });
     })();
   </script>
-  <main>
+  <main role="main">

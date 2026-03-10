@@ -112,8 +112,9 @@
       <div class="chat-input-area">
         <% if (chatUnlocked) { %>
           <form action="/messages/<%= offer.id %>" method="POST" class="chat-input-form">
-            <input type="text" name="content" class="form-control" placeholder="Type a message..."
-                   required autocomplete="off">
+            <label for="messageContent" class="sr-only">Message</label>
+            <input type="text" id="messageContent" name="content" class="form-control" placeholder="Type a message..."
+                   required autocomplete="off" aria-label="Type a message" maxlength="5000">
             <button type="submit" class="btn btn-primary" style="border-radius: 999px; padding: 0.625rem 1.25rem;">Send</button>
           </form>
           <script>

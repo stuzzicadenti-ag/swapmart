@@ -220,7 +220,12 @@ export default async function listingsRoutes(fastify) {
       }
 
       const { title, description, price, category_id, condition, location, type,
-              listing_mode, starting_price, buy_now_price, auction_duration, min_bid_increment } = fields;
+              listing_mode, starting_price, buy_now_price, auction_duration, min_bid_increment, _csrf } = fields;
+
+      // CSRF validation for multipart form
+      if (!fastify.validateCsrf(request, _csrf)) {
+        return reply.code(403).send('Invalid or missing CSRF token.');
+      }
 
       const kycVerified = await isKycVerified(request.user.id);
       const catResult = await db.query('SELECT * FROM categories ORDER BY name');

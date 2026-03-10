@@ -27,8 +27,8 @@
               <div class="flex-between" style="flex-wrap: wrap; gap: 1rem;">
                 <div class="flex-center gap-2">
                   <% if (offer.listing_image) { %>
-                    <img src="/uploads/<%= offer.listing_image %>" alt=""
-                         style="width: 60px; height: 45px; object-fit: cover; border-radius: var(--radius);">
+                    <img src="/uploads/<%= offer.listing_image %>" alt="<%= offer.listing_title %>"
+                         loading="lazy" style="width: 60px; height: 45px; object-fit: cover; border-radius: var(--radius);">
                   <% } else { %>
                     <div style="width: 60px; height: 45px; background: var(--border); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: var(--text-light);">&#128230;</div>
                   <% } %>
@@ -109,8 +109,8 @@
               <div class="flex-between" style="flex-wrap: wrap; gap: 1rem;">
                 <div class="flex-center gap-2">
                   <% if (offer.listing_image) { %>
-                    <img src="/uploads/<%= offer.listing_image %>" alt=""
-                         style="width: 60px; height: 45px; object-fit: cover; border-radius: var(--radius);">
+                    <img src="/uploads/<%= offer.listing_image %>" alt="<%= offer.listing_title %>"
+                         loading="lazy" style="width: 60px; height: 45px; object-fit: cover; border-radius: var(--radius);">
                   <% } else { %>
                     <div style="width: 60px; height: 45px; background: var(--border); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: var(--text-light);">&#128230;</div>
                   <% } %>
